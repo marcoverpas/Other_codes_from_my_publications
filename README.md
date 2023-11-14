@@ -25,7 +25,7 @@ A colection of `R` and `EViews` codes from my old publications:
 2019: <a href="https://www.elgaronline.com/abstract/journals/ejeep/16-1/ejeep.2019.01.05.xml" target="_blank" rel="noopener noreferrer">From abstract to concrete: some tips to develop an empirical SFC model</a>, <em>European Journal of Economics and Economic Policies: Intervention</em>, 16(1): 55-93. [Go to the files: <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/Italy_SFC_2019" target="_blank" rel="noopener noreferrer">EViews model</a>, <a href="https://www.dropbox.com/s/gsx1hry4vlufa56/Italy%20data.xls?dl=0" target="_blank" rel="noopener noreferrer">dataset</a>, <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/household_tfm" target="_blank" rel="noopener noreferrer">household TFM (R)</a>, <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/household_bs" target="_blank" rel="noopener noreferrer">household BS (R)</a>, <a href="http://models.sfc-models.net/passarella2019/" target="_blank" rel="noopener noreferrer">appendices</a>]</p>
   
 2017: <a href="http://onlinelibrary.wiley.com/doi/10.1111/meca.12103/full" target="_blank" rel="noopener noreferrer">The monetary circuit in the age of financialisation: a stock-flow consistent model with a twofold banking sector</a> (with M. Sawyer), <em>Metroeconomica</em>, 68(2): 321-53. [Go to the EViews file: <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/DER" target="_blank" rel="noopener noreferrer">DER Model</a>]</p>
-~~~
+---
 
 **CODES USED IN BOOK CHAPTERS**
 
