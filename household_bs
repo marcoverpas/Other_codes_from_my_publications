@@ -1,0 +1,69 @@
+# Households balance sheet, Italy 2015
+
+# R code downloading and re-classifying data from Eurostat.
+# Created by Marco veronese Passarella, 7/04/2019
+
+#################################################################
+
+#Download necessary packages 
+
+knitr::opts_chunk$set(echo = FALSE)
+library(plotrix)
+library(pdfetch)
+library(networkD3)
+library(knitr)
+#library(eurostat)
+
+#################################################################
+
+#Define name of items to be downloaded
+names<-c("F2","F3","F4","F5","F6","F7","F8","BF90")   #NOTE: I added F8
+
+#Define sectors to be used (households and non-profit institutions serving households)
+sec="S14_S15"
+
+#Download financial assets from Eurostat data (about household balance sheets: national currency, consolitated, 2015)
+F_BS_raw = pdfetch_EUROSTAT("nasa_10_f_bs", UNIT="MIO_NAC", CO_NCO="CO", NA_ITEM=names, SECTOR=sec, TIME="2015", GEO="IT")
+
+#Use/organise FA as a data frame
+F_BS<-as.data.frame(F_BS_raw)
+
+#Dowload non financial assets
+NFA_BS_raw = pdfetch_EUROSTAT("nama_10_nfa_bs", UNIT="CP_MNAC", SECTOR=sec, GEO="IT", ASSET10=c("N111N","N2N"))  #instead of N1N and N2N, but the latter is empty
+
+#Use/organise NFA as a data frame
+NFA_BS<-as.data.frame(NFA_BS_raw)
+
+#Create a 2x9 matrix representing the balance sheet
+balancesheet<-matrix(0,ncol=2,nrow=10,dimnames = list(c("Produced NFA (dwellings)","Non-produced non-financial assets","Currency and deposits","Securities other than shares","Loans","Shares and other equity","Insurance technical reserves","Derivatives and empl. stock options","Other accounts receivable/payable","Net Worth"),c("Assets","Liabilities")))  #NOTE: I added derivatives
+
+#Create a counter defining entries in the balance sheet
+counter<-1
+
+#Define and set names of non-financial assets (colnameA) - first two rows of matrix; NOTE: I used N111N istead of N1N
+for(name in c("N111N","N2N")){     
+  colnamea<-paste("A.CP_MNAC",sec,name,"IT",sep=".")
+  balancesheet[counter,1]<-NFA_BS[21,colnamea]  #21 instead of 18 (because 21 periods from 1995 to 2015)
+  counter<-counter+1
+}
+
+#Define and set the names of liabilities (colnameL) - rows 3 to 8 of matrix; NOTE: 7 instead of 6
+for(name in names[1:7]){
+  colnamea<-paste("A.MIO_NAC.CO",sec,"ASS",name,"IT",sep=".")
+  colnamel<-paste("A.MIO_NAC.CO",sec,"LIAB",name,"IT",sep=".")
+  if(is.null(F_BS[21,colnamea]))
+    balancesheet[counter,1]<-0
+  else
+    balancesheet[counter,1]<-F_BS[21,colnamea]
+  if(is.null(F_BS[21,colnamea]))
+    balancesheet[counter,2]<-0
+  else
+    balancesheet[counter,2]<-F_BS[21,colnamel]
+  counter<-counter+1
+}
+
+#Define total - i.e. cell (10,2) - of balance sheet, as summation of net financial assets (BF90) and NFAs; NOTE: 10 instead of 9
+balancesheet[10,2]<-F_BS[21,paste("A.MIO_NAC.CO",sec,"LIAB.BF90.IT",sep=".")]+NFA_BS[21,paste("A.CP_MNAC",sec,"N111N.IT",sep=".")] #+NFA_BS[20,paste("A.CP_MNAC",sec,"N2N.IT",sep=".")] #N111N instead of N1N
+
+#Display the balance sheet
+kable(balancesheet)
