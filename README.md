@@ -3,6 +3,7 @@
 A colection of `R` and `EViews` codes from my old publications:
 
 <p style="text-align: justify;"><span style="color: #ff6600;">ARTICLES IN PEER-REVIEWED ECONOMICS JOURNALS</span></p>
+
 2023: <a href="https://www.tandfonline.com/doi/full/10.1080/09538259.2023.2217776" target="_blank" rel="noopener">Economy-Finance-Environment-Society Interconnections in a Stock-Flow Consistent Dynamic Model</a> (with E. Carnevali, M. Deleidi and R. Pariboni), <em>Review of Political Economy</em> [go to the EViews code: <a href="https://github.com/marcoverpas/SFC-models-EViews/blob/master/supermultiplier" target="_blank" rel="noopener">model</a>; dowload the dataset: <a href="https://www.dropbox.com/scl/fi/xfaindcblsyo9xxevubt3/data_ref.xls?rlkey=hj9y1244ixb708ikaqi842kkj&amp;dl=0" target="_blank" rel="noopener">data</a>]
 
 2022: <a href="https://www.elgaronline.com/view/journals/ejeep/aop/article-10.4337-ejeep.2022.0084/article-10.4337-ejeep.2022.0084.xml" target="_blank" rel="noopener">It is not <em>la vie en rose</em>. New insights from Graziani's theory of the monetary circuit</a>, <em>European Journal of Economics and Economic Policies: Intervention</em>. [Go to the R code: <a href="https://github.com/marcoverpas/TMC-SFC-Model-R" target="_blank" rel="noopener">TMC-SFC-Model-R</a>; go to the (tentative) Python code: <a href="https://github.com/marcoverpas/TMC-SFC-Model-Python" target="_blank" rel="noopener">TMC-SFC-Model-Python</a>]
