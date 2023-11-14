@@ -1,0 +1,1067 @@
+' MODEL DER (Derivatives)
+' created by Marco Veronese Passarella, 5 August 2015
+
+' This program is built upon model BMW (in Wynne Godley & Marc Lavoie,
+' MONETARY ECONOMICS, Ch. 7) created by Gennaro Zezza (2006).
+
+' ****************************************************************************
+
+' Create a workfile, naming it DER, to hold data over 3000 periods
+
+wfcreate(wf=der, page=annual) u 1 3000
+
+' Creates and documents series
+series add1
+add1.displayname Premium over free-risk deposit rate
+series add2
+add2.displayname Premium of derivatives rate over securities interest rate
+series add3
+add3.displayname Sensitivity of derivatives rate to consumer credit rate
+series tau1
+tau1.displayname Parameter of random component of unit price of output
+series tau2
+tau2.displayname Parameter of random component of unit price of derivatives
+series af
+af.displayname Amortization funds (retained profit)
+series b_w
+b_w.displayname Nominal demand for securities of workers
+series b_s
+b_s.displayname Nominal supply of secturities of firms
+series c_d
+c_d.displayname Consumption goods demand by households
+series c_k_d
+c_k_d.displayname Real consumption goods demand by households
+series c_s_k
+c_s_k.displayname Production of consumption goods
+series i_s_k
+i_s_k.displayname Production of investment goods
+series c_w
+c_w.displayname Consumption goods demand by workers
+series c_k_w
+c_k_w.displayname Real consumption goods demand by workers
+series c_r
+c_r.displayname Consumption goods demand by rentiers
+series c_k_r
+c_k_r.displayname Real consumption goods demand by rentiers
+series c_s
+c_s.displayname Consumption goods supply
+series cg
+cg.displayname Capital gains on derivatives
+series da
+da.displayname Depreciation allowances
+series f_b
+f_b.displayname Profit of banks
+series f_f
+f_f.displayname Entrepreneurial profit
+series f_o
+f_o.displayname Profit of financial intermediaries (OFIs)
+series k
+k.displayname Stock of capital
+series k_t
+k_t.displayname Target stock of capital
+series i_d
+i_d.displayname Demand for investment goods
+series i_k_d
+i_k_d.displayname Real demand for investment goods
+series i_s
+i_s.displayname Supply of investment goods
+series l_f
+l_f.displayname Demand for bank loans of firms
+series l_w
+l_w.displayname Demand for bank loans of workers
+series l_r
+l_r.displayname Demand for bank loans of rentiers
+series l_s
+l_s.displayname Total supply of loans
+series l_d
+l_d.displayname Total demand for loans
+series m_o
+m_o.displayname Bank deposits held by OFIs
+series m_w
+m_w.displayname Bank deposits held by workers
+series m_r
+m_r.displayname Bank deposits held by rentiers
+series m_s
+m_s.displayname Total supply of bank deposits
+series m_d
+m_d.displayname Total demand for bank deposits
+series n_d
+n_d.displayname Corporate demand for labour
+series n_s
+n_s.displayname Supply of labour (number of workers)
+series n_r
+n_r.displayname Number of rentiers
+series h1
+h1.displayname Rentiers/workers ratio
+series h2
+h2.displayname Smoothing parameter of random component in rentiers/workers ratio
+series p
+p.displayname Unit price of output
+series p_t
+p_t.displayname Target price of output
+series p_d
+p_d.displayname Unit price of derivatives
+series p_d_t
+p_d_t.displayname Target price of derivatives
+series pr
+pr.displayname Labour productivity
+series pr_t
+pr_t.displayname Exogenous value for labour productivity
+series d_r_k
+d_r_k.displayname Real demand for derivatives of rentiers
+series d_s
+d_s.displayname Nominal supply of derivatives by OFIs
+series rep1
+rep1.displayname Repayment rate of workers
+series rep2
+rep2.displayname Repayment rate of rentiers
+series r_b
+r_b.displayname Rate of interest on securities issued by firms
+series r_c
+r_c.displayname Rate of interest on consumer credit (of workers)
+series r_d
+r_d.displayname Rate of interest on derivatives issued by OFIs
+series r_l
+r_l.displayname Rate of interest on bank loans
+series pi
+pi.displayname Premium over risk on loans to workers
+series r_l_bar
+r_l_bar.displayname Rate of interest on bank loans - exogenously set
+series r_m
+r_m.displayname Rate of interest on bank deposits
+series rho
+rho.displayname Mark-up over unit labour costs
+'series sigma
+'sigma.displayname Entrepreneurial extra-profit rate
+series v_w
+v_w.displayname Wealth of workers
+series v_r
+v_r.displayname Wealth of rentiers
+series w
+w.displayname Wage rate
+series w_t
+w_t.displayname Exogenous value for wage rate
+series wb_d
+wb_d.displayname Wage bill - demand
+series wb_s
+wb_s.displayname Wage bill - supply
+series y_k
+y_k.displayname Total real ouptut
+series y
+y.displayname Total nominal output (or income)
+series yd
+yd.displayname Disposable income of households
+series yd_w
+yd_w.displayname Disposable income of workers
+series yd_r
+yd_r.displayname Disposable income of rentiers
+series yd_w_e
+yd_w_e.displayname Expected income of workers
+series yd_r_e
+yd_r_e.displayname Expected income of rentiers
+
+' Generate parameters
+series alpha0
+alpha0.displayname Exogenous component in consumption of workers
+series alpha1
+alpha1.displayname Propensity to consume out of income of workers
+series alpha2
+alpha2.displayname Propensity to consume out of wealth of workers (loans to wealth ratio)
+series alpha3
+alpha3.displayname Veblenian parameter in consumer credit function of workers
+series alpha4
+alpha4.displayname Smoothing parameter in consumer credit function of workers
+series beta0
+beta0.displayname Exogenous component in consumption of rentiers
+series beta1
+beta1.displayname Propensity to consume out of income of rentiers
+series beta2
+beta2.displayname Propensity to consume out of wealth of rentiers (loans to wealth ratio)
+series delta
+delta.displayname Depreciation rate (= amortisation funds)
+series eta1
+eta1.displayname Sensitivity to leverage of loans to workers
+series eta2
+eta2.displayname Sensitivity to securitisation of loans to workers
+series phi
+phi.displayname Share of loans to households turned into derivatives
+series pi0
+pi0.displayname Fixed component of risk premium on loans to workers
+series pi1
+pi1.displayname Variable component of risk premium on loans to workers
+series gamma
+gamma.displayname Speed of adjustment of capital to its target value
+series kappa0
+kappa0.displayname Target capital-output ratio
+series kappa1
+kappa1.displayname Sensitivity of target capital-output ratio to financial profitability
+series lambda0
+lambda0.displayname Autonomous demand of securities of workers
+series lambda1
+lambda1.displayname Sensivity to interest rate of demand of securities of workers
+series lambda2
+lambda2.displayname Sensivity to disposable income of demand of securities of workers
+series lambda3
+lambda3.displayname Autonomous demand of derivatives of rentiers
+series lambda4
+lambda4.displayname Sensivity to interest rate of demand of derivatives of rentiers
+series lambda5
+lambda5.displayname Sensivity to disposable income of demand of derivatives of rentiers
+series theta1
+theta1.displayname Sensitivity to leverage of loans to rentiers
+
+' Set sample size to all workfile range
+smpl @all
+
+' Assign values for
+
+'   PARAMETERS
+alpha0 = 25       
+alpha1 = 0.75
+alpha3 = 1     '<---- tunes Veblenian component of consumption (higher value compared to version A20)
+alpha4 = 0.9     '<---- tunes smoothing component of consumption (it has to be high, because the shock to wage is very small)
+beta0 = 2        '<---- notice that higher values would entail c_r > yd_r and hence v_r < 0
+beta1 = 0.70
+delta = 0.1
+eta1 = 0.03     '<---- the sensitivity of workers' demand for loans to their stock of wealth is lower
+eta2 = 0.05       
+gamma = 0.08  
+kappa0 = 1
+kappa1 = 0    '<---- sensitivity of real investment to financialisation (it is supposed to be negative)
+lambda0 = 0.1     
+lambda1 = 0.1
+lambda2 = 0.01
+lambda3 = 0.1
+lambda4 = 0.1
+lambda5 = 0.01
+theta1 = 0.05     
+
+'   EXOGENOUS
+pr_t = 1   'notice that pr_t = 0.903 -> p = 1
+pr = pr_t
+r_l_bar = 0.04   
+rep1 = 0.2                
+rep2 = 0.2
+w_t = 0.86
+w = w_t
+pi0 = 0.03      
+pi1 = 0.8
+h1 = 0.03
+h2 = 0 '0.01 '<---- tunes random component of rentiers population
+p_d_t = 1
+p_t = 1
+p = p_t
+p_d = p_d_t
+
+'   STARTING VALUES FOR STOCKS
+b_w = 0
+b_s = b_w
+d_r_k = 0
+d_s = d_r_k*p_d
+l_w = 25  
+l_r = 25
+l_f = 50
+l_d = l_f + l_w + l_r
+l_s = l_d
+v_w = 25     
+v_r = l_s - v_w - l_r - l_w    
+m_o = d_s
+m_w = v_w - b_s + l_w     
+m_r = v_r - d_s + l_r    
+m_d = m_w + m_r + m_o
+m_s = l_s
+k = l_f
+
+' STARTING VALUES FOR LAGGED ENDOGENOUS
+alpha2 = 0.05
+beta2 = 0.05
+y_k = 100 
+y = y_k*p
+r_l = r_l_bar
+pi = pi0
+r_c = r_l + pi
+add1 = 0.02                    
+add2 = 0.04                        
+add3 = 0.1                      	
+tau1 = 0 '0.001              '<--- tunes random component of output price		
+tau2 = 0 '0.001              '<--- tunes random component of derivatives price		
+r_m = 0                           
+r_b = r_m + add1             
+r_d = add2 + add3*r_c   
+rho = p*pr/w - 1  '<--- costing margin is endogenous
+yd_w = 50
+yd_r = 50
+yd_w_e = yd_w
+yd_r_e = yd_r
+
+
+' Create a model object, and name it der_mod
+
+model der_mod
+
+' Add equations to model DER
+
+' ----- Basic behavioural equations
+
+' Supply of consumption goods - eq. 1 ***
+der_mod.append c_s_k = c_k_d
+
+' Supply of investment goods - eq. 2 ***
+der_mod.append i_s_k = i_k_d
+
+' Supply of labour - eq. 3
+der_mod.append n_s = n_d
+
+' Total supply of loans - eq. 4
+der_mod.append l_s = l_s(-1) + (l_d - l_d(-1))
+
+' Total (stock of) loans demanded by the private sector - eq. 5
+der_mod.append l_d = l_f + l_w + l_r
+
+' ----- Transactions of the firms
+
+' Real output - eq. 8
+der_mod.append y_k = c_s_k + i_s_k                           
+
+' Nominal output - eq. 6
+der_mod.append y = y_k*p
+
+' Unit price - eq. 7
+der_mod.append p = p_t + tau1*nrnd   '<---- exogenous (coherent with nature of model BMW)  
+
+' Mark-up over unit costs - eq. 9
+der_mod.append rho = p*pr/w - 1  '<---- endogenous, also: rho = y/wb_s - 1, as: p = (1 + rho)*(wb_s/y_k) or p = (1 + rho)*w/pr
+
+' Entrepreneurial profit (as the residual variable in distribution) - eq. 10
+der_mod.append f_f = y - wb_s - r_l(-1)*l_f(-1) - r_b(-1)*b_w(-1) - af     'negative if r_b > r_m
+
+' Depreciation allowances - eq. 11
+der_mod.append af = delta*k(-1)*p(-1)      '<---- this entails that net entrepreneurial profit = 0 under the baseline
+
+' Demand for bank loans of firms - eq. 12 ***
+der_mod.append l_f = l_f(-1) + i_k_d*p - af - (b_s - b_s(-1))  '<---- notice that: l_f = k_0 = n_s*w + i_d + r_l*l_f, and hence: l_f(-1) - af = n_s*w + r_l*l_f (see Graziani 2003, p. 28, and G&L 2007, p. 49)
+
+' ----- Transactions of households
+
+' Disposable income of workers - eq. 13
+der_mod.append yd_w = wb_s + r_m(-1)*m_w(-1) + r_b(-1)*b_w(-1) - r_c(-1)*l_w(-1)      
+
+' Disposable income of rentiers - eq. 14
+der_mod.append yd_r = r_m(-1)*m_r(-1) + f_f + f_b + f_o + r_d(-1)*p_d(-1)*d_r_k(-1) - r_l(-1)*l_r(-1)   
+
+' Total disposable income of households - eq. 15
+der_mod.append yd = yd_w + yd_r
+
+' ----- Transactions of the banks and OFIs
+
+' Total supply of deposits - eq. 16
+der_mod.append m_s = m_s(-1) + (l_s - l_s(-1)) 
+
+' Rate of interest on deposits - eq. 17          
+der_mod.append r_m = 0
+
+' Profit of the banks - eq. 18
+der_mod.append f_b = r_l(-1)*l_f(-1) - r_m(-1)*m_d(-1)     '<---- banks transfer consumer credits to OFIs for free
+
+' Profit of the OFIs - eq. 19
+der_mod.append f_o = r_l(-1)*l_r(-1) + r_c(-1)*l_w(-1) - (r_d(-1) - r_m(-1))*d_s(-1)  
+
+' Share of securitised loans - eq. 20 (including loans to rentiers)
+der_mod.append phi = d_s/(l_w(-1) + l_r(-1))   
+
+' Rate of interest on consumer credit (of workers) - eq. 21
+der_mod.append r_c = r_l + pi
+
+' Return rate on derivatives - eq. 22
+der_mod.append r_d = add2 + add3*r_c           
+
+' Return rate on securities - eq. 23
+der_mod.append r_b = r_m + add1           
+
+' ----- The wage bill
+
+' "Supply" of wages - eq. 24
+der_mod.append wb_s = w*n_s
+
+' Labour demand - eq. 25
+der_mod.append n_d = y_k/pr
+
+' Labour productivity - eq. 26
+der_mod.append pr = pr_t
+
+' Wage rate - eq. 27 
+der_mod.append w = w_t
+
+' Number of rentiers - eq. 28
+der_mod.append n_r = h1*n_d + h2*nrnd     
+
+' ----- Household behaviour
+
+' Demand for consumption goods of workers - eq. 29 ***
+der_mod.append c_k_w = alpha0 + alpha1*yd_w_e + (l_w - l_w(-1))/p    
+
+' Demand for consumption goods of rentiers - eq. 30 ***
+der_mod.append c_k_r = beta0 + beta1*yd_r_e + (l_r - l_r(-1))/p
+
+' Real income expectations of workers (adaptive / try also rational) - eq. 31 ***
+der_mod.append yd_w_e = yd_w(-1)/p(-1)
+
+' Real income expectations of rentiers (adaptive / try also rational) - eq. 32 ***
+der_mod.append yd_r_e = yd_r(-1)/p(-1)
+
+' Total demand for consumption goods - eq. 33
+der_mod.append c_k_d = c_k_w + c_k_r
+
+' Wealth of workers - eq. 34 ***
+der_mod.append v_w = v_w(-1) + yd_w - c_k_w*p '+ (l_w - l_w(-1))         
+
+' Wealth of rentiers - eq. 35 ***
+der_mod.append v_r = v_r(-1) + yd_r - c_k_r*p + cg '+ (l_r - l_r(-1))       
+
+' Capital gains - eq. 35bis
+der_mod.append cg = (p_d - p_d(-1))*d_r_k
+
+' Demand for loans of workers - eq. 36 ***
+der_mod.append l_w = l_w(-1) + alpha2*v_w(-1) - rep1*l_w(-1) + alpha3*(c_k_r/n_r - c_k_w/n_d) - alpha4*(w - w(-1)*p/p(-1))    
+
+' Notice that eq. 36 includes a Veblenian component (reflecting the class difference in per capita consumption) and a smoothing component
+
+' Loans/wealth ratio of workers - eq. 37
+der_mod.append alpha2 = eta1*(1 - (l_w(-1)*(rep1 + r_c))/v_w) + eta2*phi       
+
+' Premium over risk on loans to workers (duplicate effect of eq. 37) - eq. 38   
+der_mod.append pi = pi0 + pi1*(l_w(-1)*rep1)/v_w(-1)
+
+' Demand for loans of rentiers - eq. 39
+der_mod.append l_r = l_r(-1) + beta2*v_r(-1) - rep2*l_r(-1)
+
+' Loans/wealth ratio of rentiers - eq. 40
+der_mod.append beta2 = theta1*(1 - (l_r(-1)*(rep2 + r_l))/v_r)
+
+' ----- Portfolio choice of households
+
+' Demand for securities of workers - eq. 41
+der_mod.append b_w = lambda0*v_w + lambda1*r_b*v_w - lambda2*yd_w     
+
+' Bank deposits held by workers - eq. 42
+der_mod.append m_w = v_w - b_w + l_w   
+
+' Supply of securities of firms - eq. 43
+der_mod.append b_s = b_w   
+
+' REAL demand for derivatives of rentiers - eq. 44
+der_mod.append d_r_k = ((lambda3*v_r + lambda4*r_d*v_r - lambda5*yd_r))/p_d     
+
+' Unit price of derivatives
+der_mod.append p_d = p_d_t + tau2*nrnd
+
+' Bank deposits held by rentiers - eq. 45
+der_mod.append m_r = v_r - d_r_k*p_d + l_r   
+
+' Supply of derivatives of OFIs - eq. 46
+der_mod.append d_s = d_r_k*p_d   
+
+' Total deposits held by the private sector (gross of deposits returned to banks) - eq. 49
+der_mod.append m_d =  m_w + m_r + m_o 
+
+der_mod.append m_o = d_s
+
+
+' ----- The investment behaviour of firms
+
+' Accumulation of capital (real terms) - eq. 50 ***
+der_mod.append k = k(-1) + i_k_d - da
+
+' Real depreciation allowances - eq. 51
+der_mod.append da = delta*k(-1)
+
+' Capital stock target (nominal terms) - eq. 52 (financialisation affects kappa)
+der_mod.append k_t = (kappa0 - kappa1*r_c)*y_k(-1)
+
+' Demand for investment goods - eq. 53 ***
+der_mod.append i_k_d = gamma*(k_t - k(-1)) + da
+
+' ----- The behaviour of banks
+
+' Interest rate on loans - eq. 54
+der_mod.append r_l = r_l_bar
+
+' Hidden or residual equation
+
+'der_mod.append m_s = m_d
+
+' end of model equations
+
+
+' Select the baseline scenario
+
+der_mod.scenario "baseline"
+
+' Set simulation sample
+
+smpl 1 @last
+
+' Solve the model for the current sample
+
+der_mod.solve(i=p)
+
+
+' Select the first alternative scenario
+
+der_mod.scenario "Scenario 1"
+
+' First experiment: wage cut
+smpl @all
+smpl 2015 @last
+w_t = 0.855
+smpl @all
+
+' Solve the model for the current sample
+
+der_mod.solve(i=p)
+
+' Creates Figure 2A
+smpl 2000 2050
+graph fig2A.line y_k_1 c_s_k_1
+fig2A.options linepat
+fig2A.draw(shade, bottom, color(246, 245, 238)) 2014 2025 
+fig2A.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2A.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2A.setelem(2) axis(right)
+'fig2A.scale(right) range(106.5,107.5)
+fig2A.scale(right) overlap
+fig2A.name(1) Real output (left axis)
+fig2A.name(2) Real consumption (right axis)
+fig2A.addtext(t,just(c)) Figure 2A: Evolution in output and total consumption following a wage cut
+
+' Creates Figure 2B
+smpl 2000 2050
+graph fig2B.line yd_w_1/yd_1 yd_r_1/yd_1
+fig2B.options linepat
+fig2B.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig2B.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2B.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2B.setelem(2) axis(right)
+'fig2B.scale(right) range(106.5,107.5)
+fig2B.scale(right) overlap
+fig2B.name(1) Disposable income of workers (to total, left axis)
+fig2B.name(2) Disposable income of rentiers (to total, right axis)
+fig2B.addtext(t,just(c)) Figure 2B: Evolution in income distribution following a wage cut
+
+' Creates Figure 2C
+smpl 2000 2050
+graph fig2C.line l_w_1/v_w_1 l_r_1/v_r_1
+fig2C.options linepat
+fig2C.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig2C.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2C.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2C.setelem(2) axis(right)
+'fig2C.scale(right) range(106.5,107.5)
+fig2C.scale(right) overlap
+fig2C.name(1) Leverage ratio of workers (left axis)
+fig2C.name(2) Leverage ratio of rentiers (right axis)
+fig2C.addtext(t,just(c)) Figure 2C: Evolution in leverage ratios of households following a wage cut
+
+' Creates Figure 2D
+smpl 2000 2050
+graph fig2D.line r_d_1 r_b_1   
+fig2D.options linepat
+fig2D.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig2D.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2D.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2D.setelem(2) axis(right)
+'fig2D.scale(right) range(0.039,0.05)
+fig2D.scale(right) overlap
+fig2D.name(1) Interest rate on derivatives (left axis)
+fig2D.name(2) Interest rate on securities (right axis)
+fig2D.addtext(t,just(c)) Figure 2D: Evolution of interest rates on financial assets following a wage cut
+
+' Creates Figure 2E
+smpl 2000 2050
+graph fig2E.line f_b_1/y_1 f_o_1/y_1
+fig2E.options linepat
+fig2E.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig2E.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2E.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2E.setelem(2) axis(right)
+fig2E.scale(right) overlap
+fig2E.name(1) Bank profit to Real output (left axis)
+fig2E.name(2) OFIs profit to output (right axis)
+fig2E.addtext(t,just(c)) Figure 2E: Evolution of financial profitability following a wage cut
+
+' Creates Figure 2F
+smpl 2000 2050
+graph fig2F.line d_s_1 d_s_1/y_1    ' I dropped p_d
+fig2F.options linepat
+fig2F.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig2F.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig2F.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig2F.setelem(2) axis(right)
+'fig2F.scale(right) range(0, 0.02)
+fig2F.scale(right) overlap
+fig2F.name(1) Total amount of derivatives (left axis)
+fig2F.name(2) Derivatives to output ratio (right axis)
+fig2F.addtext(t,just(c)) Figure 2F: Evolution of derivatives following a wage cut
+
+' Select the second alternative scenario
+
+der_mod.scenario(n) "Scenario 2"
+
+' Second experiment: increase in the demand for derivatives of rentiers
+smpl @all
+w_t = 0.86 ' restores previous value
+smpl 2015 @last
+lambda3 = 0.15
+smpl @all
+
+' Solve the model for the current sample
+
+der_mod.solve(i=p)
+
+' Creates Figure 3A
+smpl 2000 2050
+graph fig3A.line y_k_2 c_s_k_2
+fig3A.options linepat
+fig3A.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3A.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3A.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3A.setelem(2) axis(right)
+'fig3A.scale(right) range(106.5,108.5)
+fig3A.scale(right) overlap
+fig3A.name(1) Real output (left axis)
+fig3A.name(2) Real consumption (right axis)
+fig3A.addtext(t,just(c)) Figure 3A: Evolution in output and total consumption following an increase in \ndemand for derivatives
+
+' Creates Figure 3B
+smpl 2000 2050
+graph fig3B.line yd_w_2/yd_2 yd_r_2/yd_2
+fig3B.options linepat
+fig3B.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3B.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3B.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3B.setelem(2) axis(right)
+'fig3B.scale(right) range(106.5,107.5)
+fig3B.scale(right) overlap
+fig3B.name(1) Disposable income of workers (to total, left axis)
+fig3B.name(2) Disposable income of rentiers (to total, right axis)
+fig3B.addtext(t,just(c)) Figure 3B: Evolution in income distribution following an increase in demand \nfor derivatives
+
+' Creates Figure 3C
+smpl 2000 2050
+graph fig3C.line l_w_2/v_w_2 l_r_2/v_r_2
+fig3C.options linepat
+fig3C.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3C.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3C.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3C.setelem(2) axis(right)
+'fig3C.scale(right) range(106.5,107.5)
+fig3C.scale(right) overlap
+fig3C.name(1) Leverage ratio of workers (left axis)
+fig3C.name(2) Leverage ratio of rentiers (right axis)
+fig3C.addtext(t,just(c)) Figure 3C: Evolution in leverage ratios of households following an increase in \ndemand for derivatives
+
+' Creates Figure 3D
+smpl 2000 2050
+graph fig3D.line r_d_2 r_b_2   
+fig3D.options linepat
+fig3D.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3D.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3D.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3D.setelem(2) axis(right)
+'fig3D.scale(right) range(0.039,0.05)
+fig3D.scale(right) overlap
+fig3D.name(1) Interest rate on derivatives (left axis)
+fig3D.name(2) Interest rate on securities (right axis)
+fig3D.addtext(t,just(c)) Figure 3D: Evolution of interest rates on financial assets following an increase \nin their demand
+
+' Creates Figure 3E
+smpl 2000 2050
+graph fig3E.line f_b_2/y_2 f_o_2/y_2
+fig3E.options linepat
+fig3E.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3E.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3E.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3E.setelem(2) axis(right)
+fig3E.scale(right) overlap
+fig3E.name(1) Bank profit to Real output (left axis)
+fig3E.name(2) OFIs profit to output (right axis)
+fig3E.addtext(t,just(c)) Figure 3E: Evolution of financial profitability following an increase in demand \nfor derivatives
+
+' Creates Figure 3F
+smpl 2000 2050
+graph fig3F.line d_s_2 d_s_2/y_2    
+fig3F.options linepat
+fig3F.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig3F.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig3F.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig3F.setelem(2) axis(right)
+'fig3F.scale(right) range(0, 0.02)
+fig3F.scale(right) overlap
+fig3F.name(1) Total amount of derivatives (left axis)
+fig3F.name(2) Derivatives to output ratio (right axis)
+fig3F.addtext(t,just(c)) Figure 3F: Evolution of derivatives following an increase in demand for derivatives
+
+' Select the third alternative scenario
+
+der_mod.scenario(n) "Scenario 3"
+
+' Third experiment: return on derivatives affects negatively the target capital to output ratio
+smpl @all
+w_t = 0.86 ' restores previous value
+lambda3 = 0.1 ' restores previous value
+smpl 2015 @last
+kappa1 = 0.1 '***
+smpl @all
+
+' Solve the model for the current sample
+
+der_mod.solve(i=p)
+
+' Creates Figure 4A
+smpl 2000 2050
+graph fig4A.line y_k_3 c_s_k_3
+fig4A.options linepat
+fig4A.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4A.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4A.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4A.setelem(2) axis(right)
+'fig4A.scale(right) range(106.5,108.5)
+fig4A.scale(right) overlap
+fig4A.name(1) Real output (left axis)
+fig4A.name(2) Real consumption (right axis)
+fig4A.addtext(t,just(c)) Figure 4A: Evolution in output and total consumption when financial profitability \naffects negatively real investment
+
+' Creates Figure 4B
+smpl 2000 2050
+graph fig4B.line yd_w_3/yd_3 yd_r_3/yd_3
+fig4B.options linepat
+fig4B.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4B.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4B.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4B.setelem(2) axis(right)
+'fig4B.scale(right) range(106.5,107.5)
+fig4B.scale(right) overlap
+fig4B.name(1) Disposable income of workers (to total, left axis)
+fig4B.name(2) Disposable income of rentiers (to total, right axis)
+fig4B.addtext(t,just(c)) Figure 4B: Evolution in income distribution when financial profitability affects \nnegatively real investment
+
+' Creates Figure 4C
+smpl 2000 2050
+graph fig4C.line l_w_3/v_w_3 l_r_3/v_r_3
+fig4C.options linepat
+fig4C.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4C.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4C.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4C.setelem(2) axis(right)
+'fig4C.scale(right) range(106.5,107.5)
+fig4C.scale(right) overlap
+fig4C.name(1) Leverage ratio of workers (left axis)
+fig4C.name(2) Leverage ratio of rentiers (right axis)
+fig4C.addtext(t,just(c)) Figure 4C: Evolution in leverage ratios of households when financial profitability \naffects negatively real investment
+
+' Creates Figure 4D
+smpl 2000 2050
+graph fig4D.line r_d_3 r_b_3   
+fig4D.options linepat
+fig4D.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4D.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4D.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4D.setelem(2) axis(right)
+'fig4D.scale(right) range(0.039,0.05)
+fig4D.scale(right) overlap
+fig4D.name(1) Interest rate on derivatives (left axis)
+fig4D.name(2) Interest rate on securities (right axis)
+fig4D.addtext(t,just(c)) Figure 4D: Evolution of interest rates on financial assets when financial profitability \naffects negatively real investment
+
+' Creates Figure 4E
+smpl 2000 2050
+graph fig4E.line f_b_3/y_3 f_o_3/y_3
+fig4E.options linepat
+fig4E.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4E.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4E.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4E.setelem(2) axis(right)
+fig4E.scale(right) overlap
+fig4E.name(1) Bank profit to Real output (left axis)
+fig4E.name(2) OFIs profit to output (right axis)
+fig4E.addtext(t,just(c)) Figure 4E: Evolution of financial profitability when financial profitability affects \nnegatively real investment
+
+' Creates Figure 4F
+smpl 2000 2050
+graph fig4F.line d_s_3 d_s_3/y_3    
+fig4F.options linepat
+fig4F.draw(shade, bottom, color(246, 245, 238)) 2014 2025
+fig4F.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig4F.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig4F.setelem(2) axis(right)
+'fig4F.scale(right) range(0, 0.02)
+fig4F.scale(right) overlap
+fig4F.name(1) Total amount of derivatives (left axis)
+fig4F.name(2) Derivatives to output ratio (right axis)
+fig4F.addtext(t,just(c)) Figure 4F: Evolution of derivatives when financial profitability affects negatively \nreal investment
+
+
+
+
+'--------------------------------------
+'--------------------------------------
+
+' Creates Figure 5a
+smpl 2000 3000
+graph fig5a.line y_k_1 c_s_k_1
+fig5a.options linepat
+fig5a.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5a.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5a.setelem(2) axis(right)
+'fig5a.scale(right) range(106.5,107.5)
+fig5a.scale(right) overlap
+fig5a.name(1) Real output (left axis)
+fig5a.name(2) Real consumption (right axis)
+fig5a.addtext(t,just(c)) Figure 5A: Evolution in output and total consumption following a wage cut
+
+' Creates Figure 5b
+smpl 2000 3000
+graph fig5b.line yd_w_1/yd_1 yd_r_1/yd_1
+fig5b.options linepat
+fig5b.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5b.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5b.setelem(2) axis(right)
+'fig5b.scale(right) range(106.5,107.5)
+fig5b.scale(right) overlap
+fig5b.name(1) Disposable income of workers (to total, left axis)
+fig5b.name(2) Disposable income of rentiers (to total, right axis)
+fig5b.addtext(t,just(c)) Figure 5B: Evolution in income distribution following a wage cut
+
+' Creates Figure 5c
+smpl 2000 3000
+graph fig5c.line l_w_1/v_w_1 l_r_1/v_r_1
+fig5c.options linepat
+fig5c.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5c.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5c.setelem(2) axis(right)
+'fig5c.scale(right) range(106.5,107.5)
+fig5c.scale(right) overlap
+fig5c.name(1) Leverage ratio of workers (left axis)
+fig5c.name(2) Leverage ratio of rentiers (right axis)
+fig5c.addtext(t,just(c)) Figure 5C: Evolution in leverage ratios of households following a wage cut
+
+' Creates Figure 5d
+smpl 2000 3000
+graph fig5d.line r_d_1 r_b_1   
+fig5d.options linepat
+fig5d.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5d.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5d.setelem(2) axis(right)
+'fig5d.scale(right) range(0.039,0.05)
+fig5d.scale(right) overlap
+fig5d.name(1) Interest rate on derivatives (left axis)
+fig5d.name(2) Interest rate on securities (right axis)
+fig5d.addtext(t,just(c)) Figure 5D: Evolution of interest rates on financial assets following a wage cut
+
+' Creates Figure 5e
+smpl 2000 3000
+graph fig5e.line f_b_1/y_1 f_o_1/y_1
+fig5e.options linepat
+fig5e.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5e.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5e.setelem(2) axis(right)
+fig5e.scale(right) overlap
+fig5e.name(1) Bank profit to Real output (left axis)
+fig5e.name(2) OFIs profit to output (right axis)
+fig5e.addtext(t,just(c)) Figure 5E: Evolution of financial profitability following a wage cut
+
+' Creates Figure 5f
+smpl 2000 3000
+graph fig5f.line d_s_1 d_s_1/y_1    
+fig5f.options linepat
+fig5f.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig5f.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig5f.setelem(2) axis(right)
+'fig5f.scale(right) range(0, 0.02)
+fig5f.scale(right) overlap
+fig5f.name(1) Total amount of derivatives (left axis)
+fig5f.name(2) Derivatives to output ratio (right axis)
+fig5f.addtext(t,just(c)) Figure 5F: Evolution of derivatives following a wage cut
+
+' Creates Figure 6a
+smpl 2000 3000
+graph fig6a.line y_k_2 c_s_k_2
+fig6a.options linepat
+fig6a.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6a.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6a.setelem(2) axis(right)
+'fig6a.scale(right) range(106.5,108.5)
+fig6a.scale(right) overlap
+fig6a.name(1) Real output (left axis)
+fig6a.name(2) Real consumption (right axis)
+fig6a.addtext(t,just(c)) Figure 6A: Evolution in output and total consumption following an increase in \ndemand for derivatives
+
+' Creates Figure 6b
+smpl 2000 3000
+graph fig6b.line yd_w_2/yd_2 yd_r_2/yd_2
+fig6b.options linepat
+fig6b.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6b.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6b.setelem(2) axis(right)
+'fig6b.scale(right) range(106.5,107.5)
+fig6b.scale(right) overlap
+fig6b.name(1) Disposable income of workers (to total, left axis)
+fig6b.name(2) Disposable income of rentiers (to total, right axis)
+fig6b.addtext(t,just(c)) Figure 6B: Evolution in income distribution following an increase in demand for \nderivatives
+
+' Creates Figure 6c
+smpl 2000 3000
+graph fig6c.line l_w_2/v_w_2 l_r_2/v_r_2
+fig6c.options linepat
+fig6c.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6c.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6c.setelem(2) axis(right)
+'fig6c.scale(right) range(106.5,107.5)
+fig6c.scale(right) overlap
+fig6c.name(1) Leverage ratio of workers (left axis)
+fig6c.name(2) Leverage ratio of rentiers (right axis)
+fig6c.addtext(t,just(c)) Figure 6C: Evolution in leverage ratios of households following an increase in \ndemand for derivatives
+
+' Creates Figure 6d
+smpl 2000 3000
+graph fig6d.line r_d_2 r_b_2   
+fig6d.options linepat
+fig6d.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6d.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6d.setelem(2) axis(right)
+'fig6d.scale(right) range(0.039,0.05)
+fig6d.scale(right) overlap
+fig6d.name(1) Interest rate on derivatives (left axis)
+fig6d.name(2) Interest rate on securities (right axis)
+fig6d.addtext(t,just(c)) Figure 6D: Evolution of interest rates on financial assets following an increase \nin their demand
+
+' Creates Figure 6e
+smpl 2000 3000
+graph fig6e.line f_b_2/y_2 f_o_2/y_2
+fig6e.options linepat
+fig6e.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6e.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6e.setelem(2) axis(right)
+fig6e.scale(right) overlap
+fig6e.name(1) Bank profit to Real output (left axis)
+fig6e.name(2) OFIs profit to output (right axis)
+fig6e.addtext(t,just(c)) Figure 6E: Evolution of financial profitability following an increase in demand \nfor derivatives
+
+' Creates Figure 6f
+smpl 2000 3000
+graph fig6f.line d_s_2 d_s_2/y_2    
+fig6f.options linepat
+fig6f.setelem(1) lcolor(red) lwidth(2) lpat(1)
+fig6f.setelem(2) lcolor(black) lwidth(2) lpat(2)
+fig6f.setelem(2) axis(right)
+'fig6f.scale(right) range(0, 0.02)
+fig6f.scale(right) overlap
+fig6f.name(1) Total amount of derivatives (left axis)
+fig6f.name(2) Derivatives to output ratio (right axis)
+fig6f.addtext(t,just(c)) Figure 6F: Evolution of derivatives following an increase in demand for derivatives
+
+' Creates Figure 7a
+smpl 2000 3000
+graph fig7a.line y_k_3 c_s_k_3
+fig7a.options linepat
+fig7a.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7a.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7a.setelem(2) axis(right)
+'fig7a.scale(right) range(106.5,108.5)
+fig7a.scale(right) overlap
+fig7a.name(1) Real output (left axis)
+fig7a.name(2) Real consumption (right axis)
+fig7a.addtext(t,just(c)) Figure 7A: Evolution in output and total consumption when financial profitability \naffects negatively real investment
+
+' Creates Figure 7b
+smpl 2000 3000
+graph fig7b.line yd_w_3/yd_3 yd_r_3/yd_3
+fig7b.options linepat
+fig7b.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7b.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7b.setelem(2) axis(right)
+'fig7b.scale(right) range(106.5,107.5)
+fig7b.scale(right) overlap
+fig7b.name(1) Disposable income of workers (to total, left axis)
+fig7b.name(2) Disposable income of rentiers (to total, right axis)
+fig7b.addtext(t,just(c)) Figure 7B: Evolution in income distribution when financial profitability affects \nnegatively real investment
+
+' Creates Figure 7c
+smpl 2000 3000
+graph fig7c.line l_w_3/v_w_3 l_r_3/v_r_3
+fig7c.options linepat
+fig7c.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7c.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7c.setelem(2) axis(right)
+'fig7c.scale(right) range(106.5,107.5)
+fig7c.scale(right) overlap
+fig7c.name(1) Leverage ratio of workers (left axis)
+fig7c.name(2) Leverage ratio of rentiers (right axis)
+fig7c.addtext(t,just(c)) Figure 7C: Evolution in leverage ratios of households when financial profitability \naffects negatively real investment
+
+' Creates Figure 7d
+smpl 2000 3000
+graph fig7d.line r_d_3 r_b_3   
+fig7d.options linepat
+fig7d.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7d.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7d.setelem(2) axis(right)
+'fig7d.scale(right) range(0.039,0.05)
+fig7d.scale(right) overlap
+fig7d.name(1) Interest rate on derivatives (left axis)
+fig7d.name(2) Interest rate on securities (right axis)
+fig7d.addtext(t,just(c)) Figure 7D: Evolution of interest rates on financial assets when financial profitability \naffects negatively real investment
+
+' Creates Figure 7e
+smpl 2000 3000
+graph fig7e.line f_b_3/y_3 f_o_3/y_3
+fig7e.options linepat
+fig7e.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7e.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7e.setelem(2) axis(right)
+fig7e.scale(right) overlap
+fig7e.name(1) Bank profit to Real output (left axis)
+fig7e.name(2) OFIs profit to output (right axis)
+fig7e.addtext(t,just(c)) Figure 7E: Evolution of financial profitability when financial profitability affects \nnegatively real investment
+
+' Creates Figure 7f
+smpl 2000 3000
+graph fig7f.line d_s_3 d_s_3/y_3    
+fig7f.options linepat
+fig7f.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+fig7f.setelem(2) lcolor(green) lwidth(2) lpat(2)
+fig7f.setelem(2) axis(right)
+'fig7f.scale(right) range(0, 0.02)
+fig7f.scale(right) overlap
+fig7f.name(1) Total amount of derivatives (left axis)
+fig7f.name(2) Derivatives to ouput ratio (right axis)
+fig7f.addtext(t,just(c)) Figure 7F: Evolution of derivatives when financial profitability affects negatively \nreal investment
+
+
+
+' Show figures created
+
+
+'1) first experiment (short run)
+
+show fig2A fig2B fig2C fig2D fig2E fig2F
+
+'2) second experiment (short run)
+
+'show fig3A fig3B fig3C fig3D fig3E fig3F
+
+'3) third experiment (short run)
+
+'show fig4A fig4B fig4C fig4D fig4E fig4F
+
+'4) first experiment (long run)
+
+'show fig5a fig5b fig5c fig5d fig5e fig5f 
+
+'5) second experiment (long run)
+
+'show fig6a fig6b fig6c fig6d fig6e fig6f
+
+'6) third experiment (long run)
+
+'show fig7a fig7b fig7c fig7d fig7e fig7f
