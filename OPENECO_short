@@ -1,12 +1,12 @@
 ' MODEL OPENECOSHORT
 
+' Created by Marco Veronese Passarella, 7 April 2019
+
 ' based on:
 '1) OPEN, developed by Zezza for Godley & Lavoie, 2006, Monetary Economics, Chapter 6
 '2) OPENECO, developed by EC and MVP, november 2018 (note: OPENECOSHORT is a simplified version of OPENECO)
  
 'NOTE: Carb = Carbonland, Ecol = Ecoland
-
-'Updated: 7/04/2019
 
 '********************************************************************************************************************************************************************************************************************************
 
