@@ -1,0 +1,601 @@
+'A MARX CRISIS MODEL
+
+'Created by Marco Veronese Passarella, University of Leeds
+'last amendment: 30 March 2016 (amended: 22 February 2017).
+
+'To be used for Routledge chapter experiments
+
+'Main hypotheses:
+
+'1. two sectors / countries
+
+'2. constant monetary expression of social labour 
+
+'3. classical hypothesis: no saving from labour incomes
+
+'4. no state intervention
+
+'5. normal rate of utilisation of plants
+
+
+'************************************************************************************
+
+wfcreate(wf=marxmodel) u 1 100
+
+'Create series
+
+series y_i
+y_i.displayname Realised value of output in investment sector
+
+series y_c
+y_c.displayname Realised value of output in consumption sector
+
+series k_i
+k_i.displayname Constant capital invested in investment sector '(circulating capital only or depreciation rate = 100%)
+
+series k_c
+k_c.displayname Constant capital invested in consumption sector '(circulating capital only or depreciation rate = 100%)
+
+series w_i
+w_i.displayname Variable capital invested in investment sector
+
+series w_c
+w_c.displayname Variable capital invested in consumption sector
+
+series s_i
+s_i.displayname Surplus value created in investment sector
+
+series s_c
+s_c.displayname Surplus value created in consumption sector
+
+series e_i
+e_i.displayname Rate of exploitation in investment sector
+
+series e_c
+e_c.displayname Rate of exploitation in consumption sector
+
+series q_i
+q_i.displayname Organic composition in investment sector
+
+series q_c
+q_c.displayname Organic composition in consumption sector
+
+series r
+r.displayname General rate of profit
+
+series n_i
+n_i.displayname Turnover rate in investment sector
+
+series n_c
+n_c.displayname Turnover rate in consumption sector
+
+series n0_i
+n0_i.displayname Parameter in turnover function (inv. sector)
+
+series n0_c
+n0_c.displayname Parameter in turnover function (cons. sector)
+
+series n1_i
+n1_i.displayname Parameter in turnover function (inv. sector)
+
+series n1_c
+n1_c.displayname Parameter in turnover function (cons. sector)
+
+series g_i
+g_i.displayname Accumulation rate of investment sector
+
+series g_c
+g_c.displayname Accumulation rate of consumption sector
+
+series g
+g.displayname Economy-wide accumulation rate
+
+series cons_i
+cons_i.displayname Consumption of capitalists of investment sector
+
+series cons_c
+cons_c.displayname Consumption of capitalists of consumption sector
+
+series theta_i
+theta_i.displayname Retention rate in investment sector
+
+series theta_c
+theta_c.displayname Retention rate in consumption sector
+
+series theta0_i
+theta0_i.displayname Parameter in retention rate function (inv. sector)
+
+series theta0_c
+theta0_c.displayname Parameter retention rate function (cons. sector)
+
+series theta1_i
+theta1_i.displayname Parameter in retention rate function (inv. sector)
+
+series theta1_c
+theta1_c.displayname Parameter in retention rate function (cons. sector)
+
+series sigma1_i
+sigma1_i.displayname Propensity to save out of non-labour incomes in investment sector
+
+series sigma1_c
+sigma1_c.displayname Propensity to save out of non-labour incomes in consumption sector
+
+series sigma2_i
+sigma2_i.displayname Propensity to save out of wealth in investment sector
+
+series sigma2_c
+sigma2_c.displayname Propensity to save out of wealth in consumption sector
+
+series h_i
+h_i.displayname Wealth in investment sector
+
+series h_c
+h_c.displayname Wealth in consumption sector
+
+series omega
+omega.displayname Wage share of net total income
+
+series pi
+pi.displayname Profit share of net total income
+
+series v
+v.displayname Total capital to net output ratio
+
+series r_i
+r_i.displayname Realised rate of profit of investment sector
+
+series r_c
+r_c.displayname Realised rate of profit of consumption sector
+
+series g_rand
+g_rand.displayname Autonomous component of c-sector growth rate
+
+
+'Define equations and values
+
+g_rand=0
+
+e_i=1   'alleged values in Marx and Olsen 2015
+
+e_c=1    'alleged values in Marx and Olsen 2015
+
+theta0_i=0.5 'Marx value
+
+theta1_i=0 
+
+theta_i=theta0_i '+theta1_i*log(1+r_i(-1))  'if theta_i = 0 then no accumulation and growth (surplus consumed by capitalists); if theta = 1 then 100% accumulation
+
+n0_i=1
+
+n0_c=1
+
+n1_i=0 '0.01
+
+n1_c=0 '0.01
+
+n_i=n0_i '+n1_i*log(cons_i(-1))    'the turnover depends on capitalist unproduction 'consumption' of financial services
+
+n_c=n0_c '+n1_c*log(cons_c(-1))
+
+q_i=4 'Marx value (exogenous and linked with technological progress)
+
+q_c=2 'Marx value (exogenous and linked with technological progress)
+
+w_i=1000 'Marx value    
+
+w_c=750 'Marx value    
+
+k_c=w_c*q_c   
+
+k_i=w_i*q_i  
+
+sigma1_i=0   '(if sigma1_i=0 then no saving of capitalists)
+
+sigma1_c=0
+
+sigma2_i=0.95   'so the propensity to consume out of wealth is 1-sigma2_i=0.05 (but no effect if sigma1_i=0)
+
+sigma2_c=0.95
+
+h_i=0
+
+h_c=0
+
+s_i=w_i*e_i*n_i    'surplus value in the investment sector (accounting for the turnover rate) 
+
+s_c=w_c*e_c*n_c   'surplus value in the consumption sector (accounting for the turnover rate)
+
+cons_i=0 '(1-theta_i)*s_i*(1-sigma1_i)+(1-sigma2_i)*h_i(-1)
+
+cons_c=0 '(1-theta_c)*s_c*(1-sigma1_c)+(1-sigma2_c)*h_c(-1)   
+
+r_i=e_i*n_i/(1+q_i)   'r_i=(theta_i*s_i+cons_i)/(k_i+w_i)
+
+r_c=e_c*n_c/(1+q_c)   'r_c=(theta_c*s_c+cons_c)/(k_c+w_c)
+
+y_i=k_i+w_i+s_i 'theta_i*s_i(-1)+cons_i 
+
+y_c=k_c+w_c+s_c 'theta_c*s_c(-1)+cons_c
+
+omega=(w_i+w_c)/(y_i+y_c-k_i-k_c)
+
+pi=1-omega  '= (s_i+s_c)/(y_i+y_c-k_i-k_c)
+
+v=(w_i+w_c+k_i+k_c)/(y_i+y_c-k_i-k_c)
+
+r=pi/v           '= (s_i+s_c)/(w_i+w_c+k_i+k_c)
+
+g_i=e_i*theta_i*n_i/(1+q_i)    
+
+g_c=((y_i-k_i-(s_i*theta_i*q_i)/(1+q_i))/k_c)-1        'equilibrium condition
+
+g=g_i    'long-run economy-wide accumulation rate
+
+theta_c=g_c*(1+q_c)/(e_c*n_c)   'endogenous (determined by g_c)
+
+
+'Create the model
+
+model marxmodel
+
+'(1) Value of variable capital in investment sector (i.e. past investment in variable capital plus the share of past surplus value which was retained and reinvested, given the organic composition of capital) 
+marxmodel.append w_i=w_i(-1)+(s_i(-1)*theta_i(-1))/(1+q_i)  'new lags!
+
+'(2) Value of variable capital in consumption sector
+marxmodel.append w_c=w_c(-1)+(s_c(-1)*theta_c(-1))/(1+q_c)  'new lags!
+
+'(3) Value of constant capital in investment sector (circulating capital only)
+marxmodel.append k_i=w_i*q_i
+
+'(4) Value of constant capital in consumption sector
+marxmodel.append k_c=w_c*q_c
+
+'(5) Surplus value in investment sector (accounting for the turnover rate)
+marxmodel.append s_i=w_i*e_i*n_i
+
+'(6) Surplus value in consumption sector
+marxmodel.append s_c=w_c*e_c*n_c
+
+'(7) Capitalist consumption from investment sector (accounting for propensity to consume and consumption out of wealth)
+marxmodel.append cons_i=(1-theta_i)*s_i*(1-sigma1_i)+(1-sigma2_i)*h_i(-1)    
+
+'(8) Capitalist consumption from consumption sector
+marxmodel.append cons_c=(1-theta_c)*s_c*(1-sigma1_c)+(1-sigma2_c)*h_c(-1)    
+
+'(9) Realised value of output in investment sector (demand side)
+marxmodel.append y_i=k_i+w_i+theta_i*s_i+cons_i   
+
+'(10) Realised value of output in consumption sector (demand side)
+marxmodel.append y_c=k_c+w_c+theta_c*s_c+cons_c   
+
+'(11) Realised rate of profit of investment sector
+marxmodel.append r_i=(theta_i*s_i+cons_i)/(k_i+w_i) 
+
+'(12) Realised rate of profit of consumption sector
+marxmodel.append r_c=(theta_c*s_c+cons_c)/(k_c+w_c)
+
+'(13) Wage share of net income
+marxmodel.append omega=(w_i+w_c)/(y_i+y_c-k_i-k_c)
+
+'(14) Profit share of net income
+marxmodel.append pi=1-omega  '= (theta_i*s_i+cons_i+theta_c*s_c+cons_c)/(y_i+y_c-k_i-k_c)
+
+'(15) Total capital to net output ratio
+marxmodel.append v=(w_i+w_c+k_i+k_c)/(y_i+y_c-k_i-k_c)
+
+'(16) General rate of profit
+marxmodel.append r=(theta_i*s_i+cons_i+theta_c*s_c+cons_c)/(w_i+w_c+k_i+k_c) 
+
+'(17) Accumulation rate of investment sector
+marxmodel.append g_i=e_i*theta_i*n_i/(1+q_i)         
+
+'(18) Accumulation rate of consumption sector
+'marxmodel.append g_c=e_c*theta_c*n_c/(1+q_c)      
+marxmodel.append g_c=(((y_i-k_i-(s_i*theta_i*q_i)/(1+q_i))/k_c)-1)+g_rand  'EQUILIBRIUM CONDITION (INCLUDING RANDOM COMPONENT)
+
+'(19) Wealth of capitalists in investment sector
+marxmodel.append h_i=h_i(-1)+sigma1_i*(1-theta_i(-1))*s_i(-1)   
+
+'(20) Wealth of capitalists in consumption sector
+marxmodel.append h_c=h_c(-1)+sigma1_c*(1-theta_c(-1))*s_c(-1)   
+
+'(21) Monetary expression of labour time = 1
+'marxmodel m=(w_i+w_c+s_i+s_c)/L=1
+
+'(22)-(23) other equations defining L_i and L_c
+
+'(24) Long-run economy-wide rate of growth
+marxmodel.append g=g_i
+
+'(25) Retention rate in consumption sector
+'marxmodel.append theta_c=theta0_c+theta1_c*log(1+r_c(-1))    'endogenous (determined by g_c)
+marxmodel.append theta_c=g_c*(1+q_c)/(e_c*n_c)
+
+'(26) Retention rate in investment sector
+marxmodel.append theta_i=theta0_i+theta1_i*log(1+r_i(-1))
+
+'(27) Turnover rate in investment sector
+marxmodel.append n_i=n0_i+n1_i*log(1+cons_i(-1))       '+1 because the initial value is 0; notice also that I used cons instead of cons(-1)
+
+'(28) Turnover rate in consumption sector
+marxmodel.append n_c=n0_c+n1_c*log(1+cons_c(-1))
+
+'add equations (29)-(34)
+
+
+'Solve the model
+
+smpl 1 100                                       
+marxmodel.scenario "baseline"
+marxmodel.solve
+
+
+'Create first shock: a fall in the rate of retention in investment sector (and hence in the rate of accumulation)
+marxmodel.scenario "scenario 1"
+marxmodel.override theta0_i
+copy theta0_i theta0_i_1
+smpl 20 @last
+theta0_i_1=(theta0_i_1)/2    '(if theta0_i_1=0 then no accumulation)
+smpl @all
+marxmodel.solve
+
+'Second shock: a 10% increase in organic composition of capital of investment industry
+marxmodel.scenario(n) "scenario 2"
+marxmodel.override q_i
+copy q_i q_i_2
+smpl 20 @last
+q_i_2=q_i_2*1.1      
+'marxmodel.override q_c  'add shock in consumption industry
+'copy q_c q_c_2
+'smpl 20 @last
+'q_c_2=q_c_2*1.1
+smpl @all
+marxmodel.solve
+
+'Third shock: a 10% fall in capitalists' propensity to consume
+marxmodel.scenario(n) "scenario 3"
+marxmodel.override sigma1_i
+copy sigma1_i sigma1_i_3
+smpl 20 @last
+sigma1_i_3=sigma1_i_3+0.1      
+'marxmodel.override sigma1_c  'add shock in consumption industry
+'copy sigma1_c sigma1_c_3
+'smpl 20 @last
+'sigma1_c_3=sigma1_c_3+0.1
+smpl @all
+marxmodel.solve
+
+'Fourth shock: an increase in finance impact on turnover rate
+marxmodel.scenario(n) "scenario 4"
+marxmodel.override n1_i
+copy n1_i n1_i_4
+smpl 20 @last
+n1_i_4=n1_i_4+0.001      
+'marxmodel.override n1_c  'add shock in consumption industry
+'copy n1_c n1_c_4
+'smpl 20 @last
+'n1_c_4=n1_c_4+0.001
+smpl @all
+marxmodel.solve
+
+'Fifth shock: an increase in autonomous component of c-sector growth rate (only five periods)
+marxmodel.scenario(n) "scenario 5"
+marxmodel.override g_rand
+copy g_rand g_rand_5
+smpl 20 25 '@last
+g_rand_5=g_rand_5+0.01      
+'marxmodel.override n1_c  'add shock in consumption industry
+'copy n1_c n1_c_4
+'smpl 20 @last
+'n1_c_4=n1_c_4+0.001
+smpl @all
+marxmodel.solve
+
+
+
+'Create charts
+
+'Preminary check: comparison with Olsen (2015)
+
+smpl 2 10
+graph figA.line g_i_0 g_c_0
+figA.name(1) Accumulation rate in investment sector
+figA.name(2) Accumulation rate in consumption sector
+figA.addtext(t,just(c)) Chart A. Convergence of growth rates 
+
+smpl 2 10
+graph figB.line theta_i_0 theta_c_0
+figB.name(1) Retention rate in investment sector
+figB.name(2) Retention rate in consumption sector
+figB.addtext(t,just(c)) Chart B. Retention rates 
+
+smpl 2 10
+graph figC.bar(s) y_i_0 y_c_0 'y_i_0+y_c_0
+figC.name(1) Realised value of output in investment sector
+figC.name(2) Realised value of output in consumption sector
+'figC.name(3) Total output
+figC.addtext(t,just(c)) Chart C. Nominal level of outputs 
+
+smpl 2 10 '30
+graph figD.line r_i_0 r_c_0 r_0
+'figD.options linepat
+'figD.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'figD.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+'figD.setelem(3) lcolor(red) lwidth(2) lpat(3)
+figD.setelem(3) axis(right)
+figD.scale(right) overlap
+figD.name(1) Realised profit rate in investment sector
+figD.name(2) Realised profit rate rate in consumption sector
+figD.name(3) General rate of profit: equalisation (right axis)
+figD.addtext(t,just(c)) Chart D. Profit rates
+
+'Other charts: reaction to shocks
+
+smpl 18 30
+graph fig1.line g_i_1 g_c_1 
+fig1.name(1) Accumulation rate in investment sector
+fig1.name(2) Accumulation rate in consumption sector
+fig1.addtext(t,just(c)) Chart Q. Impact of a fall in the investment sector retention rate on growth rates 
+
+smpl 18 30
+graph fig2.line r_i_1 r_c_1 r_1
+'fig2.options linepat
+'fig2.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'fig2.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+'fig2.setelem(3) lcolor(red) lwidth(2) lpat(3)
+fig2.setelem(3) axis(right)
+fig2.scale(right) overlap
+fig2.name(1) Realised rate of profit in investment sector
+fig2.name(2) Realised rate of profit in consumption sector
+fig2.name(3) General rate of profit: equalisation (right axis)
+fig2.addtext(t,just(c)) Chart R. Impact of a fall in the investment sector retention rate on profitability
+
+smpl 18 100
+graph fig3.line (theta_i_1*s_i_1(-1)+cons_i_1)/(theta_i_0*s_i_0(-1)+cons_i_0) (w_i_1+k_i_1)/(w_i_0+k_i_0) (theta_c_1*s_c_1(-1)+cons_c_1)/(theta_c_0*s_c_0(-1)+cons_c_0) (w_c_1+k_c_1)/(w_c_0+k_c_0)
+fig3.name(1) Realised surplus in investment sector (relative to baseline)
+fig3.name(2) Total capital invested in investment sector (relative to baseline)
+fig3.name(3) Realised surplus in consumption sector (relative to baseline)
+fig3.name(4) Total capital invested in consumption sector (relative to baseline)
+fig3.addtext(t,just(c)) Chart 3. Impact of a fall in the investment sector retention rate on profit rates components
+
+smpl 18 30
+graph fig4.line omega_1 pi_1
+fig4.name(1) Wage share of net income
+fig4.name(2) Profit share of net income
+fig4.addtext(t,just(c)) Chart S. Impact of a fall in the investment sector retention rate on income shares
+
+smpl 18 30
+graph fig5.line g_i_2 g_c_2 
+fig5.name(1) Accumulation rate in investment sector
+fig5.name(2) Accumulation rate in consumption sector
+fig5.addtext(t,just(c)) Chart I. Impact of an increase in the investment sector OCC on growth rates 
+
+smpl 18 30
+graph fig6.line r_i_2 r_c_2 r_2
+'fig6.options linepat
+'fig6.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'fig6.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+'fig6.setelem(3) lcolor(red) lwidth(2) lpat(3)
+fig6.setelem(3) axis(right)
+fig6.scale(right) overlap
+fig6.name(1) Realised rate of profit in investment sector
+fig6.name(2) Realised rate of profit in consumption sector
+fig6.name(3) General rate of profit: equalisation (right axis)
+fig6.addtext(t,just(c)) Chart L. Impact of an increase in the investment sector OCC on profitability
+
+smpl 18 30
+graph fig8.line omega_2 pi_2
+fig8.setelem(2) axis(right)
+fig8.scale(right) overlap
+fig8.name(1) Wage share of net income
+fig8.name(2) Profit share of net income (right axis)
+fig8.addtext(t,just(c)) Chart M. Impact of an increase in the investment sector OCC on income shares
+
+smpl 18 100
+graph fig7.line (theta_i_2*s_i_2(-1)+cons_i_2)/(theta_i_0*s_i_0(-1)+cons_i_0) (w_i_2+k_i_2)/(w_i_0+k_i_0) (theta_c_2*s_c_2(-1)+cons_c_2)/(theta_c_0*s_c_0(-1)+cons_c_0) (w_c_2+k_c_2)/(w_c_0+k_c_0)
+fig7.name(1) Realised surplus in investment sector (relative to baseline)
+fig7.name(2) Total capital invested in investment sector (relative to baseline)
+fig7.name(3) Realised surplus in consumption sector (relative to baseline)
+fig7.name(4) Total capital invested in consumption sector (relative to baseline)
+fig7.addtext(t,just(c)) Chart 7. Impact of an increase in the investment sector OCC on profit rates components
+
+smpl 18 30
+graph fig9.line g_i_3 g_c_3 
+fig9.name(1) Accumulation rate in investment sector
+fig9.name(2) Accumulation rate in consumption sector
+fig9.addtext(t,just(c)) Chart N. Impact of a fall in i-capitalist propensity to consume on growth rates 
+
+smpl 18 30
+graph fig10.line r_i_3 r_c_3 r_3
+'fig10.options linepat
+'fig10.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'fig10.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+'fig10.setelem(3) lcolor(red) lwidth(2) lpat(3)
+fig10.setelem(3) axis(right)
+fig10.scale(right) overlap
+fig10.name(1) Realised rate of profit in investment sector
+fig10.name(2) Realised rate of profit in consumption sector
+fig10.name(3) General rate of profit: equalisation (right axis)
+fig10.addtext(t,just(c)) Chart O. Impact of a fall in i-capitalist propensity to consume on profitability
+
+smpl 18 100
+graph fig11.line (theta_i_3*s_i_3(-1)+cons_i_3)/(theta_i_0*s_i_0(-1)+cons_i_0) (w_i_3+k_i_3)/(w_i_0+k_i_0) (theta_c_3*s_c_3(-1)+cons_c_3)/(theta_c_0*s_c_0(-1)+cons_c_0) (w_c_3+k_c_3)/(w_c_0+k_c_0)
+fig11.name(1) Realised surplus in investment sector (relative to baseline)
+fig11.name(2) Total capital invested in investment sector (relative to baseline)
+fig11.name(3) Realised surplus in consumption sector (relative to baseline)
+fig11.name(4) Total capital invested in consumption sector (relative to baseline)
+fig11.addtext(t,just(c)) Chart 11. Impact of a fall in i-capitalist propensity to consume on profit rates components
+
+smpl 18 30
+graph fig12.line omega_3 pi_3
+fig12.name(1) Wage share of net income
+fig12.name(2) Profit share of net income
+fig12.addtext(t,just(c)) Chart P. Impact of a fall in i-capitalist propensity to consume on income shares
+
+smpl 18 30 '100
+graph fig13.line g_i_4 g_c_4 
+fig13.name(1) Accumulation rate in investment sector
+fig13.name(2) Accumulation rate in consumption sector
+fig13.addtext(t,just(c)) Chart T. Impact of an increase in finance sensitivity of turnover rate on growth rates 
+
+smpl 18 30 '100
+graph fig14.line r_i_4 r_c_4 r_4
+'fig14.options linepat
+'fig14.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'fig14.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+'fig14.setelem(3) lcolor(red) lwidth(2) lpat(3)
+fig14.setelem(3) axis(right)
+fig14.scale(right) overlap
+fig14.name(1) Realised rate of profit in investment sector
+fig14.name(2) Realised rate of profit in consumption sector
+fig14.name(3) General rate of profit: equalisation (right axis)
+fig14.addtext(t,just(c)) Chart U. Impact of an increase in finance sensitivity of turnover rate on profitability
+
+smpl 18 100
+graph fig15.line (theta_i_4*s_i_4(-1)+cons_i_4)/(theta_i_0*s_i_0(-1)+cons_i_0) (w_i_4+k_i_4)/(w_i_0+k_i_0) (theta_c_4*s_c_4(-1)+cons_c_4)/(theta_c_0*s_c_0(-1)+cons_c_0) (w_c_4+k_c_4)/(w_c_0+k_c_0)
+fig15.name(1) Realised surplus in investment sector (relative to baseline)
+fig15.name(2) Total capital invested in investment sector (relative to baseline)
+fig15.name(3) Realised surplus in consumption sector (relative to baseline)
+fig15.name(4) Total capital invested in consumption sector (relative to baseline)
+fig15.addtext(t,just(c)) Chart 15. Impact of an increase in finance sensitivity of turnover rate on profit rates components
+
+smpl 18 30 '100
+graph fig16.line omega_4 pi_4
+fig16.setelem(2) axis(right)
+fig16.scale(right) overlap
+fig16.name(1) Wage share of net income
+fig16.name(2) Profit share of net income (right axis)
+fig16.addtext(t,just(c)) Chart V. Impact of an increase in finance sensitivity of turnover rate on income shares
+
+smpl 18 40
+graph fig17.line g_i_5 g_c_5 
+fig17.name(1) Accumulation rate in investment sector
+fig17.name(2) Accumulation rate in consumption sector
+fig17.addtext(t,just(c)) Chart W. Impact of an increase in c-sector autonomous accumulation on growth rates
+
+smpl 18 40
+graph fig18.line (y_i_5-y_c_5) (y_i_5-y_c_5)/(y_i_0-y_c_0)
+'fig18.options linepat
+'fig18.setelem(1) lcolor(orange) lwidth(2) lpat(1)
+'fig18.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig18.setelem(2) axis(right)
+fig18.scale(right) overlap
+fig18.name(1) Output gap between sectors (i-sector minus c-sector level)
+fig18.name(2) Output gap between sectors (right axis, ratio to baseline)
+fig18.addtext(t,just(c)) Chart X. Impact of an increase in c-sector autonomous accumulation on output
+
+smpl 18 30
+graph fig19.line omega_5 pi_5
+fig19.setelem(2) axis(right)
+fig19.scale(right) overlap
+fig19.name(1) Wage share of net income
+fig19.name(2) Profit share of net income (right axis)
+fig19.addtext(t,just(c)) Chart Y. Impact of an increase in c-sector autonomous accumulation on income shares
+
+
+'Display figures
+show figA figB figC figD
+show fig1 fig2 fig4 'meaning Q,R,S
+show fig5 fig6 fig8  'meaning I,L,M
+show fig9 fig10 fig12 'meaning N,O,P
+show fig13 fig14 fig16 'meaning T,U,V
