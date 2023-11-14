@@ -1,0 +1,129 @@
+# Transaction flow matrix, Italy, 2015, households sector
+
+#Download necessary packages
+library(plotrix)
+library(pdfetch)
+library(networkD3)
+library(knitr)
+
+#################################################################
+
+# Select the flows
+names<-c("P1","P2","D21","D31","P3","P6","P7","P5G","D1","D2","D3","D42","D41","D43","D44","D45","D5","D6","D61","D62","D7","D8","D9","NP","B9")
+
+# Obtain the data
+ITS14_S15data_raw = pdfetch_EUROSTAT("nasa_10_nf_tr", UNIT="CP_MNAC",NA_ITEM=names, GEO="IT",
+                              SECTOR=c("S14_S15"), TIME="2015")
+
+# Transform the data into a data.frame
+ITS14_S15data<-as.data.frame(ITS14_S15data_raw)
+
+# Automatic procedure to remove the non-interesting bit of the colnames
+coln<-colnames(ITS14_S15data)
+newcoln<-c()
+TFMS14_S15data<-c()
+
+for(i in 1:length(coln)){
+  name<-coln[i]
+  tname<-strsplit(name,"\\.")[[1]]
+  newname<-paste(tname[3:4],collapse=".")
+  
+# If the column contains only NA, remove it from the dataset
+  if(!is.na(ITS14_S15data[21,i])){
+    newcoln<-c(newcoln,newname) 
+    TFMS14_S15data<-c(TFMS14_S15data,ITS14_S15data[21,i]) #21 = 2015
+  }
+}
+
+# Create a new dataset with only values 2015
+TFMS14_S15data<-as.data.frame(t(TFMS14_S15data))
+colnames(TFMS14_S15data)<-newcoln
+
+# Create the aggregates
+Households <-c(  TFMS14_S15data$RECV.P1,                                                     #1
+              -TFMS14_S15data$PAID.P2,                                                       #2
+              0, #D21 Taxes on Products                                                      #3
+              0, #D31 Subsidies on Products                                                  #4
+              paste(TFMS14_S15data$RECV.P1-TFMS14_S15data$PAID.P2,"]"),                      #5
+              -TFMS14_S15data$PAID.P3,                                                       #6
+              0, #P6 Export                                                                  #7
+              0, #P7 Import                                                                  #8
+              -TFMS14_S15data$PAID.P5G,                                                      #9
+              paste(TFMS14_S15data$RECV.P1-TFMS14_S15data$PAID.P2-
+                    TFMS14_S15data$PAID.P3-TFMS14_S15data$PAID.P5G,"]"),                     #10
+              TFMS14_S15data$RECV.D1-TFMS14_S15data$PAID.D1,                                 #11
+              -TFMS14_S15data$PAID.D2,                                                       #12
+              TFMS14_S15data$RECV.D3,                                                        #13
+              TFMS14_S15data$RECV.D42, #-TFMS14_S15data$PAID.D42,                            #14
+              TFMS14_S15data$RECV.D41-TFMS14_S15data$PAID.D41,                               #15
+              TFMS14_S15data$RECV.D43-TFMS14_S15data$PAID.D43+TFMS14_S15data$RECV.D44
+              -TFMS14_S15data$PAID.D44+TFMS14_S15data$RECV.D45-TFMS14_S15data$PAID.D45,      #16
+              -TFMS14_S15data$PAID.D5,                                                       #17
+              TFMS14_S15data$RECV.D61-TFMS14_S15data$PAID.D61+TFMS14_S15data$RECV.D62
+              -TFMS14_S15data$PAID.D62,                                                      #18    
+              -TFMS14_S15data$PAID.D7+TFMS14_S15data$RECV.D7,                                #19
+              TFMS14_S15data$RECV.D8-TFMS14_S15data$PAID.D8,                                 #20
+              -TFMS14_S15data$PAID.D9+TFMS14_S15data$RECV.D9,                                #21
+              paste(TFMS14_S15data$RECV.D1-TFMS14_S15data$PAID.D1-TFMS14_S15data$PAID.D2+
+                    TFMS14_S15data$RECV.D3+TFMS14_S15data$RECV.D42+TFMS14_S15data$RECV.D41-
+                    TFMS14_S15data$PAID.D41+TFMS14_S15data$RECV.D43-TFMS14_S15data$PAID.D43+
+                    TFMS14_S15data$RECV.D44-TFMS14_S15data$PAID.D44+TFMS14_S15data$RECV.D45-
+                    TFMS14_S15data$PAID.D45-TFMS14_S15data$PAID.D5+
+                    TFMS14_S15data$RECV.D61-TFMS14_S15data$PAID.D61+TFMS14_S15data$RECV.D62
+                    -TFMS14_S15data$PAID.D62-
+                    TFMS14_S15data$PAID.D7+TFMS14_S15data$RECV.D7+TFMS14_S15data$RECV.D8-
+                    TFMS14_S15data$PAID.D8-TFMS14_S15data$PAID.D9+
+                    TFMS14_S15data$RECV.D9,"]"),                                             #22
+              paste(TFMS14_S15data$RECV.P1-TFMS14_S15data$PAID.P2-
+                    TFMS14_S15data$PAID.P3-TFMS14_S15data$PAID.P5G+
+                    TFMS14_S15data$RECV.D1-TFMS14_S15data$PAID.D1-TFMS14_S15data$PAID.D2+
+                    TFMS14_S15data$RECV.D3+TFMS14_S15data$RECV.D42+TFMS14_S15data$RECV.D41-
+                    TFMS14_S15data$PAID.D41+TFMS14_S15data$RECV.D43-TFMS14_S15data$PAID.D43+
+                    TFMS14_S15data$RECV.D44-TFMS14_S15data$PAID.D44+TFMS14_S15data$RECV.D45-
+                    TFMS14_S15data$PAID.D45-TFMS14_S15data$PAID.D5+
+                    TFMS14_S15data$RECV.D61-TFMS14_S15data$PAID.D61+TFMS14_S15data$RECV.D62
+                    -TFMS14_S15data$PAID.D62-
+                    TFMS14_S15data$PAID.D7+TFMS14_S15data$RECV.D7+TFMS14_S15data$RECV.D8-
+                    TFMS14_S15data$PAID.D8-TFMS14_S15data$PAID.D9+
+                    TFMS14_S15data$RECV.D9,"]"),                                             #23
+              -TFMS14_S15data$PAID.NP,                                                       #24
+              0, #Taxes less subsidies on products                                           #25
+              TFMS14_S15data$PAID.B9)                                                        #26
+                           
+colnames<-"Households"   
+rownames<-c( "Gross output",
+            "Intermediate consumption",
+            "Taxes on Products",
+            "Subsidies on Products",
+            "[Memo: GDP",
+            "Consumption",
+            "Export",
+            "Import",
+            "Gross Capital Formation (Investment)",
+            "[Total production",
+            "Wages",
+            "Taxes on production and import",
+            "Subsidies on production",
+            "Dividends",
+            "Interest payments",
+            "Other property incomes",
+            "Taxes (on income and wealth)",
+            "Social benefits",
+            "Other current transfers",
+            "Adjustments in pensions",
+            "Capital transfers",
+            "[Total transfers",
+            "[Sum of production and transfers",
+            "Net Non-Produced NF Assets",
+            "Taxes less subsidies on products",
+            "Net Lending Position")
+
+# Create table of results
+TFMS14_S15data_1<-as.data.frame(Households,row.names=rownames) #,col.names=colnames)
+
+# Print table_1
+kable(TFMS14_S15data_1)
+
+
+# Create table with additional colunm (to include labels)
+#TFMSdata<-cbind(column 1,column 2, etc.)
