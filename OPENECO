@@ -3,7 +3,7 @@
 ' OPENECO MODEL - PUBLIC
 ' A two-country ecological model   
 
-' Last update: 14 April 2020
+' Created by Marco Veronese Passarella, 14 April 2020
 
 ' This code allows replicating the simulations conducted in: Carnevali, E., Deleidi, M., Pariboni, R. and Veronese Passarella, M. 2020.
 ' Cross-Border Financial Flows and Global Warming in a Two-Area Ecological SFC Model. Socio-Economic Planning Sciences, DOI: 10.1016/j.seps.2020.100819
