@@ -1,0 +1,187 @@
+#MARX RS MODEL: BY SECTOR
+#HM VERSION
+
+#Made by Marco Veronese Passarella, 6th November 2019
+
+
+############################################################################
+
+#STEP 1: Clear the workspace and define the number of periods and scenarios
+
+#Clear all
+rm(list=ls(all=TRUE))
+
+#Number of periods
+nPeriods = 100
+
+#Number of scenarios
+nScenarios=2 
+
+
+############################################################################
+
+#STEP 2: 
+
+#Variables
+w_i <- matrix(data=1000,nrow=nScenarios,ncol=nPeriods) #Variable capital invested in investment sector
+w_c <- matrix(data=750,nrow=nScenarios,ncol=nPeriods) #Variable capital invested in consumption sector
+e_i <- matrix(data=1,nrow=nScenarios,ncol=nPeriods) #Rate of exploitation in investment sector
+e_c <- matrix(data=1,nrow=nScenarios,ncol=nPeriods) #Rate of exploitation in consumption sector
+q_i <- matrix(data=4,nrow=nScenarios,ncol=nPeriods) #Organic composition in investment sector
+q_c <- matrix(data=2,nrow=nScenarios,ncol=nPeriods) #Organic composition in consumption sector
+k_i <- matrix(data=w_i*q_i,nrow=nScenarios,ncol=nPeriods) #Constant capital invested in investment sector #(circulating capital only or depreciation rate = 100%)
+k_c <- matrix(data=w_c*q_c,nrow=nScenarios,ncol=nPeriods) #Constant capital invested in consumption sector #(circulating capital only or depreciation rate = 100%)
+s_i <- matrix(data=w_i*e_i,nrow=nScenarios,ncol=nPeriods) #Surplus value created in investment sector
+s_c <- matrix(data=w_c*e_c,nrow=nScenarios,ncol=nPeriods) #Surplus value created in consumption sector
+y_i <- matrix(data=k_i+w_i+s_i,nrow=nScenarios,ncol=nPeriods) #Realised value of output in investment sector
+y_c <- matrix(data=k_c+w_c+s_c,nrow=nScenarios,ncol=nPeriods) #Realised value of output in consumption sector
+cons_i <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Consumption of capitalists of investment sector
+cons_c <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Consumption of capitalists of consumption sector
+theta_i <- matrix(data=0.5,nrow=nScenarios,ncol=nPeriods) #Retention rate in investment sector
+theta0_i <- matrix(data=0.5,nrow=nScenarios,ncol=nPeriods) #Parameter in retention rate function (inv. sector)
+theta0_c <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Parameter retention rate function (cons. sector)
+theta1_c <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Parameter in retention rate function (cons. sector)
+g_i <- matrix(data=e_i*theta_i/(1+q_i),nrow=nScenarios,ncol=nPeriods) #Accumulation rate of investment sector
+g_c <- matrix(data=((y_i-k_i-(s_i*theta_i*q_i)/(1+q_i))/k_c)-1,nrow=nScenarios,ncol=nPeriods) #Accumulation rate of consumption sector
+g <- matrix(data=g_i,nrow=nScenarios,ncol=nPeriods) #Economy-wide accumulation rate
+theta_c <- matrix(data=g_c*(1+q_c)/(e_c),nrow=nScenarios,ncol=nPeriods) #Retention rate in consumption sector
+sigma1_i <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Propensity to save out of non-labour incomes in investment sector
+sigma1_c <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Propensity to save out of non-labour incomes in consumption sector
+sigma2_i <- matrix(data=0.95,nrow=nScenarios,ncol=nPeriods) #Propensity to save out of wealth in investment sector
+sigma2_c <- matrix(data=0.95,nrow=nScenarios,ncol=nPeriods) #Propensity to save out of wealth in consumption sector
+h_i <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Wealth in investment sector
+h_c <- matrix(data=0,nrow=nScenarios,ncol=nPeriods) #Wealth in consumption sector
+omega <- matrix(data=(w_i+w_c)/(y_i+y_c-k_i-k_c),nrow=nScenarios,ncol=nPeriods) #Wage share of net total income
+pi <- matrix(data=1-omega,nrow=nScenarios,ncol=nPeriods) #Profit share of net total income
+v <- matrix(data=(w_i+w_c+k_i+k_c)/(y_i+y_c-k_i-k_c),nrow=nScenarios,ncol=nPeriods) #Total capital to net output ratio
+r <- matrix(data=pi/v,nrow=nScenarios,ncol=nPeriods) #General rate of profit
+r_i <- matrix(data=e_i/(1+q_i),nrow=nScenarios,ncol=nPeriods) #Realised rate of profit of investment sector
+r_c <- matrix(data=e_c/(1+q_c),nrow=nScenarios,ncol=nPeriods) #Realised rate of profit of consumption sector
+
+
+############################################################################
+
+# STEP 3A: SCENARIOS, TIME AND ITERATIONS
+
+#Select scenarios
+for (j in 1:nScenarios){
+  
+  #Define the time loop
+  for (i in 2:nPeriods){
+    
+    #Define iterations
+    for (iterations in 1:100){
+      
+      #Define alternative scenarios
+      
+      #Negative shock to retention rate of investment sector 
+      if (i>=20 && j==2){
+        theta0_i[2,i]=0.25
+      }
+
+
+# STEP 3B: MODEL EQUATIONS      
+      
+#(1) Value of variable capital in investment sector 
+w_i[j,i]=w_i[j,i-1]+(s_i[j,i-1]*theta_i[j,i-1])/(1+q_i[j,i-1])
+
+#(2) Value of variable capital in consumption sector
+w_c[j,i]=w_c[j,i-1]+(s_c[j,i-1]*theta_c[j,i-1])/(1+q_c[j,i-1])
+  
+#(3) Value of constant capital in investment sector (circulating capital only)
+k_i[j,i]=w_i[j,i]*q_i[j,i]
+
+#(4) Value of constant capital in consumption sector
+k_c[j,i]=w_c[j,i]*q_c[j,i]
+
+#(5) Surplus value in investment sector
+s_i[j,i]=w_i[j,i]*e_i[j,i]
+
+#(6) Surplus value in consumption sector
+s_c[j,i]=w_c[j,i]*e_c[j,i]
+
+#(7) Capitalist consumption from investment sector (out of income and wealth)
+cons_i[j,i]=(1-theta_i[j,i])*s_i[j,i]*(1-sigma1_i[j,i])+(1-sigma2_i[j,i])*h_i[j,i-1]
+
+#(8) Capitalist consumption from consumption sector
+cons_c[j,i]=(1-theta_c[j,i])*s_c[j,i]*(1-sigma1_c[j,i])+(1-sigma2_c[j,i])*h_c[j,i-1]
+
+#(9) Realised value of output in investment sector (demand side)
+y_i[j,i]=k_i[j,i]+w_i[j,i]+theta_i[j,i]*s_i[j,i]+cons_i[j,i]
+
+#(10) Realised value of output in consumption sector (demand side)
+y_c[j,i]=k_c[j,i]+w_c[j,i]+theta_c[j,i]*s_c[j,i]+cons_c[j,i]
+
+#(11) Realised rate of profit of investment sector
+r_i[j,i]=(theta_i[j,i]*s_i[j,i]+cons_i[j,i])/(k_i[j,i]+w_i[j,i]) 
+
+#(12) Realised rate of profit of consumption sector
+r_c[j,i]=(theta_c[j,i]*s_c[j,i]+cons_c[j,i])/(k_c[j,i]+w_c[j,i])
+
+#(13) Wage share (to net income)
+omega[j,i]=(w_i[j,i]+w_c[j,i])/(y_i[j,i]+y_c[j,i]-k_i[j,i]-k_c[j,i])
+
+#(14) Profit share (to net income)
+pi[j,i]=1-omega[j,i]
+
+#(15) Total capital to net output ratio
+v[j,i]=(w_i[j,i]+w_c[j,i]+k_i[j,i]+k_c[j,i])/(y_i[j,i]+y_c[j,i]-k_i[j,i]-k_c[j,i])
+
+#(16) General rate of profit
+r[j,i]=(theta_i[j,i]*s_i[j,i]+cons_i[j,i]+theta_c[j,i]*s_c[j,i]+cons_c[j,i])/(w_i[j,i]+w_c[j,i]+k_i[j,i]+k_c[j,i])
+
+#(17) Accumulation rate of investment sector
+g_i[j,i]=e_i[j,i]*theta_i[j,i]/(1+q_i[j,i])         
+
+#(18) Accumulation rate of consumption sector
+g_c[j,i]=(((y_i[j,i]-k_i[j,i]-(s_i[j,i]*theta_i[j,i]*q_i[j,i])/(1+q_i[j,i]))/k_c[j,i])-1)  #Equilibrium condition
+
+#(19) Wealth of capitalists in investment sector
+h_i[j,i]=h_i[j,i-1]+sigma1_i[j,i-1]*(1-theta_i[j,i-1])*s_i[j,i-1]
+
+#(20) Wealth of capitalists in consumption sector
+h_c[j,i]=h_c[j,i-1]+sigma1_c[j,i-1]*(1-theta_c[j,i-1])*s_c[j,i-1]
+
+#(21) Long-run economy-wide rate of growth
+g[j,i]=g_i[j,i]
+
+#(22) Retention rate in consumption sector
+theta_c[j,i]=g_c[j,i]*(1+q_c[j,i])/(e_c[j,i])
+
+#(23) Retention rate in investment sector
+theta_i[j,i]=theta0_i[j,i]
+
+    }
+  }
+}
+
+############################################################################
+
+#STEP 4A: CREATE TRANSPARENT COLOR FOR SHADED AREAS
+
+mycol <- rgb(0, 0, 255, max = 255, alpha = 50, names = "blue50")  
+mycol2 <- rgb(204, 204, 204, max = 255, alpha = 50, names = "grey8050")
+mycol3 <- rgb(0,255,0, max = 255, alpha = 50, names = "mygreen")
+mycol4 <- rgb(255,0,0, max = 255, alpha = 50, names = "myred")
+mycol5 <- rgb(255,204,0, max = 255, alpha = 50, names = "myyellow")
+
+
+#STEP 4B: PLOT CHARTS
+
+layout(matrix(c(1,2), 1, 2, byrow = TRUE))
+
+#Growth rates after shock to i-sector retention rate
+plot(g_i[2,18:30], type="l", lty = 1, lwd = 2, col=4, font.main=1,cex.main=0.75,main="Fig. 1 - Impact of a fall in the retention rate \n of I-capitalists on growth rates",ylab = 'Accumulation rates',xlab = 'Time', ylim = range(0.04,0.24),cex.axis=0.75,cex.lab=0.8)
+grid()
+rect(xleft=0,xright=2,ybottom=0.0,ytop=1,col=mycol3,border=NA)
+rect(xleft=2,xright=4,ybottom=0.0,ytop=1,col=mycol5,border=NA)
+lines(g_c[2,18:30], type="l", lty = 3, lwd = 2, col=2)
+legend("topright",c("I-sector","C-sector"),  bty = "n", cex = 0.80, lty=c(1,3), lwd=c(2,2), col = c(4,2), box.lty=0)
+
+#Retention rates after shock to i-sector retention rate
+plot(theta_i[2,18:30], type="l", lty = 1, lwd = 2, col=4, font.main=1,cex.main=0.75,main="Fig. 2 - Impact of a fall in the retention rate \n of I-capitalists on retention rates",ylab = 'Retention rates',xlab = 'Time', ylim = range(0.15,0.7),cex.axis=0.75,cex.lab=0.8)
+grid()
+rect(xleft=0,xright=2,ybottom=0.0,ytop=1,col=mycol3,border=NA)
+rect(xleft=2,xright=4,ybottom=0.0,ytop=1,col=mycol5,border=NA)
+lines(theta_c[2,18:30], type="l", lty = 3, lwd = 2, col=2)
+legend("topright",c("I-sector","C-sector"),  bty = "n", cex = 0.80, lty=c(1,3), lwd=c(2,2), col = c(4,2), box.lty=0)
