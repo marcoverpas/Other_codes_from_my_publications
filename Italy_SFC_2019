@@ -1,0 +1,1817 @@
+' MODEL ItalySFC for Eviews version 6 to 10
+
+' by Marco Veronese Passarella
+
+' Contents: This code replicates the simulations performed in Veronese Passarella, M. (2020) From abstract to concrete: some tips for developing an empirical SFC Model,
+' European Journal of Economics and Economic Policies: Intervention, 16(1), pp. 55-93.
+
+' ****************************************************************************
+
+'Developed on: October 6, 2018                                                                                                                      
+
+'Revised on: March 17, 2020
+
+' **************************************************************************** 
+
+' Copyright (c) 2017 Marco Veronese Passarella
+' Permission is hereby granted, free of charge, to any person obtaining a 
+' copy of this software and associated documentation files (the "Software"),
+' to deal in the Software without restriction, including without limitation
+' the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+' and/or sell copies of the Software, and to permit persons to whom the 
+' Software is furnished to do so, subject to the following conditions:
+
+' The above copyright notice and this permission notice shall be included in 
+' all copies or substantial portions of the Software.
+
+' THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+' IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+' FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+' AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+' LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+' FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE the USE OR OTHER DEALINGS 
+' IN THE SOFTWARE.
+
+' ****************************************************************************
+
+'Create workfile: annual data from 1996 to 2030 (named 'ItalySFC')
+wfcreate(wf = ItalySFC) a 1996 2030
+
+'Upload time series (actual figures) to be compared with forecasted values (note: '_ts' means 'time series")
+
+'a) GDP AND CAPITAL DEFLATORS (PRICES) ---------------------------------------------------------------------------------------------------------------------------------
+read(b2, s=price) "C:\Users\...\Italy data.xls" p_y_ts p2_y_ts p_k_ts p_h_ts newhouse_d_ts house_s_ts                                        
+
+'b) HOUSEHOLDS -------------------------------------------------------------------------------------------------------------------------------
+read(b2, s=households) "C:\Users\...\Italy data.xls" yyd_h_ts ggdp_h_ts wwb_ts ttau_h_ts iint_h_ts tt_h_ts aann_ts pprop_h_ts ccons_h_ts nnw_h_ts dd_h_ts mmort_h_ts iinv_h_ts nnl_h_ts ffunds_h_ts hhouse_h_ts oofin_h_ts bb_h_ts nnfw_h_ts wwb_h_p_ts iint_hpaid_ts iint_hrecv_ts
+
+'Create real series (note: for the sake of simplicity, I use the same deflator for all magnitudes. Needless to say, this is not accurate. I would suggest using data at constant prices here)
+series yd_h_ts = yyd_h_ts*100/p_y_ts
+series gdp_h_ts = ggdp_h_ts*100/p_y_ts
+series wb_ts = wwb_ts*100/p_y_ts
+series tau_h_ts = ttau_h_ts*100/p_y_ts
+series int_h_ts = iint_h_ts*100/p_y_ts
+series t_h_ts = tt_h_ts*100/p_y_ts
+series ann_ts = aann_ts*100/p_y_ts
+series prop_h_ts = pprop_h_ts*100/p_y_ts
+series cons_h_ts = ccons_h_ts*100/p_y_ts
+series nw_h_ts = nnw_h_ts*100/p_y_ts
+series d_h_ts = dd_h_ts*100/p_y_ts
+series mort_h_ts = mmort_h_ts*100/p_y_ts
+series inv_h_ts = iinv_h_ts*100/p_y_ts                     
+series nl_h_ts = nnl_h_ts*100/p_y_ts
+series funds_h_ts = ffunds_h_ts*100/p_y_ts
+series house_h_ts = hhouse_h_ts*100/p_y_ts
+series ofin_h_ts = oofin_h_ts*100/p_y_ts
+series b_h_ts = bb_h_ts*100/p_y_ts
+series nfw_h_ts = nnfw_h_ts*100/p_y_ts
+series wb_h_p_ts = wwb_h_p_ts*100/p_y_ts
+series int_hpaid_ts = iint_hpaid_ts*100/p_y_ts
+series int_hrecv_ts = iint_hrecv_ts*100/p_y_ts
+
+'c) NFCs (AND OTHER) -------------------------------------------------------------------------------------------------------------------------
+read(b2, s=nfc) "C:\Users\...\Italy data.xls" ggdp_ts kk_synth iinv_f_ts iinv_tot_ts r_lf_ts r_z_ts gg_k_synth dd_f_ts yy_ts eexport_ts ggov_ts n_ts iimp_ts ner_ts ccons_int_ts nnet_tau_tot_ts ppi_f_ts ggdp_b_ts ggdp_row_ts ggdp_f_ts iint_f_ts wwb_other_ts oopaym_f_ts ppi_fu_ts ddiv_f_ts ttau_f_ts ttransf_f_ts tt_f_ts ffunds_f_ts pprop_f_ts ddiv_h_ts ddiv_b_ts ddiv_row_ts r_v_ts vv_f_ts vv_b_ts vv_h_ts vv_g_ts vv_row_ts ll_f_ts xi_b_ts p_v_synth nnl_f_ts nnw_f_ts research_ts yy_n_synth gg_n_synth
+
+'Create real series
+series gdp_ts = ggdp_ts*100/p_y_ts
+series k_synth = kk_synth*100/p_y_ts
+series inv_f_ts = iinv_f_ts*100/p_y_ts
+series inv_tot_ts = iinv_tot_ts*100/p_y_ts 
+series d_f_ts = dd_f_ts*100/p_y_ts
+series y_ts = yy_ts*100/p_y_ts
+series export_ts = eexport_ts*100/p_y_ts
+series gov_ts = ggov_ts*100/p_y_ts 
+series imp_ts = iimp_ts*100/p_y_ts 
+series cons_int_ts = ccons_int_ts*100/p_y_ts
+series net_tau_tot_ts = nnet_tau_tot_ts*100/p_y_ts
+series pi_f_ts = ppi_f_ts*100/p_y_ts
+series gdp_b_ts = ggdp_b_ts*100/p_y_ts
+series gdp_row_ts = ggdp_row_ts*100/p_y_ts
+series gdp_f_ts = ggdp_f_ts*100/p_y_ts
+series int_f_ts = iint_f_ts*100/p_y_ts
+series wb_other_ts = wwb_other_ts*100/p_y_ts
+series opaym_f_ts = oopaym_f_ts*100/p_y_ts
+series pi_fu_ts = ppi_fu_ts*100/p_y_ts
+series div_f_ts = ddiv_f_ts*100/p_y_ts
+series tau_f_ts = ttau_f_ts*100/p_y_ts
+series transf_f_ts = ttransf_f_ts*100/p_y_ts
+series t_f_ts = tt_f_ts*100/p_y_ts
+series funds_f_ts = ffunds_f_ts*100/p_y_ts
+series prop_f_ts = pprop_f_ts*100/p_y_ts
+series div_h_ts = ddiv_h_ts*100/p_y_ts
+series div_b_ts = ddiv_b_ts*100/p_y_ts
+series div_row_ts = ddiv_row_ts*100/p_y_ts
+series v_f_ts = vv_f_ts*100/p_y_ts
+series v_b_ts = vv_b_ts*100/p_y_ts
+series v_h_ts = vv_h_ts*100/p_y_ts
+series v_g_ts = vv_g_ts*100/p_y_ts
+series v_row_ts = vv_row_ts*100/p_y_ts
+series l_f_ts = ll_f_ts*100/p_y_ts
+series nl_f_ts = nnl_f_ts*100/p_y_ts
+series nw_f_ts = nnw_f_ts*100/p_y_ts 
+series y_n_synth  = yy_n_synth*100/p_y_ts 
+series g_k_synth = d(k_synth)/k_synth(-1)
+series g_n_synth = d(y_n_synth)/y_n_synth(-1)
+series e_imp_ts = ((d(imp_ts)/imp_ts(-1))/(d(y_ts)/y_ts(-1))) 
+series yd_f_ts = gdp_f_ts - wb_ts - tau_f_ts - int_f_ts + t_f_ts - prop_f_ts - div_f_ts 
+
+'d) GOVERNMENT ---------------------------------------------------------------------------------------------------------------------------------
+read(b2, s=gov) "C:\Users\...\Italy data.xls" r_b_ts bb_g_ts bb_f_ts bb_row_ts bb_b_ts ggdp_g_ts ccons_g_ts iinv_g_ts wwb_g_ts ttau_tot_ts tt_tot_ts ddiv_g_ts iint_g_ts pprop_g_ts ffunds_g_ts nnl_g_ts r_ba_ts p_b_synth nnw_g_ts ll_g_ts dd_g_ts edu_ts research_g_ts ddebt_g_ts
+
+'Create real series
+series b_g_ts = bb_g_ts*100/p_y_ts 
+series b_f_ts = bb_f_ts*100/p_y_ts 
+series b_row_ts = bb_row_ts*100/p_y_ts 
+series b_b_ts = bb_b_ts*100/p_y_ts 
+series gdp_g_ts = ggdp_g_ts*100/p_y_ts 
+series cons_g_ts = ccons_g_ts*100/p_y_ts 
+series inv_g_ts = iinv_g_ts*100/p_y_ts 
+series wb_g_ts = wwb_g_ts*100/p_y_ts 
+series tau_tot_ts = ttau_tot_ts*100/p_y_ts 
+series t_tot_ts = tt_tot_ts*100/p_y_ts 
+series div_g_ts = ddiv_g_ts*100/p_y_ts 
+series int_g_ts = iint_g_ts*100/p_y_ts 
+series prop_g_ts = pprop_g_ts*100/p_y_ts 
+series funds_g_ts = ffunds_g_ts*100/p_y_ts 
+series nl_g_ts = nnl_g_ts*100/p_y_ts 
+series nw_g_original_ts = nnw_g_ts*100/p_y_ts 
+series l_g_ts = ll_g_ts*100/p_y_ts 
+series d_g_ts = dd_g_ts*100/p_y_ts 
+series debt_g_ts = ddebt_g_ts*100/p_y_ts 
+series int_f_res_ts = int_f_ts - (r_lf_ts(-1)/100*l_f_ts(-1) + r_ba_ts/100*(-b_f_ts(-1)))
+series nw_g_ts = nw_g_original_ts 
+
+'e) FINANCIAL SECTOR ---------------------------------------------------------------------------------------------------------------------------------
+read(b2, s=banks) "C:\Users\...\Italy data.xls" ggdp_b_ts iinv_b_ts wwb_b_ts ttau_b_ts ddiv_b_ts iint_b_ts pprop_b_ts tt_b_ts ffunds_b_ts nnl_b_ts ppi_b_ts nnw_b_ts ll_b_ts dd_b_ts r_ecb_ts
+
+'Create real series
+series gdp_b_ts = ggdp_b_ts*100/p_y_ts
+series inv_b_ts = iinv_b_ts*100/p_y_ts
+series wb_b_ts = wwb_b_ts*100/p_y_ts
+series tau_b_ts= ttau_b_ts*100/p_y_ts
+series ddiv_b_ts = div_b_ts*100/p_y_ts 
+series int_b_ts = iint_b_ts*100/p_y_ts
+series prop_b_ts = pprop_b_ts*100/p_y_ts
+series t_b_ts = tt_b_ts*100/p_y_ts
+series funds_b_ts = ffunds_b_ts*100/p_y_ts
+series nl_b_ts = nnl_b_ts*100/p_y_ts
+series pi_b_ts = ppi_b_ts*100/p_y_ts
+series nw_b_ts = nnw_b_ts*100/p_y_ts
+series l_b_ts = ll_b_ts*100/p_y_ts
+series d_b_ts = dd_b_ts*100/p_y_ts
+series v_b_iss_ts = @recode(v_b_ts<0,v_b_ts,0)
+series v_b_pur_ts = @recode(v_b_ts<0,1,v_b_ts) 'Note: I put 1 (instead of 0) to avoid negative log issues
+series nfw_b_ts = nw_b_ts*(1-0.008) + (-d_b_ts) 'Note: 0.008 is the value of nu_kb
+series div_b_recv_ts = @recode(div_b_ts>0,div_b_ts,0)
+series div_b_paid_ts = @recode(div_b_ts>0,0,div_b_ts)
+
+'f) REST OF THE WORLD ---------------------------------------------------------------------------------------------------------------------------------
+read(k2, s=row) "C:\Users\...\Italy data.xls" nnl_row_ts nnw_row_ts ll_row_ts dd_row_ts tt_row_ts ttau_row_ts
+
+'Create real series
+series nl_row_ts = nnl_row_ts*100/p_y_ts
+series nw_row_ts = nnw_row_ts*100/p_y_ts
+series l_row_ts = ll_row_ts*100/p_y_ts
+series d_row_ts = dd_row_ts*100/p_y_ts
+series t_row_ts = tt_row_ts*100/p_y_ts
+series tau_row_ts = ttau_row_ts*100/p_y_ts
+series v_row_pur_ts = 0 '@recode(v_row_ts<0,0,v_row_ts)
+series div_row_recv_ts = @recode(div_row_ts>0,div_row_ts,0)
+
+'g) FIXED CAPITAL AND DWELLINGS ---------------------------------------------------------------------------------------------------------------------------------
+read(b2, s=fixed capital) "C:\Users\...\Italy data.xls" kk_tot_ts gg_k_ts hhouse_tot_ts nu_kb_ts nu_kf_ts nu_kg_ts nu_kh_ts nu_hb_ts nu_hf_ts nu_hg_ts nu_hh_ts k_grow_ts u_ts ddiv_tot_ts
+
+'Create real series
+series k_tot_ts = kk_tot_ts*100/p_y_ts
+series house_tot_ts = hhouse_tot_ts*100/p_y_ts                                 
+series div_tot_ts = ddiv_tot_ts*100/p_y_ts
+series g_k_ts = d(k_tot_ts)/k_tot_ts(-1)
+
+'i) ADDITIONAL SERIES
+series ofin_f_ts = d_f_ts + (-v_f_ts) - l_f_ts + (-b_f_ts) - nw_f_ts                                     'NFCs' additional financial and non-financial assets (including dwellings)
+series ofin_b_ts = (-d_b_ts) + v_b_ts - (-l_b_ts) + b_b_ts - nw_b_ts                               'Financial sector's additional financial and non-financial assets (including dwellings)
+series ofin_g_ts = nw_g_ts - (d_g_ts + v_g_ts - l_g_ts + (-b_g_ts))                                'Government's additional financial and non-financial assets (including dwellings)
+series v_tot_ts = v_f_ts+v_b_iss_ts+v_row_ts                                                                 'Total equity and shares
+series v_fh_ts = (v_f_ts/v_tot_ts)*v_h_ts                                                                         'NFC equity and shares held by households 
+series cg_h_ts = nw_h_ts - nw_h_ts(-1) - yd_h_ts + cons_h_ts + inv_h_ts - funds_h_ts  'Capital gains realised by households
+series cg_b_ts = nw_b_ts - nw_b_ts(-1) - pi_b_ts + inv_b_ts                                           'Capital gains realised by financial institutions
+series cg_f_ts = nw_f_ts - nw_f_ts(-1) - yd_f_ts + inv_f_ts - funds_f_ts                            'Capital gains realised by NFCs
+series cg_g_ts = nw_g_ts - nw_g_ts(-1) - nl_g_ts                                                            'Capital gains realised by government
+
+' **************************************************************************** 
+'Create and label series (endogenous variables, exogenous variables and other parameters)
+
+'a) HOUSEHOLDS -------------------------------------------------------------------------------------------------------------------------
+series cons_h
+cons_h.label(d) Household consumption
+series yd_h
+yd_h.label(d) Household disposable income
+series nw_h
+nw_h.label Households net wealth
+series nfw_h
+nfw_h.label Households financial assets
+series c_int
+c_int.label(d) Share of intermediate consumption to total production
+series dummy
+dummy.label(d) Crisis dummy
+series mort_h
+mort_h.label(d) Household mortgages 
+series house_h
+house_h.label(d) Dwellings (stock) held by households
+series inv_h
+inv_h.label(d) Housing investment
+series tau_h
+tau_h.label(d) Tax burden on households
+series theta_h
+theta_h.label(d) Average tax rate on household income
+series wb
+wb.label(d) Household wages
+series gdp
+gdp.label(d) Total GDP of the economy
+series gdp_h
+gdp_h.label(d) Household GDP
+series beta_h
+beta_h.label(d) Share of household GDP to total GDP
+series alpha_h_t
+alpha_h_t.label(d) Household transfers to wages ratio
+series alpha_h_p
+alpha_h_p.label(d) Hosehold net property income to wages ratio
+series alpha_h_i
+alpha_h_i.label(d) Households interests to wages ratio
+series n
+n.label(d) Total employment (20 to 64 years)
+series y
+y.label(d) Total gross product
+series prod_l
+prod_l.label(d) Gross product per employee  
+series funds_h
+funds_h.label(d) Adjustment in household funds
+series alpha_h_fu
+alpha_h_fu.label(d) Adjustment in household funds to disposable income ratio
+series nl_h
+nl_h.label(d) Household net lending
+series n_init
+n_init.label(d) Initial employment (1996)
+series g_n
+g_n.label(d) Potential growth rate 
+series int_h
+int_h.label(d) Net interest received by households
+series int_hpaid
+int_hpaid.label(d) Total interests paid by households
+series int_hrecv
+int_hrecv.label(d) Total interests received by households
+series d_h
+d_h.label(d) Bank deposits held by households
+series v_h
+v_h.label(d) Equity held by households (net stock)
+series b_h	
+b_h.label(d) Securities held by households (net stock)
+series ofin_h	
+ofin_h.label(d) Other financial assets held by households (net stock)
+series perc_ofin_h
+perc_ofin_h.label(d) Percentage of other financial assets held by households (net stock) '^^^^^NEW
+series zeta	
+zeta.label(d) Profit share to GDP
+series omega_tot
+omega_tot.label(d) Wage share to GDP
+series omega_lab
+omega_lab.label(d) Labour income share to GDP
+series omega_s	
+omega_s.label(d) Share of wages paid by NPISH to total wages
+series omega_o	
+omega_o.label(d) Share of wages paid by non-productive sectors to total wages
+series ann
+ann.label(d) Overall annuities received by households
+series div_h
+div_h.label(d) Total (net) dividends received by households
+series div_fh 
+div_fh.label(d) Net dividends paid by NFCs to households
+series div_bh 
+div_bh.label(d) Net dividends paid by financial institutions to households
+series div_rowh
+div_rowh.label(d) Net dividends paid by foreign corporations to households
+series prop_h
+prop_h.label(d) Other property income received by households
+series t_h
+t_h.label(d) Net transfers received by households (benefits, subsidies, etc.)
+series v_fh
+v_fh.label(d) NFC equity held by households
+series x_f
+x_f.label(d) NFC equity to total equity
+series v_bh
+v_bh.label(d) Financial institutions equity held by households
+series x_b
+x_b.label(d) Financial institutions equity to total equity
+series v_rowh     
+v_rowh.label(d) Foreign corporations equity held by households
+series r_h
+r_h.label(d) Property income rate
+series q_f
+q_f.label(d) NFC securities to total securities
+series q_gf
+q_gf.label(d) Net percentage of Government bonds purchased by NFCs (before 2003)
+series v_tot
+v_tot.label(d) Total equity and shares of the economy
+series b_tot
+b_tot.label(d) Total securities (other than shares) of the economy
+series residuals_h
+residuals_h.label(d) Household net lending residuals (up until 2016)
+series b_fh
+b_fh.label(d) NFC securities held by households
+series b_gh
+b_gh.label(d) Government bonds held by households
+
+'b) NFCs -------------------------------------------------------------------------------------------------------------------------
+series gdp_f
+gdp_f.label(d) GDP associated with firms
+series g_prod
+g_prod.label(d) Growth rate of productivity
+series k_tot
+k_tot.label(d) Stock of productive capital
+series delta_k
+delta_k.label(d) Capital depreciation rate
+series delta_f
+delta_f.label(d) NFC investment to total investment
+series inv_f
+inv_f.label(d) Investment undertaken by NFCs
+series inv_tot
+inv_tot.label(d) Total current investment
+series g_k
+g_k.label(d) Capital growth rate (NFC investment rate)
+series beta_f
+beta_f.label(d) Share of NFC GDP to total GDP
+series r_lf
+r_lf.label(d) Interest rate on loans to NFCs
+series r_z
+r_z.label(d) Risk-free interest rate (10-year German bunds)
+series i_t
+i_t.label(d) ECB Policy rate
+series d_f 
+d_f.label(d) Deposits held by NFCs
+series y_ad
+y_ad.label(d) Aggregate demand
+series gov_sp 
+gov_sp.label(d) Government spending net of interest payments
+series gov_rev 
+gov_rev.label(d) Total government spending revenue
+series export
+export.label(d) Export
+series imp
+imp.label(d) Import
+series ner
+ner.label(d) Nominal exchange rate
+series pi_f
+pi_f.label(d) Profits of NFCs
+series tau_f
+tau_f.label(d) Taxes paid by NFCs
+series transf_f
+transf_f.label(d) Subsidies and transfers to/from NFCs (including capital transfers)
+series int_f
+int_f.label(d) Net interest received by NFCs
+series r_d
+r_d.label(d) Interest rate on bank deposits
+series l_f
+l_f.label(d) Loans to NFCs
+series pi_fu
+pi_fu.label(d) Retained profits of NFCs
+series s_f
+s_f.label(d) NFC profit retention rate
+series div_f
+div_f.label(d) Total dividends paid by NFCs
+series theta_f
+theta_f.label(d) Tax rate paid by NFC
+series v_f
+v_f.label(d) NFC Total equity stock
+series div_fb
+div_fb.label(d) NFC Dividends paid to domestic financial sector
+series v_fb
+v_fb.label(d) NFC Equity held by domestic financial sector
+series div_frow
+div_frow.label(d) NFC dividends paid to foreign investors
+series v_frow
+v_frow.label(d) NFC equity held by foreign investors
+series div_fg
+div_fg.label(d) NFC net dividends paid to government sector
+series v_fg
+v_fg.label(d) NFC equity held by government sector
+series v_f_r
+v_f_r.label(d) Volume of NFC new equity issued to fund investment
+series p_v
+p_v.label(d) Price of NFC new equity issued to fund investment
+series psi
+psi.label(d) Share of investment funded by equity
+series npl
+npl.label(d) Loans write offs
+series nl_f
+nl_f.label(d) NFC net lending
+series xi_b  
+xi_b.label(d) Percentage of non-performing bank loans
+series xi_f  
+xi_f.label(d) Percentage of NPBL which become NFC loan write offs
+series eta_f  
+eta_f.label(d) Extra-growth of NFC deposits compared with GDP
+series cons_int 
+cons_int.label(d) Intermediate consumption (total)
+series net_tau_tot
+net_tau_tot.label(d) Total taxes on products net of subsidies
+series wb_other
+wb_other.label(d) Wages paid by non-productive sectors
+series opaym_f
+opaym_f.label(d) Other payments made by NFCs
+series gdp_g
+gdp_g.label(d) Government GDP
+series gdp_row
+gdp_row.label(d) Rest of the world GDP component
+series alpha_f_t
+alpha_f_t.label(d) NFC subsidies and transfers to profit rate
+series t_f
+t_f.label Current subsidies and transfers to/from NFCs
+series funds_f
+funds_f.label NFC adjustment in funds
+series prop_f
+prop_f.label Other property income to/from NFCs
+series alpha_f_o
+alpha_f_o.label(d) Other property income to profit ratio
+series r_v
+r_v.label(d) Share prices index
+series nw_f
+nw_f.label NFC net wealth
+series nfw_f
+nfw_f.label NFC financial assets holdings
+series yd_f
+yd_f.label NFC disposable income
+series ofin_f	
+ofin_f.label(d) Other financial and non-financial assets held by NFCs (net stock)
+series b_f	
+b_f.label(d) Securities issued by NFCs (net stock)
+series alpha_f_fu
+alpha_f_fu.label(d) NFC adjustment in funds to profit ratio
+series int_f_res
+int_f_res.label(d) Other net interest payments from/to NFCs
+series b_gf 
+b_gf.label(d) Net government bonds purchased by NFCs (up until 2003)
+series int_fb
+int_fb.label(d) Interest paid by NFCs to financial sector
+series int_fh
+int_fh.label(d) Interest paid by NFCs to households
+series int_frow
+int_frow.label(d) Interest paid by NFCs to RoW
+series xi_inv
+xi_inv.label(d) % of investment that goes to waste
+series percd
+percd.label(d) % of new loans to firms that turn into deposits & cash
+series y_n
+y_n.label(d) Potential output 
+series y_n_l
+y_n_l.label(d) Potential output (labour component) 
+series y_n_k
+y_n_k.label(d) Potential output (capital component) 
+series prod_k
+prod_k.label(d) Output to capital ratio 
+series p_k
+p_k.label(d) Capital deflator 
+series p_y
+p_y.label(d) GDP deflator (price index)
+series inflat
+inflat.label(d) Inflation (output)
+series residuals_f
+residuals_f.label(d) NFC net lending residuals
+series divper_f
+divper_f.label(d) Percentage of total dividends paid by NFCs
+series perc_ofin_f
+perc_ofin_f.label(d) Percentage of other assets held by NFCs (net stock)
+
+'c) GOVERNMENT -------------------------------------------------------------------------------------------------------------------------
+series r_b
+r_b.label(d) 10-year government bond yields (%)
+series r_ba
+r_ba.label(d) Average government bond yields (%)
+series b_g
+b_g.label(d) 10-year government bonds
+series nl_g
+nl_g.label(d) Government net lending
+series int_g
+int_g.label(d) Government interest payments
+series int_g_res
+int_g_res.label(d) Government interest payments (residual component)
+series gdp_g
+gdp_g.label(d) Government GDP
+series cons_g
+cons_g.label(d) Government consumption 
+series inv_g
+inv_g.label(d) Government investment 
+series wb_g
+wb_g.label(d) Government wages
+series tau_tot
+tau_tot.label(d) Total tax revenue
+series t_tot
+t_tot.label(d) Total transfers, benefits and subsidies
+series div_g
+div_g.label(d) Dividends received by the government
+series prop_g
+prop_g.label(d) Government other property income
+series funds_g
+funds_g.label(d) Government funds adjustments
+series gov
+gov.label(d) Government total expenditure
+series beta_g
+beta_g.label(d) Share of government GDP to total GDP
+series spread
+spread.label(d) Spread between Italian and German bond yields
+series m
+m.label(d) Mark-up of Italian bond rate over German bond rate
+series spread_av
+spread_av.label(d) Spread between Italian bond average rate and German bond rate
+series m_av
+m_av.label(d) Mark-up of Italian bond average rate over German bond rate
+series alpha_g_c
+alpha_g_c.label(d) Government consumption share of GDP
+series v_g
+v_g.label(d) Net equity held by government sector
+series v_fg
+v_fg.label(d) Net NFC equity held by government sector
+series alpha_g_i
+alpha_g_i.label(d) Government investment share of GDP
+series b_g_r
+b_g_r.label(d) Real supply of government bonds
+series p_b
+p_b.label(d) Price of government bonds
+series gbills
+gbills.label(d) Nominal supply of government bills
+series omega_g
+omega_g.label(d) Government wage share of GDP
+series alpha_g_v
+alpha_g_v.label(d) Government equity holdings to GDP ratio
+series alpha_g_p
+alpha_g_p.label(d) Government property income to GDP ratio
+series alpha_g_fu
+alpha_g_fu.label(d) Government funds adjustment to GDP ratio
+series e_g
+e_g.label(d) Share of accounting dividends received by government 
+series e_b
+e_g.label(d) Share of accounting dividends received/paid by financial sector
+series e_row
+e_row.label(d) Share of RoW dividends paid to households
+series theta_tot
+theta_tot.label(d) Total (net) taxes on products to gross output
+series i_f
+i_f.label(d) Share of interests paid by/to firms to total interest payments
+series int_gb
+int_gb.label(d) Interest paid by Government to financial sector
+series int_gh
+int_gh.label(d) Interest paid by government to households
+series int_grow
+int_grow.label(d) Interest paid by government to RoW
+series nw_g
+nw_g.label(d) Government net wealth 
+series l_g
+l_g.label(d) Government net loans stock
+series d_g
+d_g.label(d) Government net deposits stock
+series eta_lg
+eta_lg.label(d) Government loans to net wealth
+series eta_dg
+eta_dg.label(d) Government deposits to net wealth
+series tau_prod
+tau_prod.label(d) Taxes on products
+series t_prod
+t_prod.label(d) Subsidies on products
+series residuals_g
+residuals_g.label(d) Government net lending residuals
+series ofin_g	
+ofin_g.label(d) Other financial and non-financial assets held by government (net stock) 
+series perc_ofin_g
+perc_ofin_g.label(d) Percentage of other assets held by government (net stock) 
+series v_bg
+v_bg.label(d) Financial sector equity held by government
+series v_rowg
+v_rowg.label(d) RoW equity held by government
+series div_bg
+div_bg.label(d) Dividends paid by financial sector to government
+
+'d) FINANCIAL SECTOR -------------------------------------------------------------------------------------------------------------------------
+series perc_ofin_b
+perc_ofin_b.label(d) Percentage of other assets held by financial sector (net stock) '^^^^^NEW
+series gdp_b
+gdp_b.label(d) Financial institutions GDP
+series beta_b
+beta_b.label(d) Share of financial institutions GDP to total GDP
+series omega_b
+omega_b.label(d) Financial sector wage share to GDP
+series tau_b
+tau_b.label(d) Total taxes paid by financial sector
+series theta_b
+theta_b.label(d) Tax rate paid on financial sector profits
+series pi_b
+pi_b.label(d) Financial sector (retained) profits
+series t_b
+t_b.label(d) Total transfers to financial sector
+series alpha_b_t
+alpha_b_t.label(d) Financial sector transfers to profit ratio
+series prop_b
+prop_b.label(d) Other property income paid by financial sector
+series alpha_b_p
+alpha_b_p.label(d) Financial sector property income to profit ratio
+series funds_b
+funds_b.label(d) Financial sector funds adjustment to profit ratio
+series alpha_b_fu
+alpha_b_fu.label(d) Financial sector funds adjustment to profit ratio
+series int_b
+int_b.label(d) Financial sector net interest 
+series d_b
+d_b.label(d) Total net bank deposits
+series ofin_b
+ofin_b.label(d) Other net financial and non-financial assets held by financial sector
+series int_b_res
+int_b_res.label(d) Additional interest payments from/to financial sector
+series perc_int_b_res
+perc_int_b_res.label(d) Additional interest payments from/to financial sector as a percentage of other interests
+series nw_b
+nw_b.label(d) Net wealth of financial sector
+series nfw_b
+nfw_b.label(d) Net financial assets held by financial sector
+series inv_b
+inv_b.label(d) Investment undertaken by financial sector
+series d_res
+d_res.label(d) Bank deposits adjustment
+series l_b
+l_b.label(d) Total net loans granted by banks
+series b_b
+nw_b.label(d) Securities held by financial sector 
+series b_fb
+b_fb.label(d) NFC securities held by financial sector
+series nw_b
+nw_b.label(d) Financial institutions net wealth 
+series s_b
+s_b.label(d) Retention rate of financial sector profit
+series l_tot
+l_tot.label(d) Total stock of loans
+series d_tot
+d_tot.label(d) Total stock of deposits
+series r_add
+r_add.label(d) Risk premium over zero-risk interest rate
+series div_rowb
+div_rowb.label(d) Net dividends paid by foreign corporations to financial sector
+series v_rowb     
+v_rowb.label(d) Foreign corporations equity held by financial sector
+series nl_b
+nl_b.label(d) Net lending by the financial sector
+series alpha_b_inv
+alpha_b_inv.label(d) Financial investment to total (productive) investment ratio
+series l_rec
+l_rec.label(d) Total accounting loans 
+series d_rec
+d_rec.label(d) Total accounting deposits 
+series v_b
+v_b.label(d) Net equity entry of financial corporations 
+series residuals_b
+residuals_b.label(d) Financial sector net lending residuals  
+series v_b_iss  
+v_b_iss.label(d) Net equity issued by financial corporations 
+series v_b_pur 
+v_b_pur.label(d) Net equity purchased by financial corporations 
+series div_b
+div_b.label(d) Dividends entry of financial corporations 
+series div_b_paid
+div_b_paid.label(d) Dividends paid by financial corporations 
+series div_b_recv
+div_b_recv.label(d) Dividends received by financial corporations 
+series divper_b
+divper_b.label(d) Percentage of total dividends paid by financial sector 
+series wb_b
+wb_b.label(d) Wages paid by financial sector
+series b_gb
+b_gb.label(d) Goverment bonds held by RoW
+
+'e) REST OF THE WORLD -------------------------------------------------------------------------------------------------------------------------
+series divper_row 
+divper_row.label(d) Percentage of total dividends paid by RoW 
+series nl_row
+nl_row.label(d) Rest of the world net lending
+series nw_row
+nw_row.label(d) Rest ot the world net wealth 
+series l_row
+l_row.label(d) Stock of loans to the rest of the world 
+series d_row
+d_row.label(d) Deposits held by the rest of the world 
+series r_ecb
+r_ecb.label(d) Policy rate for Euro Area
+series v_row     
+v_row.label(d) Rest of the world net equity
+series div_row
+div_row.label(d) Net dividends entry of rest of the world
+series div_row_recv
+div_row_recv.label(d) Net dividends received by rest of the world 
+series div_row_paid
+div_row_paid.label(d) Net dividends paid by rest of the world 
+series int_row
+int_row.label(d) Net interest received by rest of the world
+series t_row
+t_row.label(d) Rest of the world transfers
+series alpha_row_t
+alpha_row_t.label(d) Rest of the world transfers to GDP
+series tau_row
+tau_row.label(d) Rest of the world tax revenues
+series theta_row
+theta_row.label(d) Rest of the world tax rate
+series e_imp
+theta_row.label(d) Output elasticity of import 
+series b_row
+b_row.label(d) Securities held by rest of the world
+series div_brow
+div_brow.label(d) Dividends paid by financial sector to RoW
+series div_rowg
+div_rowg.label(d) Dividends paid by RoW to government
+series b_frow
+b_frow.label(d) NFC securities held by RoW
+series b_grow
+b_grow.label(d) Government bonds held by RoW
+series div_tot
+div_tot.label(d) Total dividends
+
+'f) OTHER SERIES -------------------------------------------------------------------------------------------------------------------------
+series nu_kb = 0.008
+nu_kb.label(d) Banks produced NFA as a percentage of net worth 
+series nu_kf
+nu_kf.label(d) NFC produced NFA as a percentage of net worth 'Note: missing data for original nu_h(i) and nu_k(i) coefficients. Average values 2013-2015 are used.
+series lev_h
+lev_h.label(d) Household NFW to loans ratio 
+series lev_f
+lev_f.label(d) Firms NFW to loans ratio 
+series lev2_f
+lev2_f.label(d) Firms leverage ratio  'Note: as defined by major institutions
+series lev_b
+lev_b.label(d) Financial sector NFW to loans ratio 
+series def_g
+def_g.label(d) Government deficit to GDP ratio 
+series debt_g
+debt_g.label(d) Government debt stock to GDP ratio
+
+'HOUSING MARKET                                       
+series house_s            
+house_s.label(d) Supply of new housing (synthetic)
+series newhouse_d            
+newhouse_d.label(d) Housing transactions (number)
+series g_H                
+g_H.label(d) Growth rate of housing stock
+series phi_h1 
+phi_h1.label(d) Parameter in housing demand function
+series phi_h2
+phi_h2.label(d) Parameter in housing demand function
+series p_H
+p_H.label(d) Housing price index
+series perc_HH
+perc_HH.label(d) Parameter in housing price function
+series dti
+dti.label(d) Debt to income ratio of households
+series dti0                                     
+dti0.label(d) Parameter in debt to income function
+series cg_h                        
+cg_h.label(d) Capital gains realised by households 'Note: CG on housing
+series perc_cg_h                        
+perc_cg_h.label(d) Capital gains realised by households as % of net wealth
+series cg_h_res                        
+cg_h_res.label(d) Capital gains on other financial assets
+series cg_b                        
+cg_b.label(d) Capital gains realised by banks 'Note: CG on T-bonds
+series perc_cg_b                        
+perc_cg_b.label(d) Capital gains realised by banks as % of net wealth
+series cg_f                        
+cg_f.label(d) Capital gains realised by firms
+series perc_cg_f                        
+perc_cg_f.label(d) Capital gains realised by firms as % of net wealth
+series cg_g                        
+cg_g.label(d) Capital gains realised by government
+series perc_cg_g                        
+perc_cg_g.label(d) Capital gains realised by government as % of net wealth
+
+'g) DUMMY SERIES -------------------------------------------------------------------------------------------------------------------------
+series dummy_v_b = @recode(@date<@dateval("2008"),1,0) 'Note: not a real dummy. It allows creating additional series 
+series dummy_b_f = @recode(@date<@dateval("2003"),0,1) 'Note: not a real dummy. it allows creating additional series
+series dummy_prod=@recode(@date>@dateval("2007"),0,1)
+
+'h) ADDITIONAL SERIES -------------------------------------------------------------------------------------------------------------------------
+series b_tot_ts = (b_f_ts*dummy_b_f + b_g_ts)                       'Total securities (stock) in the economy
+series v_tot_ts = (v_f_ts + v_b_ts*dummy_v_b + v_row_ts)      'Total equity and shares (stock) in the economy
+series parag                                                                            'Note: to be used in cons_g (= 0 under baseline)
+parag.label(d) Autonomous government consumption
+
+' **************************************************************************** 
+' Set sample size to all workfile range
+smpl 1996 2030
+
+'Define the set of paramters to be estimated, named p(1), p(2), ..., p(400)
+coef(400) p
+
+'I) Estimate parameter values (two simple methods)
+
+'I.a) Create the system of equations for estimation (named 'sys1')
+
+'system sys1
+'sys1.append ....
+'Estimate parameter values in the system above using SUR method 
+'sys1.sur(o)   ' o = default option, meaning that it iterates only on the coefficient vector with one step of the weighting matrix
+
+'I.b) Use simple OLS estimation equation by equation
+
+'Estimate production function parameters during "normal times" (1996-2008)
+smpl 1996 2008
+equation eq1.ls(cov=white) log(y_ts) = p(305) + p(306)*@trend + p(307)*log(k_tot_ts) 
+equation eq2.ls(cov=white) log(y_ts) = p(308) + p(309)*@trend + p(310)*log(n_ts) 
+
+'Estimate other coefficients using all the sample
+smpl 1996 2030
+equation eq3.ls(cov=white) int_hrecv_ts = p(241) + p(242)*(int_hrecv_ts(-1)) + p(243)*r_ba_ts + p(244)*r_ba_ts(-1) + p(245)*b_h_ts + p(246)*b_h_ts(-1) + p(247)*b_h_ts*r_ba_ts + p(248)*b_h_ts(-1)*r_ba_ts(-1)    
+equation eq4.ls(cov=white) -int_hpaid_ts = p(231) + p(232)*(-int_hpaid_ts(-1)) + p(233)*r_ecb_ts + p(234)*r_ecb_ts(-1) + p(235)*mort_h_ts + p(236)*mort_h_ts(-1) + p(237)*mort_h_ts*r_ecb_ts + p(238)*mort_h_ts(-1)*r_ecb_ts(-1) 
+equation eq5.ls(cov=white) t_h_ts/wb_ts(-1)=p(9)+p(10)*@trend
+equation eq6.ls(cov=white) prop_h_ts/wb_ts(-1)=p(11) + p(12)*@trend
+equation eq8.ls(cov=white) cons_h_ts= p(251) + p(252)*cons_h_ts(-1) + p(253)*yd_h_ts(-1)+p(254)*nw_h_ts(-1)
+equation eq9.ls(cov=white) house_h_ts = p(255)*house_h_ts(-1) + p(256)*inv_h_ts
+equation eq10.ls(cov=white) v_h_ts = p(17)*nfw_h_ts(-1) + p(18)*nfw_h_ts(-1)*r_v_ts(-1) + p(19)*yd_h_ts + p(20)*nfw_h_ts(-1)*r_ba_ts(-1)
+equation eq12.ls(cov=white) b_h_ts = p(27)*nfw_h_ts(-1) + p(28)*nfw_h_ts(-1)*r_v_ts(-1) + p(29)*yd_h_ts + p(30)*nfw_h_ts(-1)*r_ba_ts(-1)
+equation eq13.ls(cov=white) b_h_ts = p(265)*nfw_h_ts(-1) + p(266)*nfw_h_ts(-1)*r_v_ts(-1) + p(267)*yd_h_ts + p(268)*nfw_h_ts(-1)*r_ba_ts(-1) + p(269)*b_h_ts(-1) + p(270)*@trend + p(271)*@trend^2
+equation eq14.ls(cov=white) d_h_ts = p(34)*nfw_h_ts(-1) + p(35)*nfw_h_ts(-1)*r_v_ts + p(36)*yd_h_ts + p(37)*nfw_h_ts(-1)*r_ba_ts(-1)
+'Note: ofin_h implicit parameter values (with no trend component) are:
+'lambda_h40 = 1-(lambda_h10 + lambda_h20)
+'lambda_h41 = -(lambda_h11 + lambda_h21) 
+'lambda_h42 = -(lambda_h12 + lambda_h22) 
+'lambda_h43 = -(lambda_h13 + lambda_h23) 
+equation eq16.ls(cov=white) mort_h_ts = mort_h_ts(-1) + p(38)*yd_h_ts(-1) + p(39)*house_h_ts(-1) + p(40)*inv_h_ts(-1) 
+equation eq17.ls(cov=white) inv_h_ts = p(41)*inv_h_ts(-1) + p(42)*mort_h_ts(-1) + p(43)*house_h_ts(-1) + p(44)*yd_h_ts(-1) + p(45)*(d(prop_h_ts(-1))/prop_h_ts(-2))
+equation eq19.ls(cov=white) (cons_int_ts/y_ts) = p(46)*(cons_int_ts(-1)/y_ts(-1)) +p(47)*y_ts(-1)
+equation eq20.ls(cov=white) (1 + (inv_tot_ts - inv_h_ts - k_tot_ts)/k_tot_ts(-1)) = p(48)*(1 + (inv_tot_ts(-1) - inv_h_ts(-1) - k_tot_ts(-1))/k_tot_ts(-2)) + p(49)*d(inv_tot_ts)
+equation eq21.ls(cov=white) g_k_ts = p(286) + p(287)*(y_ts/k_tot_ts(-1)) + p(288)*r_lf_ts(-1) +  p(289)*pi_f_ts(-1)/k_tot_ts(-1) + p(292)*(r_z_ts(-1))
+equation eq22.ls(cov=white) (inv_f_ts/inv_tot_ts) = p(56) + p(57)*(inv_f_ts(-1)/inv_tot_ts(-1)) + p(58)*y_ts(-1) + p(59)*@trend
+equation eq24.ls(cov=white) imp_ts = imp_ts(-1)*exp(p(295) + p(296)*log(y_ts/y_ts(-1)) + p(297)*(ner_ts-ner_ts(-1)))
+equation eq25.ls(cov=white) export_ts = p(300)*export_ts(-1) + p(301)*d(y_ts/n_ts) + p(302)*d(imp_ts) + p(303)*d(ner_ts)
+equation eq26.ls(cov=white) inv_b_ts = p(172) + p(173)*inv_b_ts(-1) + p(174)*@trend + p(175)*r_z_ts(-1) + p(176)*r_v_ts(-1) + p(177)*pi_b_ts(-1)/(nw_b_ts(-1)) + d(p_v_synth)*p(178)
+equation eq27.ls(cov=white) b_b_ts = p(188)*nfw_b_ts(-1) + p(189)*nfw_b_ts(-1)*r_v_ts(-1) + p(190)*pi_b_ts + p(191)*nfw_b_ts(-1)*r_ba_ts(-1) 
+equation eq28.ls(cov=white) v_b_pur_ts = p(192)*nfw_b_ts(-1) + p(193)*nfw_b_ts(-1)*r_v_ts(-1) + p(194)*pi_b_ts + p(195)*nfw_b_ts(-1)*r_ba_ts(-1) 
+equation eq29.ls(cov=white) l_row_ts = p(205)*l_row_ts(-1) + p(206)*r_ecb_ts(-1) + p(207)*gdp_row_ts(-1) + p(208)*ner_ts(-1) + p(209)*(imp_ts(-1) + export_ts(-1)) + p(210)*(imp_ts(-1) - export_ts(-1))
+equation eq30.ls(cov=white) b_row_ts = p(212)*r_z_ts(-1) + p(213)*r_ecb_ts(-1) + p(214)*r_ba_ts(-1) + p(215)*ner_ts(-1) + p(216)*r_v_ts(-1)
+equation eq31.ls(cov=white) d_row_ts = p(217)*l_row_ts(-1) + p(218)*gdp_row_ts(-1) + p(219)*(imp_ts(-1) + export_ts(-1)) + p(220)*(imp_ts(-1) - export_ts(-1)) + p(221)*r_ba_ts(-1) + p(222)*gdp_ts(-1)
+equation eq32.ls(cov=white) p_y_ts = p(311)*p_y_ts(-1) + p(312)*(y_n_synth-y_ts) + p(313)*wb_ts/y_ts + p(314)*ner_ts 
+equation eq33.ls(cov=white) p_k_ts = p(315)*p_k_ts(-1) + p(316)*(gdp_ts/k_tot_ts) + p(317)*wb_ts/y_ts + p(318)*ner_ts
+equation eq34.ls(cov=white) d(log(y_ts/n_ts)) = p(60)*dummy_prod+p(61)*d(log(inv_f_ts)) + p(62)*d(log(export_ts)) + p(63)*d(log(cons_g_ts)) + dummy_prod*p(64)*d(log(inv_f_ts)) + dummy_prod*p(65)*d(log(cons_g_ts))
+equation eq35.ls(cov=white) inv_h_ts = p(332) + p(333)*inv_h_ts(-1) + p(334)*mort_h_ts(-1) + p(335)*p_H_ts(-1)
+equation eq36.ls(cov=white) newhouse_d_ts = p(336) + p(337)*d(p_H_ts)
+equation eq37.ls(cov=white) p_h_ts = p(338)*(mort_h_ts/yd_h_ts)*yd_h_ts(-1)/house_h_ts  
+
+'II) Select starting values for stocks and lagged (endogenous) variables to fit past time series
+alpha_h_p = prop_h_ts/wb_ts(-1)
+prod_l = y_ts/n_ts 
+delta_f = inv_f_ts/inv_tot_ts 
+r_lf = r_lf_ts
+r_z = r_z_ts
+r_b = r_b_ts
+r_h=r_z_ts
+c_int = cons_int_ts/gdp_ts
+alpha_g_p = prop_g_ts/gdp_ts
+alpha_g_fu = funds_g_ts/gdp_ts
+theta_tot = net_tau_tot_ts/y_ts
+beta_f = gdp_f_ts/gdp_ts
+beta_b = gdp_b_ts/gdp_ts
+i_f = int_f_ts/(int_f_ts+int_g_ts)
+omega_b = wb_b_ts/gdp_ts
+nu_kf = 0.09 'Note: 2015 value
+beta_h = gdp_h_ts/gdp_ts
+omega_tot = wb_ts/gdp_ts
+nw_h = nw_h_ts
+house_h = house_h_ts
+funds_h = funds_h_ts
+n = n_ts
+cons_h = cons_h_ts
+tau_h = tau_h_ts
+wb = wb_ts
+gdp = gdp_ts
+y = y_ts
+inv_h = inv_h_ts
+int_h = int_h_ts
+nl_h = yd_h - cons_h - inv_h + funds_h 
+d_h = d_h_ts
+k_tot = k_tot_ts
+d_f = d_f_ts
+inv_tot = inv_tot_ts
+cons_g = cons_g_ts
+export = export_ts
+imp = imp_ts
+cons_int = cons_int_ts
+net_tau_tot = net_tau_tot_ts
+y_ad = cons_h  + cons_g + inv_tot + export - imp + cons_int - net_tau_tot
+inv_f = inv_f_ts
+ner = ner_ts
+v_f = -v_f_ts
+l_f = l_f_ts
+prop_h = prop_h_ts
+b_g = -b_g_ts
+g_k = g_k_ts 'Note: synth data, 1997 value
+pi_f = pi_f_ts
+inv_g = inv_g_ts
+b_h = b_h_ts
+b_f = b_f_ts
+nw_f = nw_f_ts 'Note: negative sign
+b_gf = b_f_ts
+int_hpaid = -int_hpaid_ts 'Note: negative sign
+int_b = int_b_ts
+int_f = -int_f_ts
+nw_b = pi_b_ts - inv_b_ts
+inv_b = inv_b_ts
+d_b = d_h_ts+d_f_ts+d_g_ts+d_row_ts
+l_b = mort_h_ts+l_f_ts+l_g_ts+l_row_ts
+nw_g = nw_g_ts
+nw_b = nw_b_ts
+nw_row = nw_row_ts
+pi_b = pi_b_ts
+d_tot = d_g_ts+d_b_ts
+l_tot = d_tot  
+l_g = l_g_ts
+l_row = l_row_ts
+r_ecb = r_ecb_ts
+r_add = r_lf_ts-r_ecb_ts
+nl_f = nl_f_ts
+nl_b = nl_b_ts
+nl_g = nl_g_ts
+nl_row = nl_row_ts
+nfw_b = nw_b_ts - (nw_b_ts*nu_kb) + (-d_b_ts)
+gdp_row = gdp_row_ts
+int_hrecv = int_hrecv_ts
+v_h = v_h_ts
+v_b = v_b_ts 
+p_y = p_y_ts 
+p_k = p_k_ts 
+debt_g = -nw_g_ts/gdp_ts 
+ofin_f = ofin_f_ts 
+y_n = y_n_synth 
+gdp_h = gdp_h_ts
+gdp_b= gdp_b_ts
+gdp_g= gdp_g_ts
+gdp_row= gdp_row_ts
+wb= wb_ts
+wb_other= wb_other_ts
+funds_f=funds_f_ts
+prop_f=prop_f_ts
+dti = mort_h_ts/yd_h_ts
+house_s = house_s_ts
+newhouse_d = newhouse_d_ts
+b_b=b_b_ts
+v_tot = v_tot_ts
+v_fh = v_fh_ts
+spread_av = r_ba_ts-r_z_ts
+m_av = (r_ba_ts/r_z_ts)-1
+mort_h = mort_h_ts
+nfw_h = nw_h_ts - house_h_ts + mort_h_ts 
+yd_h = yd_h_ts   
+r_ba = r_ba_ts
+cg_h = cg_h_ts
+cg_f = cg_f_ts
+cg_g = cg_g_ts
+cg_b = cg_b_ts
+p_b = p_b_synth
+p_v = p_v_synth
+house_h = house_h_ts
+p_h = p_h_ts
+
+'Variables to be checked
+r_v = @mean(r_v_ts, "1997 1997")
+gdp = @mean(gdp_ts, "1997 1997")
+omega_s = @mean((wb_h_p_ts/wb_ts), "1997 1997") 
+
+'III) Reasonable values for remaining parameters
+gbills = 0              'Starting value of nominal supply of government bills (convention)
+r_d = 0                 'Interest rate on bank deposits and cash (convention)
+parag = 0             'Autonomous government consumption or fiscal policy shock (0 in baseline scenario)
+xi_f = 0.7              'Percentage of NPBL which become NFC loan write offs (inferred from available data)
+psi = 0.01             'Percentage of investment funded by new shares - Note: Burgess et al. 2016 use 0.1 for UK!
+v_f_r = -v_f           'Real volume of NFC equity, so that p_v = 1 (convention) - Note: v_f < 0
+p_v = v_f_r/-v_f     'Price (index) of NFC shares
+b_g_r = b_g          'Real volume of government bonds, so that p_b = 1 (convention)
+p_b = b_g/b_g_r   'Price (index) of Government bonds 
+p_H = 40               'Initial value of housing (based on available data)
+g_H = 0.03            'Growth rate of housing               
+cg_h = 0                'Initial value for housing CG
+perc_cg_h = -0.45 'Percentage of household capital gains or losses on other financial assets (average over period 1996-2016)
+
+'--------------------------------------------------------------------------------------------------------------------------------------------------
+'Create the model (named 'ItalySFC')
+model ItalySFC
+
+'Set up system of difference equations
+
+' **************************************************************************** 
+'I) KEY BEHAVIOURAL EQUATIONS OF THE MODEL - Note: add factors replaced with actual values before 2018
+'(8) - Interest received by households 
+ItalySFC.append int_hrecv = p(241) + p(242)*(int_hrecv(-1)) + p(243)*r_ba + p(244)*r_ba(-1) + p(245)*b_h + p(246)*b_h(-1) + p(247)*b_h*r_ba + p(248)*b_h(-1)*r_ba(-1) 
+'(9) - Interest paid by households - Note: I used r_ecb, but I would recommend using the rate of interest on mortgages instead
+ItalySFC.append int_hpaid = p(231) + p(232)*(int_hpaid(-1)) + p(233)*r_ecb + p(234)*r_ecb(-1) + p(235)*mort_h + p(236)*mort_h(-1) + p(237)*mort_h*r_ecb + p(238)*mort_h(-1)*r_ecb(-1)
+'(12) - Consumption function
+ItalySFC.append cons_h = p(251) + p(252)*cons_h(-1) + p(253)*yd_h(-1)+p(254)*nw_h(-1)
+'(15) Household non-f. assets (dwellings, stock)
+ItalySFC.append house_h = p(255)*house_h(-1) + p(256)*inv_h
+'(17) Total (net) equity held by households (stock)
+ItalySFC.append v_h = p(17)*nfw_h(-1) + p(18)*nfw_h(-1)*r_v(-1) + p(19)*yd_h + p(20)*nfw_h(-1)*r_ba(-1)
+'(23) Total securities held by households
+ItalySFC.append b_h = p(27)*nfw_h(-1) + p(28)*nfw_h(-1)*r_v(-1) + p(29)*yd_h + p(30)*nfw_h(-1)*r_ba(-1)
+'(25bis) Total securities of the economy
+ItalySFC.append b_tot = @recode((b_f)<0,b_g,(b_f+b_g))                           
+'(26) - New (net) deposits held by households - Note: r_d = 0
+ItalySFC.append d_h = p(34)*nfw_h(-1) + p(35)*nfw_h(-1)*r_v(-1) + p(36)*yd_h + p(37)*nfw_h(-1)*r_ba(-1)
+'(28) - New net mortgages (loans to households)
+ItalySFC.append mort_h = mort_h(-1) + p(38)*yd_h(-1) + p(39)*house_h(-1) + p(40)*inv_h(-1) 
+'(39) - Rate of growth of capital
+ItalySFC.append g_k = @recode(@date<@dateval("2017"),g_k_ts,@mean(g_k_ts, "2010 2017"))   
+'(47) - Import (akin to Burgess et al. 2016)
+ItalySFC.append imp = imp(-1)*exp(p(295) + p(296)*log(y/y(-1)) + p(297)*(ner-ner(-1)))
+'(50) - NFC net interests (positive) - Note: average 2012-2016 value after 2016 
+ItalySFC.append int_f = @recode(@date<@dateval("2017"),-int_f_ts,@mean(-int_f_ts, "2012 2016"))
+'(125) - Total securities held by financial corporations - Note: big forecasting gap after 2011
+ItalySFC.append b_b = p(188)*nfw_b(-1) + p(189)*nfw_b(-1)*r_v(-1) + p(190)*pi_b + p(191)*nfw_b(-1)*r_ba(-1)
+'(136) - Loans to/from rest of the world
+ItalySFC.append l_row = p(205)*l_row(-1) + p(206)*r_ecb(-1) + p(207)*gdp_row(-1) + p(208)*ner(-1) + p(209)*(imp(-1) + export(-1)) + p(210)*(imp(-1) - export(-1))
+'(137) - Deposits held by rest of the world
+ItalySFC.append d_row = p(217)*l_row(-1) + p(218)*gdp_row(-1) + p(219)*(imp(-1) + export(-1)) + p(220)*(imp(-1) - export(-1)) + p(221)*r_ba(-1) + p(222)*gdp(-1)
+'Note: I take actual values (up to 2017) for the next three series, to avoid approximation issues with add factors
+'(124) - Equity held by financial sector
+ItalySFC.append v_b_pur = @recode(@date<@dateval("2017"),v_b_pur_ts, p(192)*nfw_b(-1) + p(193)*nfw_b(-1)*r_v(-1) + p(194)*pi_b + p(195)*nfw_b(-1)*r_ba(-1) )
+'(138) - Italian export
+ItalySFC.append export = @recode(@date<@dateval("2017"),export_ts,p(300)*export(-1) + p(301)*d(prod_l) + p(302)*d(imp) + p(303)*d(ner))
+'(145) - Net securities held by RoW
+ItalySFC.append b_row = @recode(@date<@dateval("2016"),b_row_ts,p(212)*r_z(-1) + p(213)*r_ecb(-1) + p(214)*r_ba(-1) + p(215)*ner(-1) + p(216)*r_v(-1) )
+
+' **************************************************************************** 
+'ALTERNATE EQUATIONS FOR HOUSING STOCK - Note: housing data too poor and short to be used before 2016
+'Supply of new housing (theoretical, already defined in dataset (for g_H = 0.03)
+ItalySFC.append house_s = house_s(-1)*(1+g_H)                                        
+'Housing transactions (number)
+ItalySFC.append newhouse_d = p(336) + p(337)*d(p_H)
+'Housing price index 
+ItalySFC.append p_H = p(338)*dti*yd_h(-1)/house_h
+'Housing investment
+ItalySFC.append inv_h = @recode(@date<@dateval("2016"),inv_h_ts,@mean(inv_h_ts,"2015 2016"))
+
+' **************************************************************************** 
+'III) OTHER EQUATIONS
+
+'a) HOUSEHOLDS -------------------------------------------------------------------------------------------------------------------------
+'(1) - Disposable income of households
+ItalySFC.append @identity yd_h = gdp_h + wb - tau_h + int_h + t_h + ann                                                
+'(2) - Total annuities
+ItalySFC.append @identity ann = div_h + prop_h                                                                                      
+'(3) - Household GDP 
+ItalySFC.append gdp_h = (beta_h)*gdp                                                                                       
+'(4) Net wages
+ItalySFC.append wb = omega_tot*gdp                                                                               
+'(5) Labour share to GDP
+ItalySFC.append omega_lab = (int_h+ann+wb*(1-omega_s))/gdp                                 
+'(6) - Taxes paid by households
+ItalySFC.append tau_h = theta_h*wb(-1)                                                                                    
+'(7) - Net interest earned by households
+ItalySFC.append @identity int_h = int_hrecv - int_hpaid                                                                            
+'(10) - Transfers received by households
+ItalySFC.append t_h = alpha_h_t*wb(-1)                                                             
+'(11) - Other property income received by households 
+ItalySFC.append prop_h = alpha_h_p*wb(-1)                                                       
+'(13) - Household net wealth
+ItalySFC.append @identity nw_h = nw_h(-1) + yd_h - cons_h - inv_h + funds_h + cg_h
+'(13bis) Total capital gains made by households as a % of (past period) net wealth
+ItalySFC.append cg_h = @recode(@date<@dateval("2017"),cg_h_ts,d(p_b)*b_h(-1)/p_b(-1) + d(p_v)*v_h(-1)/p_v(-1) + d(p_h)*house_h(-1)/p_h(-1) + cg_h_res)
+'(13tris) Capital gains made by households on other financial assets 
+ItalySFC.append cg_h_res = cg_h*perc_cg_h                                                         
+'(27BIS) - Additional financial worth of household sector - Note: ofin_h includes capital gains
+ItalySFC.append @identity ofin_h = nfw_h - d_h - v_h - b_h
+'(14) Household total financial assets
+ItalySFC.append @identity nfw_h = nw_h - house_h + mort_h                                                                                                   
+'(30) Property income growth rate
+ItalySFC.append r_h = (d(prop_h)/prop_h(-1))                                            
+'(31) - Household net lending
+ItalySFC.append @identity nl_h = yd_h - cons_h - inv_h + funds_h
+'(31bis) Houshold net lending residuals - Note 1: just "theoretical" residuals after 2016
+ItalySFC.append residuals_h = @recode(@date<@dateval("2017"),nl_h_ts-nl_h,(@mean(nl_h_ts,"2016 2016")-nl_h))
+'(32) - Adjustment in household funds (composite entry)
+ItalySFC.append funds_h = alpha_h_fu*yd_h(-1)                                       
+
+'b) NFCs -------------------------------------------------------------------------------------------------------------------------
+'(33) - Total GDP    
+ItalySFC.append @identity gdp = y - cons_int + net_tau_tot                                                                                                                                                            
+'(34) - NFC GDP 
+ItalySFC.append gdp_f = beta_f*gdp                                                                                
+'(35) - Total intermediate consumption (total) 
+ItalySFC.append cons_int = c_int*gdp                                                                                
+'Equation (36) dropped --- see meta-parameters
+'(37) - Stock of capital fixed (net of 'non-productive' investment)
+ItalySFC.append k_tot = k_tot(-1)*(1+g_k)             
+'(38) - Total investment of the economy
+ItalySFC.append inv_tot = (g_k + delta_k)*k_tot(-1)                                      
+'(40) - Narrowly-defined NFC investment (including inventories)
+ItalySFC.append inv_f = inv_tot*delta_f                   
+'(41) - Deposits held by NFCs (growing along with GDP) - Note: eta_f is slighly inaccurate
+ItalySFC.append d_f = @recode(@date<@dateval("2016"),d_f_ts,(1+eta_f)*d_f(-1)*gdp/gdp(-1)) 
+'(42) - Aggregate demand
+ItalySFC.append @identity y_ad = cons_h + cons_g + inv_tot + export - imp + cons_int - net_tau_tot 
+'(43) - Equilibrium condition (aggregate supply adjusts to demand) 
+ItalySFC.append y = y_ad                                                                      
+'(44) - Employment (endogenous)
+ItalySFC.append n = y/prod_l                                                                 
+ '(44bis) - Leontief roduction function (1996-2008)
+ItalySFC.append y_n = @recode(y_n_l<y_n_k,y_n_l,y_n_k)
+'(44tris) - Potential growth rate
+ItalySFC.append g_n = d(log(y_n))                                                 
+'(44quater) - Output per unit of labour
+ItalySFC.append y_n_l = exp(p(308) + p(309)*@trend + p(310)*log(n))          
+'(44quinquies) - Output per unit of capital
+ItalySFC.append y_n_k = exp(p(305) + p(306)*@trend + p(307)*log(k_tot))   
+'(44sexies) - GDP deflator (price index)
+ItalySFC.append p_y = @recode(@date<@dateval("2017"),p_y_ts,p(311)*p_y(-1) + p(312)*(y_n-y) + p(313)*wb/y + p(314)*ner)
+'(44septies) - Capital deflator
+ItalySFC.append p_k = @recode(@date<@dateval("2017"),p_k_ts,p(315)*p_k(-1) + p(316)*(gdp/k_tot) + p(317)*wb/y+ p(318)*ner)
+'(45) - Endogenous productivity growth
+ItalySFC.append g_prod = p(60)*dummy_prod + p(61)*d(inv_f)/inv_f(-1) + p(62)*(d(export)/export(-1)) + p(63)*d(cons_g)/cons_g(-1) + dummy_prod*p(64)*d(inv_f)/inv_f(-1) + dummy_prod*p(65)*d(cons_g)/cons_g(-1)     
+'(46) - Labour productivity
+ItalySFC.append prod_l = prod_l(-1)*(1+g_prod)                                                      
+'(48) - NFC profits
+ItalySFC.append pi_f = gdp_f - (wb - wb_other) - (tau_f - t_f) - int_f + funds_f + prop_f                 
+'(49) - Non-labour income share to GDP
+ItalySFC.append zeta = 1-omega_lab                                                                                     
+'(54) - Other wages
+ItalySFC.append wb_other = omega_o*wb                                                                 
+'(55) - NFC retained profits
+ItalySFC.append pi_fu = s_f*pi_f                                                                                  
+'(56) - NFC distributed profits
+ItalySFC.append div_f = (1 - s_f)*pi_f                                                                            
+'(57) - Taxes paid by NFCs
+ItalySFC.append tau_f = theta_f*(gdp(-1) - (gdp_h(-1) + gdp_b(-1) + gdp_g(-1) + gdp_row(-1)) - (wb(-1) - wb_other(-1)) + int_f(-1) - funds_f(-1) - prop_f(-1))
+'(58) - Subsidies and transfers to/from NFCs
+ItalySFC.append t_f = alpha_f_t*pi_f(-1)                                                                              
+'(59) Adjustment in NFC funds
+ItalySFC.append funds_f = alpha_f_fu*pi_f(-1)                                                                         
+'(60) Other property income from/to NFCs
+ItalySFC.append prop_f = alpha_f_o*pi_f(-1)                                                                            
+'(65) - Volume of NFC new equity funding a % of investment (see Burgess et al. 2016)
+ItalySFC.append v_f_r = v_f_r(-1) + psi*inv_f(-1)/p_v(-1)  
+'(66) - Price of NFC new equity
+ItalySFC.append p_v = v_f/v_f_r                                                                                       
+'(67) - Bank loans to NFCs (similar to Burgess et al. 2016) - Note: percd is the percentage of new loans that turn into bank deposits and cash
+ItalySFC.append l_f = l_f(-1) - nl_f - d(v_f) + percd*d(d_f) - npl  
+'(68) - NFC loans write-offs 
+ItalySFC.append npl = xi_b/100*l_f(-1)*xi_f                                                       
+'(69) - NFC net lending 
+ItalySFC.append @identity nl_f = pi_fu - inv_f                                                                     
+'(69bis) SFC net lending residuals 
+ItalySFC.append residuals_f = @recode(@date<@dateval("2017"),nl_f_ts-nl_f,(@mean(nl_f_ts,"2016 2016")-nl_f))    
+'(70) - NFC disposable income  
+ItalySFC.append @identity yd_f = gdp_f - wb - tau_f + int_f + t_f - prop_f - div_f               
+'(71) - NFC net wealth or worth
+ItalySFC.append @identity nw_f = nw_f(-1) + yd_f - inv_f + funds_f + cg_f
+'(71bis) Total capital gains made by fims as a % of (past period) net wealth
+ItalySFC.append cg_f = perc_cg_f*nw_f(-1)                                                                    
+'(72) - NFC financial liabilities - Note: (-nw_f*nu_kf) = house_f 
+ItalySFC.append @identity nfw_f = nw_f - (-nw_f*nu_kf) + l_f + v_f + b_f - b_gf          
+'(73) - NFC other financial and non-financial (dwellings) liabilities
+ItalySFC.append @identity ofin_f = d_f + v_f - l_f + b_f - b_gf  - nw_f
+
+'c) GOVERNMENT -------------------------------------------------------------------------------------------------------------------------
+'(80) - Government net lending - Note: slighly inaccurate at the beginning of the period
+ItalySFC.append @identity nl_g = gov_rev - gov_sp - int_g           
+'(80bis) Government net lending residuals 
+ItalySFC.append residuals_g = @recode(@date<@dateval("2017"),nl_g_ts-nl_g,(@mean(nl_g_ts,"2016 2016")-nl_g))    
+'(81) - Government interest payments (including a small residual component)
+ItalySFC.append int_g = r_ba/100*b_g + int_g_res                                              
+'(82) - Government spending (net of interest payments) 
+ItalySFC.append @identity gov_sp = cons_g + inv_g + wb_g + t_tot + funds_g            
+'(83) - Total government revenues 
+ItalySFC.append @identity gov_rev = gdp_g + tau_tot + prop_g + div_g                      
+'(84) - Government consumption (including shock component) 
+ItalySFC.append cons_g = parag + alpha_g_c*gdp                                             
+'(85) - Government investment 
+ItalySFC.append inv_g = alpha_g_i*gdp                                                         
+'(86) - Government wages 
+ItalySFC.append wb_g = omega_g*gdp                                                           
+'(87) - Total equity held by the government 
+ItalySFC.append v_g = alpha_g_v*gdp                                                              
+'(91) - Total tax revenue 
+ItalySFC.append @identity tau_tot = tau_h + tau_f + tau_b + tau_row 
+'(92) - Total transfers  
+ItalySFC.append @identity t_tot = t_h + t_f + t_b + t_row                     
+'(93) - Government GDP (as a % of total GDP) 
+ItalySFC.append gdp_g = beta_g*gdp                                                                 
+'(95) - Government property income 
+ItalySFC.append prop_g = alpha_g_p*gdp                                               
+'(96) - Government adjustment in funds 
+ItalySFC.append funds_g = alpha_g_fu*gdp                                                  
+'(97) - Real supply of government bonds (where e(p_b) = p_b(-1)) 
+ItalySFC.append b_g_r = b_g_r(-1) - (-nl_g)/p_b(-1) + gbills(-1)/p_b(-1)            
+'(98) - Price of government bonds 
+ItalySFC.append p_b = b_g/b_g_r                                                                             
+'(99) - Nominal supply of government bills or BOT 
+ItalySFC.append gbills = p_b(-1)*d(b_g_r)-(b_g - b_g(-1)*p_b/p_b(-1))                      
+'(100) - Total taxes on products net of subsidies 
+ItalySFC.append net_tau_tot = theta_tot*y                                                           
+'(104) - Net stock of loans from/to government 
+ItalySFC.append l_g = nw_g*eta_lg                     
+'(105) - Net stock of deposits (and cash) from/to government 
+ItalySFC.append d_g = nw_g*eta_dg                     
+'(106) - Net wealth of government
+ItalySFC.append @identity nw_g = nw_g(-1) + nl_g + cg_g
+'(106bis) Total capital gains (losses) made by government as a % of (past period) net wealth 
+ItalySFC.append cg_g = perc_cg_g*nw_g(-1)                                       
+'(106tris) Government's additional financial and non-financial assets (including dwellings)
+ItalySFC.append @identity ofin_g = nw_g - (d_g + v_g - l_g + b_g)
+
+'d) FINANCIAL SECTOR -------------------------------------------------------------------------------------------------------------------------
+'(107) - Financial institutions GDP 
+ItalySFC.append gdp_b = beta_b*gdp                                                          
+'(108) - Profit of financial sector 
+ItalySFC.append @identity pi_b = gdp_b - wb_b - tau_b + t_b + div_b + prop_b + int_b + funds_b       
+'(109) - Net lending of financial sector 
+ItalySFC.append @identity nl_b = pi_b - inv_b 
+'(109bis) Financial sector net lending residuals 
+ItalySFC.append residuals_b = @recode(@date<@dateval("2017"),nl_b_ts-nl_b,(@mean(nl_b_ts,"2016 2016")-nl_b))   
+'(110) - Financial sector wages 
+ItalySFC.append wb_b = omega_b*gdp                                              
+'(111) - Total taxes (on profit) paid by financial sector 
+ItalySFC.append tau_b = theta_b*pi_b(-1)                                               
+'(112) - Total transfers received by financial sector 
+ItalySFC.append t_b = alpha_b_t*pi_b(-1)                                                      
+'(113) - Other property income received by financial sector 
+ItalySFC.append prop_b = alpha_b_p*pi_b                                               
+'(114) - Financial sector adjusmtment in funds 
+ItalySFC.append funds_b = alpha_b_fu*pi_b                                                
+'(115) - Financial sector net earning from lending 
+ItalySFC.append int_b = (int_hpaid + int_f)*(1 + perc_int_b_res)           
+'(116) - Financial sector investment function
+ItalySFC.append inv_b = alpha_b_inv*inv_tot                                                                                                          
+'(117) - Financial sector net wealth
+ItalySFC.append @identity nw_b = nw_b(-1) + pi_b - inv_b + cg_b
+'(117bis) Total capital gains made by financial institutions as a % of (past period) net wealth
+ItalySFC.append cg_b = perc_cg_b*nw_b(-1)                                       
+'(119) - Total bank loans (net stock)
+ItalySFC.append @identity l_b = mort_h + l_f + l_g  - l_row                                                      
+'(120) - Total bank deposits (net stock)
+ItalySFC.append @identity d_b = d_h + d_f + d_g + d_row                                     
+'(121) - Total stock of loans including RoW
+ItalySFC.append l_tot = @recode((l_row)>0,(l_b + l_row), l_b)       
+'(122) - Total stock of deposits (inclunding those from government) created by total demand for loans
+ItalySFC.append d_tot = d_tot(-1) + d(l_tot)                                    
+'(123) - Financial assets held by financial sector - Note: (nw_b*nu_kb) = house_b
+ItalySFC.append @identity nfw_b = nw_b - (nw_b*nu_kb) + d_b      
+'(132) - Other financial assets held by financial sector (residual) ^^^^^NEW
+ItalySFC.append @identity ofin_b = d_b + v_b - l_b + b_b - nw_b
+
+'e) REST OF THE WORLD -------------------------------------------------------------------------------------------------------------------------
+'(134) - Rest of the world GDP (residual)
+ItalySFC.append @identity gdp_row = gdp - (gdp_h + gdp_f + gdp_g + gdp_b)                               
+'(135) - Rest of the world GDP net lending (residual)
+ItalySFC.append @identity nl_row = -(nl_h + nl_f + nl_g + nl_b)                                                      
+ '(146) - Net equity issued by RoW
+ItalySFC.append @identity v_row = v_h + v_g - v_f - (-v_b)                                                           
+ '(148) - Net interest earned by RoW
+ItalySFC.append @identity int_row = -(int_f + (-int_g) - int_h - int_b)                                 
+ '(149) - Transfers to RoW
+ItalySFC.append t_row = alpha_row_t*gdp                                                    
+'(150) - Taxes paid by RoW
+ItalySFC.append tau_row = theta_row*gdp                                                     
+
+'f) CROSS-SECTOR ASSET HOLDINGS AND PAYMENTS  -------------------------------------------------------------------------------------------------------------------------
+
+'-----f.1) EQUITY DEMAND BY SECTOR
+
+'----- EQUITY ISSUED BY NFCs
+'(64) - NCF total equity 
+ItalySFC.append @identity v_f = v_fh + v_fg + v_fb                                             
+'(131) - Net NFC equity purchased (after 2007) by financial corporations
+ItalySFC.append v_fb = x_f*v_b_pur '                                              
+'(18) Net NFC equity held by households (stock)
+ItalySFC.append v_fh = x_f*v_h                                                                         
+'(88) - Net NFC equity held by government (stock) - Note: x_f(g) = 1
+ItalySFC.append v_fg = x_f*v_g                                                                  
+
+'----- EQUITY ISSUED BY FINANCIAL SECTOR
+'(124tris) - Net equity entry of financial sector
+ItalySFC.append @identity v_b = v_b_pur - v_b_iss 
+'(124bis) - Equity issued by financial sector - Note: if negative, purchase of equity = buyback
+ItalySFC.append @identity v_b_iss = v_bh + v_bg 
+'(19) Fin. corps. equity held by households (stock, up until 2007)
+ItalySFC.append v_bh = @recode(x_b>0, v_h*x_b,0)                      
+'(89) - Fin. corps. equity held by government (stock, up until 2007)
+ItalySFC.append v_bg = @recode(x_b>0,x_b*v_g,0)                        
+
+'----- EQUITY ISSUED BY RoW
+'(20) RoW equity held by households (stock, residual)
+ItalySFC.append v_rowh = @recode(x_b>0,(1 - x_f - x_b)*v_h,(1 - x_f)*v_h)                   
+'(90) - RoW equity held by government (stock, residual)
+ItalySFC.append v_rowg = @recode(x_b>0,(1 - x_f - x_b)*v_g,(1 - x_f)*v_g)                 
+'(142) - RoW equity held by financial sector
+ItalySFC.append v_rowb = x_b*v_row                                                                             
+
+'----- EQUITY ISSUED BY ALL SECTORS
+'(21) - Total equity issued in the economy
+ItalySFC.append @identity v_tot = v_f+v_b_iss+v_row                                                 
+
+'-----f.2) RECEIVED DIVIDENDS BY SECTOR
+
+'----- RECEIVED BY HOUSEHOLDS
+'(22) - Total dividends received by households
+ItalySFC.append @identity div_h = div_tot - div_fg - div_fb  - div_frow                                       
+'(22bis) - Total dividends paid (and received) in the economy
+ItalySFC.append @identity div_tot = div_f + (-div_b_paid) + (-div_row_paid)                
+'(63) - NFC dividends paid to households (residual)
+ItalySFC.append @identity div_fh = div_f - div_fg - div_fb  - div_frow                                      
+'(128) - Net dividends paid by financial corp.s to households
+ItalySFC.append @identity div_bh = -div_b_paid-div_brow                                                                                                    
+'(139) - Net dividends paid by RoW to households
+ItalySFC.append div_rowh = -divper_row*div_h                                             
+
+'----- RECEIVED BY GOVERNMENT
+'(61tris) - Total dividends received by government
+ItalySFC.append div_g = e_g*v_g/v_tot              
+'(61) - NFC dividends paid to government sector
+ItalySFC.append div_fg =divper_f*div_g            
+'(61bis) - RoW dividends paid to government sector
+ItalySFC.append div_rowg = divper_row*div_g  
+'(61tris) - Financial sector dividends paid to government sector
+ItalySFC.append div_bg =divper_b*div_g  
+
+'----- RECEIVED BY FINANCIAL CORPORATIONS (AND OTHER SECTORS)
+'(118) - Financial sector net received dividends
+ItalySFC.append div_b_recv = e_b*div_tot*v_b_pur/v_tot         
+'(62) - NFC dividends paid to financial sector (all net positive dividends received are assumed to be paid by NFCs)
+ItalySFC.append div_fb = @recode(@date<@dateval("2016"),divper_f*div_b_recv,0)   
+  '(141) - Net dividends paid by RoW to financial sector (assumption = 0)
+ItalySFC.append div_rowb = @recode(@date<@dateval("2016"),divper_row*div_b_recv,0)
+  '(141bis) - Net profits distributed (net dividends) paid by financial sector - Note: s_b is the percentage of retained profits
+ItalySFC.append div_b_paid = (1-s_b)*pi_b
+'(141bis) - Net dividends entry of financial sector - Note: div_b_paid < 0 and usually |div_b_paid| > |div_b_recv|, so that div_b < 0
+ItalySFC.append @identity div_b = div_b_recv + div_b_paid 
+
+'----- RECEIVED BY RoW
+'(155) - Total net dividends received by RoW (as a percentage of total dividends, div_row_recv/div_tot, because v_row_pur is always zero)
+ItalySFC.append div_row_recv = e_row*div_tot                           '
+'Note: equation (156) removed
+ '(157) - Dividends paid by NFCs to RoW
+ItalySFC.append div_frow = divper_f*div_row_recv                                                     
+'(158) - Dividends paid by financial sector to RoW 
+ItalySFC.append div_brow = divper_b*div_row_recv                                                   
+'(159) - RoW sector paid dividends (because div_row is defined residually at the economy-wide level)
+ItalySFC.append div_row_paid = @recode(@date<@dateval("2016"),(div_row_ts - div_row_recv_ts), @mean((div_row_ts - div_row_recv_ts),"2016 2016"))
+ '(147) - Net dividend paid by RoW (negligible in data)
+ItalySFC.append @identity div_row = div_row_paid + div_row_recv                                 
+
+'-----F.3) SECURITIES / BONDS DEMAND BY SECTOR
+
+'----- ISSUED BY NFCs
+'(74) - Demand for NFC securities (from 2003)
+ItalySFC.append @identity b_f = b_fb + b_fh + b_frow                                                    
+'(127) - NFC securities held by financial corp.s - Note: q_f = b_f/(b_f + b_g)
+ItalySFC.append b_fb = q_f*b_b                                               
+'(24) NFC sec. held by households (stock) (from 2003) 
+ItalySFC.append b_fh = b_h*q_f                                                                         
+ '(144) - NFC securities held by RoW
+ItalySFC.append b_frow = q_f*b_row                                                                              
+
+'----- ISSUED BY GOVERNMENT
+'(76) - Demand for government bonds
+ItalySFC.append @identity b_g = b_gh + b_grow + b_gb + b_gf                               
+'(25) Government bonds held by households (stock)    
+ItalySFC.append b_gh = b_h*(1-q_f)                                                                
+'(143) - Government bonds held by RoW
+ItalySFC.append b_grow = (1-q_f)*b_row                                                        
+'(126) - Government bonds held by financial corp.s
+ItalySFC.append b_gb = (1-q_f)*b_b                                                                
+'(75) - Net government bonds purchased by NFCs (up until 2003)
+ItalySFC.append b_gf = @recode((b_f)>0,0,(b_g*q_gf))                               
+
+'----- F.4) INTEREST PAYMENTS RECEIVED BY SECTOR
+
+'----- INTERESTS PAID BY FIRMS
+'(51) - Net interest that households get from NFCs - Note: it does not mirror NFC bond holdings
+ItalySFC.append int_fh = int_h*i_f                          
+'(52) - Net interest that financial sector gets from NFCs (i.e. interests that NFCs pay to financial sector)
+ItalySFC.append int_fb = int_b*i_f                          
+'(53) - Net interest that RoW get from NFCs
+ItalySFC.append int_frow = int_row*i_f                 
+
+'----- INTERESTS PAID BY GOVERNMENT
+'(101) - Interest paid by Government to financial sector
+ItalySFC.append @identity int_gb = int_b - int_fb                 
+'(102) - Interest paid by government to households - Note: it does not mirror bond holdinds
+ItalySFC.append @identity int_gh = int_h - int_fh                   
+'(103) - Interest paid by government to RoW
+ItalySFC.append @identity int_grow = int_row - int_frow 
+
+'g) CENTRAL BANK AND EXOGENOUS INTEREST RATES -----------------------------------------------------------------
+'(152) - Euro Area Policy rate                                                       
+ItalySFC.append r_ecb = @recode(@date<@dateval("2016"), r_ecb_ts,@mean(r_ecb_ts, "2016 2016"))   
+'(153) - Nominal exchange rate                                                              
+ItalySFC.append ner = @recode(@date<@dateval("2016"), ner_ts,@mean(ner_ts, "2016 2016")) 
+'(154) - Risk-free interest rate (German bonds)                                                                                          
+ItalySFC.append r_z = @recode(@date<@dateval("2016"), r_z_ts,@mean(r_z_ts, "2016 2016")) 
+'(133) - Interest rate on loans to NFCs
+ItalySFC.append r_lf = r_ecb + r_add                                 
+'(77) - Average yields on government bonds
+ItalySFC.append r_ba = r_z*(1+m_av)                                                     
+'(78) - Mark-up of Italian gov. bond average rate over German rate
+ItalySFC.append m_av = spread_av/(r_z)                                                  
+'Note: r_d = 0
+
+'h) LEVERAGE AND OTHER RATIOS -----------------------------------------------------------------------------------------------
+'(L1) - Household leverage index (loans to net financial wealth ratio)
+ItalySFC.append lev_h = mort_h/nw_h                            
+'(L2) - NFC leverage index (loans to net financial wealth ratio)
+ItalySFC.append lev_f = l_f/v_f                                           
+ '(L2bis) - NFC leverage index (loans to net financial wealth ratio) - Note: as calculated by Bank of Italy and ISTAT
+ItalySFC.append lev2_f = (l_f+b_f)/(l_f+b_f+v_f)            
+'(L3) - Financial sector's leverage index (deposit to net financial wealth ratio)
+ItalySFC.append lev_b = d_b/nfw_b                                 
+'(L4) - Government deficit to GDP ratio
+ItalySFC.append def_g = -nl_g/gdp                                  
+'(L5) - Government debt stock to GDP ratio 
+ItalySFC.append debt_g = -nw_g/gdp                              
+'(L6) - Inflation (output)     
+ItalySFC.append inflat = d(log(p_y))                                 
+
+'i) MOVING PARAMETERS: MOVING AVERAGES UNTIL 2016 AND THEN LAST (AVERAGE) VALUE ---------------------------------------------------
+'(B1) - Household GDP to total GDP
+ItalySFC.append beta_h = @recode(@date<@dateval("2016"),@movavc(gdp_h_ts/gdp_ts,1), @mean(gdp_h_ts/gdp_ts,"2016 2016"))     
+'(B2) Share of net wages to GDP
+ItalySFC.append omega_tot = @recode(@date<@dateval("2016"),@movavc(wb_ts/gdp_ts,1), @mean(wb_ts/gdp_ts,"2016 2016"))     
+'(B3) - Hosehold tax rate
+ItalySFC.append theta_h = @recode(@date<@dateval("2016"),@movavc(tau_h_ts/wb_ts(-1),1), @mean(tau_h_ts/wb_ts(-1),"2016 2016"))    
+'(B4) - Household transfers to wage ratio
+ItalySFC.append alpha_h_t = @recode(@date<@dateval("2016"),@movavc(t_h_ts/wb_ts(-1),1), @mean(t_h_ts/wb_ts(-1),"2016 2016"))    
+'(B5) - Other property income to wages ratio
+ItalySFC.append alpha_h_p = @recode(@date<@dateval("2016"),@movavc(prop_h_ts/wb_ts(-1),1), @mean(prop_h_ts/wb_ts(-1),"2016 2016"))     
+'(B6) % of NFC equity to total equity
+ItalySFC.append x_f = @recode(@date<@dateval("2016"),@movavc(v_f_ts/v_tot_ts,1), @mean(v_f_ts/v_tot_ts,"2016 2016"))     
+'(B7) % of fin. corp. equity to total equity
+ItalySFC.append x_b = @recode(@date<@dateval("2016"),@movavc(v_b_ts/v_tot_ts,1), @mean(v_b_ts/v_tot_ts,"2016 2016"))     
+ '(B8) % of NFC securities to total securities
+ItalySFC.append q_f = @recode(@date<@dateval("2003"),0,@recode(@date<@dateval("2016"),@movavc(b_f_ts/b_tot_ts,1), @mean(b_f_ts/b_tot_ts,"2016 2016")))    
+'(B9) - Share of NFC GDP to total GDP
+ItalySFC.append beta_f = @recode(@date<@dateval("2016"),@movavc(gdp_f_ts/gdp_ts,1), @mean(gdp_f_ts/gdp_ts,"2016 2016"))     
+'(B10) - Capital depreciation rate
+ItalySFC.append delta_k = @recode(@date<@dateval("2016"),@movavc((inv_tot_ts/k_tot_ts(-1))-g_k_ts,1), @mean((inv_tot_ts/k_tot_ts(-1))-g_k_ts,"2016 2016")) 
+'(B11) - NFC investment to total investment ratio
+ItalySFC.append delta_f = @recode(@date<@dateval("2016"),@movavc(inv_f_ts/inv_tot_ts,1), @mean(inv_f_ts/inv_tot_ts,"2016 2016"))     
+'(B12) - Additional (residual) NFC net interest paid to households
+ItalySFC.append int_f_res = @recode(@date<@dateval("2016"),@movavc(int_f_res_ts,1), @mean(int_f_res_ts,"2016 2016"))     
+'(B13) Share of interest paid by/to firms to total interest payments
+ItalySFC.append i_f = @recode(@date<@dateval("2016"),@movavc((int_f_ts/(int_f_ts + int_g_ts)),1), @mean((int_f_ts/(int_f_ts + int_g_ts)),"2016 2016")) 
+'(B14) - Other wages to manuf. wages
+ItalySFC.append omega_o = @recode(@date<@dateval("2016"),@movavc(wb_other_ts/wb_ts,1), @mean(wb_other_ts/wb_ts,"2016 2016"))     
+'(B15) - Rate of retention
+ItalySFC.append s_f = @recode(@date<@dateval("2016"),@movavc(pi_fu_ts/pi_f_ts,1), @mean(pi_fu_ts/pi_f_ts,"2016 2016"))    
+'(B16) - NFC tax rate
+ItalySFC.append theta_f = @recode(@date<@dateval("2016"),@movavc((tau_f_ts/((gdp_ts(-1) - (gdp_h_ts(-1) + gdp_b_ts(-1) + gdp_g_ts(-1) + gdp_row_ts(-1)) - (wb_ts(-1) - wb_other_ts(-1)) - int_f_ts(-1) - funds_f_ts(-1) - prop_f_ts(-1)))),1), @mean((tau_f_ts/((gdp_ts(-1) - (gdp_h_ts(-1) + gdp_b_ts(-1) + gdp_g_ts(-1) + gdp_row_ts(-1)) - (wb_ts(-1) - wb_other_ts(-1)) - int_f_ts(-1) - funds_f_ts(-1) - prop_f_ts(-1)))),"2016 2016"))    
+'(B17) - NFC transfers to profit ratio
+ItalySFC.append alpha_f_t = @recode(@date<@dateval("2016"),@movavc(t_f_ts/pi_f_ts(-1),1), @mean(t_f_ts/pi_f_ts(-1),"2016 2016"))     
+'(B18) - NFC funds to profit ratio
+ItalySFC.append alpha_f_fu = @recode(@date<@dateval("2016"),@movavc(funds_f_ts/pi_f_ts(-1),1), @mean(funds_f_ts/pi_f_ts(-1),"2016 2016"))     
+'(B19) Percentage of write-offs
+ItalySFC.append xi_b = @recode(@date<@dateval("2016"),@movavc(xi_b_ts,1), @mean(xi_b_ts,"2016 2016"))     
+'(B20) - Government consumption to GDP
+ItalySFC.append alpha_g_c = @recode(@date<@dateval("2016"),@movavc(cons_g_ts/gdp_ts,1), @mean(cons_g_ts/gdp_ts,"2016 2016"))     
+'(B21) - Gov. inv. to GDP
+ItalySFC.append alpha_g_i = @recode(@date<@dateval("2016"),@movavc(inv_g_ts/gdp_ts,1), @mean(inv_g_ts/gdp_ts,"2016 2016"))     
+'(B22) - Government wages to GDP
+ItalySFC.append omega_g = @recode(@date<@dateval("2016"),@movavc(wb_g_ts/gdp_ts,1), @mean(wb_g_ts/gdp_ts,"2016 2016"))     
+'(B23) - Government equity holdings to GDP
+ItalySFC.append alpha_g_v = @recode(@date<@dateval("2016"),@movavc(v_g_ts/gdp_ts,1), @mean(v_g_ts/gdp_ts,"2016 2016"))     
+'(B24) - Government adjustment in funds to GDP ratio
+ItalySFC.append alpha_g_fu = @recode(@date<@dateval("2016"),@movavc(-funds_g_ts/gdp_ts,1), @mean(-funds_g_ts/gdp_ts,"2016 2016"))     
+'(B25) - Government property income to GDP ratio
+ItalySFC.append alpha_g_p = @recode(@date<@dateval("2016"),@movavc(prop_g_ts/gdp_ts,1), @mean(prop_g_ts/gdp_ts,"2016 2016"))     
+'(B26) - Loans to net wealth ratio of government
+ItalySFC.append eta_lg = @recode(@date<@dateval("2016"),@movavc(l_g_ts/nw_g_ts,1), @mean(l_g_ts/nw_g_ts,"2016 2016"))     
+'(B27) - Deposits to net wealth ratio of government
+ItalySFC.append eta_dg = @recode(@date<@dateval("2016"),@movavc(d_g_ts/nw_g_ts,1), @mean(d_g_ts/nw_g_ts,"2016 2016"))     
+'(B28) - Share of financial GDP to total GDP
+ItalySFC.append beta_b = @recode(@date<@dateval("2016"),@movavc(gdp_b_ts/gdp_ts,1), @mean(gdp_b_ts/gdp_ts,"2016 2016"))     
+'(B29) - Share of financial sector wages to GDP
+ItalySFC.append omega_b = @recode(@date<@dateval("2016"),@movavc(wb_b_ts/gdp_ts,1), @mean(wb_b_ts/gdp_ts,"2016 2016"))     
+'(B30) - Profit tax rate paid by financial sector
+ItalySFC.append theta_b = @recode(@date<@dateval("2016"),@movavc(tau_b_ts/pi_b_ts(-1),1), @mean(tau_b_ts/pi_b_ts(-1),"2016 2016"))     
+'(B31) - Financial sector transfers to profit ratio
+ItalySFC.append alpha_b_t = @recode(@date<@dateval("2016"),@movavc(t_b_ts/pi_b_ts(-1),1), @mean(t_b_ts/pi_b_ts(-1),"2016 2016"))     
+'(B32) - Financial sector adjustment in funds to profit ratio
+ItalySFC.append alpha_b_fu = @recode(@date<@dateval("2016"),@movavc(funds_b_ts/pi_b_ts,1), @mean(funds_b_ts/pi_b_ts,"2016 2016"))     
+'(B33) - Financial sector property income to profit ratio
+ItalySFC.append alpha_b_p = @recode(@date<@dateval("2016"),@movavc(prop_b_ts/pi_b_ts,1), @mean(prop_b_ts/pi_b_ts,"2016 2016"))     
+'(B34) - Percentage of additional interest payments made/received by financial sector
+ItalySFC.append perc_int_b_res = @recode(@date<@dateval("2016"),@movavc(int_b_ts/(-int_hpaid_ts - int_f_ts) -1,1), @mean(int_b_ts/(-int_hpaid_ts - int_f_ts) -1,"2016 2016")) 
+'(B35) - Financial sector retention rate
+ItalySFC.append s_b = @recode(@date<@dateval("2016"),@movavc(1-(div_b_paid_ts/pi_b_ts),1), @mean(1-(div_b_paid_ts/pi_b_ts),"2016 2016")) 
+'(B36) - NFC loan risk premium over risk-free interest rate
+ItalySFC.append r_add = @recode(@date<@dateval("2016"),@movavc(r_lf_ts - r_ecb_ts,1), @mean((r_lf_ts - r_ecb_ts),"2016 2016"))     
+'(B37) - RoW transfers to GDP ratio
+ItalySFC.append alpha_row_t = @recode(@date<@dateval("2016"),@movavc(t_row_ts/gdp_ts,1), @mean(t_row_ts/gdp_ts,"2016 2016"))     
+'(B38) - RoW taxes to GDP ratio 
+ItalySFC.append theta_row = @recode(@date<@dateval("2016"),@movavc(-tau_row_ts/gdp_ts,1), @mean(-tau_row_ts/gdp_ts,"2016 2016"))    
+'(B39) - Total taxes on products to gross output ratio
+ItalySFC.append theta_tot = @recode(@date<@dateval("2016"),@movavc(net_tau_tot_ts/y_ts,1), @mean(net_tau_tot_ts/y_ts,"2016 2016"))     
+'(B41) - Households funds to disp. income ratio
+ItalySFC.append alpha_h_fu = @recode(@date<@dateval("2016"),@movavc(funds_h_ts/yd_h_ts(-1),1), @mean(funds_h_ts/yd_h_ts(-1),"2016 2016")) 
+'(B42) - Goverment "beta"
+ItalySFC.append beta_g = @recode(@date<@dateval("2016"),@movavc((gdp_g_ts/gdp_ts),1), @mean((gdp_g_ts/gdp_ts),"2016 2016")) 
+'(B43) - Intermediate consumption to GDP ratio
+ItalySFC.append c_int = @recode(@date<@dateval("2016"),@movavc(cons_int_ts/gdp_ts,1), @mean(cons_int_ts/gdp_ts,"2016 2016")) 
+'(B44) - Output elasticity of import
+ItalySFC.append e_imp = @recode(@date<@dateval("2016"),@movavc(((d(imp_ts)/imp_ts(-1))/(d(y_ts)/y_ts(-1))),1), @mean(((d(imp_ts)/imp_ts(-1))/(d(y_ts)/y_ts(-1))),"2016 2016")) 
+'(B45) - Extra growth of firms deposits
+ItalySFC.append eta_f = @recode(@date<@dateval("2016"),@movavc(((d_f_ts/(d_f_ts(-1)*gdp_ts/gdp_ts(-1)))-1),1), @mean(((d_f_ts/(d_f_ts(-1)*gdp_ts/gdp_ts(-1)))-1),"2016 2016"))  
+'(B46) - Firms property income to profit ratio
+ItalySFC.append alpha_f_o = @recode(@date<@dateval("2016"),@movavc(prop_f_ts/pi_f_ts(-1),1), @mean(prop_f_ts/pi_f_ts(-1),"2016 2016")) 
+ '(B47) - % of new loans to firms that turn into deposits & cash
+ItalySFC.append percd = @recode(@date<@dateval("2016"),@movavc(((d(l_f_ts) + nl_f_ts + d(-v_f_ts) + xi_b_ts/100*l_f_ts(-1)*xi_f)/d(d_f_ts)),1), @mean(((d(l_f_ts) + nl_f_ts + d(-v_f_ts) + xi_b_ts/100*l_f_ts(-1)*xi_f)/d(d_f_ts)),"2016 2016"))
+'(B49) - Net percentage of gov bonds purchased by NFCs
+ItalySFC.append q_gf = @recode(@date<@dateval("2016"),@movavc(-b_f_ts/b_g_ts(-1),1), @mean(-b_f_ts/b_g_ts(-1),"2016 2016"))   
+  '(B50) - Spread
+ItalySFC.append spread_av = @recode(@date<@dateval("2016"),@movavc(r_ba_ts-r_z_ts,1), @mean(r_ba_ts-r_z_ts,"2016 2016"))
+'(B51) - Residual gov. interests
+ItalySFC.append int_g_res = @recode(@date<@dateval("2016"),@movavc(-(int_g_ts-(r_ba_ts/100*b_g_ts)),1), @mean(-(int_g_ts-(r_ba_ts/100*b_g_ts)),"2016 2016"))  
+'(B52) - Share of accounting dividends received by government
+ItalySFC.append e_g = @recode(@date<@dateval("2016"),@movavc((div_g_ts*(-v_tot_ts)/v_g_ts) ,1), @mean((div_g_ts*(-v_tot_ts)/v_g_ts) ,"2016 2016")) 
+ '(B54) - Banks investment to total investment
+ItalySFC.append alpha_b_inv = @recode(@date<@dateval("2016"),@movavc(inv_b_ts/inv_tot_ts,1), @mean(inv_b_ts/inv_tot_ts,"2016 2016"))
+'(B56) - Percentage of total dividends paid by NFCs
+ItalySFC.append divper_f =  @recode(@date<@dateval("2016"),div_f_ts/div_tot_ts,@mean(div_f_ts/div_tot_ts, "2016 2016")) 
+'(B57) - Percentage of total dividends paid by financial sector
+ItalySFC.append divper_b =  @recode(@date<@dateval("2016"),@recode(div_b_ts<0,-div_b_ts/div_tot_ts,0),@mean(-div_b_ts/div_tot_ts, "2016 2016")) 
+'(B58) - Percentage of total dividends paid by RoW
+ItalySFC.append divper_row =  @recode(@date<@dateval("2016"),@recode(div_row_ts<0,-div_row_ts/div_tot_ts, 0),@mean(-div_row_ts/div_tot_ts, "2016 2016")) 
+'(B59) - Share of accounting dividends received by financial sector ^^^^^NEW
+ItalySFC.append e_b = @recode(@date<@dateval("2016"),@movavc((div_b_recv_ts*(-v_tot_ts)/(div_tot_ts*v_b_pur_ts)),1), @mean((div_b_recv_ts*(-v_tot_ts)/v_b_pur_ts),"2016 2016")) 
+'(B60) - Share of accounting dividends received by RoW as a percentage ot total dividends
+ItalySFC.append e_row = @recode(@date<@dateval("2016"),@movavc(div_row_recv_ts/div_tot_ts,1), @mean(div_row_recv_ts/div_tot_ts,"2016 2016")) 
+'(B62) - Percentage of other financial assets of households
+ItalySFC.append perc_ofin_h = @recode@(@date<@dateval("2016"),ofin_h_ts/nw_h_ts, @mean(ofin_h_ts/nw_h_ts,"2016 2016"))  
+'(B62bis) - Percentage of capital gains made by households
+ItalySFC.append perc_cg_h = @recode@(@date<@dateval("2016"),cg_h_ts/nw_h_ts(-1), @mean(cg_h_ts/nw_h_ts(-1),"2016 2016"))  
+ '(B63) - Percentage of other financial assets of NFCs
+ItalySFC.append perc_ofin_f = @recode@(@date<@dateval("2016"),ofin_f_ts/nw_f_ts, @mean(ofin_f_ts/nw_f_ts,"2016 2016")) 
+'(B63bis) - Percentage of capital gains made by NFCs
+ItalySFC.append perc_cg_f = @recode@(@date<@dateval("2016"),cg_f_ts/nw_f_ts(-1), @mean(cg_f_ts/nw_f_ts(-1),"2016 2016"))  
+'(B64) - Percentage of other financial assets of government
+ItalySFC.append perc_ofin_g = @recode@(@date<@dateval("2016"),ofin_g_ts/nw_g_ts, @mean(ofin_g_ts/nw_g_ts,"2016 2016"))  
+'(B64bis) - Percentage of capital gains made by government
+ItalySFC.append perc_cg_g = @recode@(@date<@dateval("2016"),cg_g_ts/nw_g_ts(-1), @mean(cg_g_ts/nw_g_ts(-1),"2016 2016"))  
+'(B65) - Percentage of other financial assets of financial sector
+ItalySFC.append perc_ofin_b = @recode@(@date<@dateval("2016"),ofin_b_ts/nw_b_ts, @mean(ofin_b_ts/nw_b_ts,"2016 2016"))  
+'(B65bis) - Percentage of capital gains made by financial sector
+ItalySFC.append perc_cg_b = @recode@(@date<@dateval("2016"),cg_b_ts/nw_b_ts(-1), @mean(cg_b_ts/nw_b_ts(-1),"2016 2016"))  
+'(B66) - Households' debt to income ratio
+ItalySFC.append dti = @recode@(@date<@dateval("2016"),mort_h_ts/yd_h_ts, @mean(mort_h_ts/yd_h_ts,"2016 2016"))  
+
+'--------------------------------------------------------------------------------------------------------------------------------------------------
+' Select the baseline Scenario
+ItalySFC.scenario "baseline"
+
+'Define the sample
+smpl 1996 2030
+
+'Create "Add factors" to improve in-sample forecast
+delete *_a
+ItalySFC.addassign(v) cons_h int_hrecv int_hpaid house_h v_h b_h d_h mort_h imp b_b l_row d_row newhouse_d
+ItalySFC.addinit(v=n) cons_h int_hrecv int_hpaid house_h v_h b_h d_h mort_h imp b_b l_row d_row newhouse_d
+
+'Solve the model
+ItalySFC.solve 
+
+'--------------------------------------------------------------------------------------------------------------------------------------------------
+
+'Create alternate 4 alternative scenarios or shocks
+
+'Permanent cut in government consumption (-1%)
+ItalySFC.scenario "scenario 1"
+ItalySFC.override parag
+copy parag parag_1
+smpl 2017 @last
+parag_1 = -gdp*0.01 
+smpl 1998 2030 
+ItalySFC.solve
+
+'Permanent increase in government consumption (+1%)
+ItalySFC.scenario(n) "scenario 2"
+ItalySFC.override parag
+copy parag parag_2
+smpl 2017 @last
+parag_2 = gdp*0.01 
+smpl 1998 2030 
+ItalySFC.solve
+
+'Temporary cut in government consumption (-1%, two years)
+ItalySFC.scenario(n) "scenario 3"
+ItalySFC.override parag
+copy parag parag_3
+smpl 2017 2019
+parag_3 = -gdp*0.01 
+smpl 1998 2030 
+ItalySFC.solve
+
+'Temporary increase in government consumption (+1%, two years)
+ItalySFC.scenario(n) "scenario 4"
+ItalySFC.override parag
+copy parag parag_4
+smpl 2017 2019
+parag_4 = gdp*0.01 
+smpl 1998 2030 
+ItalySFC.solve
+
+'--------------------------------------------------------------------------------------------------------------------------------------------------
+'Create charts
+
+' Figure A: Household net lending (% of GDP)
+smpl 1997 2025
+graph figA.line nl_h_0/gdp_0 nl_h_ts/gdp_ts 
+figA.draw(shade, bottom, color(246, 245, 238)) 2000 2002 
+figA.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figA.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figA.draw(shade, bottom, color(255,213,149)) 2016 2025
+figA.options linepat
+figA.setelem(1) lcolor(151,255,151) lwidth(5) lpat(1)
+figA.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figA.name(1) Simulated
+figA.name(2) Actual series
+figA.addtext(t,just(c),font(16)) A. Household net lending (% GDP)
+figA.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figA.options gridl gridb gridauto frameaxes("none")
+figA.legend -inbox 
+
+' Figure B: NFC net lending (% of GDP)
+smpl 1997 2025
+graph figB.line nl_f_0/gdp_0 nl_f_ts/gdp_ts 
+figB.draw(shade, bottom, color(246, 245, 238)) 2000 2002
+figB.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figB.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figB.draw(shade, bottom, color(255,213,149)) 2016 2025
+figB.draw(line, left, color(black),width(1),pattern(2)) 0
+figB.options linepat
+figB.setelem(1) lcolor(151,255,151) lwidth(5) lpat(1)
+figB.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figB.name(1) Simulated
+figB.name(2) Actual series
+figB.addtext(t,just(c),font(16)) B. SFC net lending (% GDP)
+figB.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figB.options gridl gridb gridauto frameaxes("none")
+figB.legend -inbox 
+
+' Figure C: Government net lending (% of GDP)
+smpl 1997 2025
+graph figC.line nl_g_0/gdp_0 nl_g_ts/gdp_ts 
+figC.draw(shade, bottom, color(246, 245, 238)) 2000 2002
+figC.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figC.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figC.draw(shade, bottom, color(255,213,149)) 2016 2025
+figC.draw(line, left, color(black),width(1),pattern(2)) 0
+figC.options linepat
+figC.axis(left) range(-0.06, 0.01)
+figC.setelem(1) lcolor(157,157,255) lwidth(5) lpat(1)
+figC.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figC.name(1) Simulated
+figC.name(2) Actual series
+figC.addtext(t,just(c),font(16)) C. Government net lending (% GDP)
+figC.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figC.options gridl gridb gridauto frameaxes("none")
+figC.legend -inbox 
+
+' Figure D: Financial sector net lending (% of GDP)
+smpl 1997 2025
+graph figD.line nl_b_0/gdp_0 nl_b_ts/gdp_ts  
+figD.draw(shade, bottom, color(246, 245, 238)) 2000 2002
+figD.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figD.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figD.draw(shade, bottom, color(255,213,149)) 2016 2025
+figD.draw(line, left, color(black),width(1),pattern(2)) 0
+figD.options linepat
+figD.axis(left) range(-0.01, 0.04)
+figD.setelem(1) lcolor(151,255,151) lwidth(5) lpat(1)
+figD.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figD.name(1) Simulated
+figD.name(2) Actual series
+figD.addtext(t,just(c),font(16)) D. Financial sector net lending (% GDP)
+figD.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figD.options gridl gridb gridauto frameaxes("none")
+figD.legend -inbox 
+
+' Figure E: Rest of world net lending (% of GDP)
+smpl 1997 2025
+graph figE.line nl_row_0/gdp_0 nl_row_ts/gdp_ts 
+figE.draw(shade, bottom, color(246, 245, 238)) 2000 2002
+figE.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figE.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figE.draw(shade, bottom, color(255,213,149)) 2016 2025
+figE.draw(line, left, color(black),width(1),pattern(2)) 0
+figE.options linepat
+figE.setelem(1) lcolor(255,164,72) lwidth(5) lpat(1)
+figE.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figE.name(1) Simulated
+figE.name(2) Actual series
+figE.addtext(t,just(c),font(16)) E. Rest of world net lending (% GDP)
+figE.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figE.options gridl gridb gridauto frameaxes("none")
+figE.legend -inbox 
+
+' Figure G: Private sector net lending (% of GDP)
+smpl 1997 2025
+graph figF.line ((nl_h_0+nl_f_0+nl_b_0)/gdp_0) ((nl_h_ts+nl_f_ts+nl_b_ts)/gdp_ts) 
+figF.draw(shade, bottom, color(246, 245, 238)) 2000 2002
+figF.draw(shade, bottom, color(246, 245, 238)) 2008 2009 
+figF.draw(shade, bottom, color(246, 245, 238)) 2011 2013 
+figF.draw(shade, bottom, color(255,213,149)) 2016 2025
+figF.draw(line, left, color(black),width(1),pattern(2)) 0
+figF.options linepat
+figF.setelem(1) lcolor(248,211,7) lwidth(5) lpat(1)
+figF.setelem(2) symbol(1) symbolsize(2XL) linecolor(black) lcolor(black) linewidth(1) linepattern(12) 'no line
+figF.name(1) Simulated
+figF.name(2) Actual series
+figF.addtext(t,just(c),font(16)) Figure F. Private sector net lending (% GDP) 
+figF.addtext(ibr,font(15.5),textcolor(black)) Forecast period
+figF.options gridl gridb gridauto frameaxes("none")
+figF.legend -inbox '-display
+
+' Figure 1: Real GDP
+smpl 2015 2019
+graph fig1.line d(log(gdp_1))-d(log(gdp_0))  d(log(gdp_2))-d(log(gdp_0))  
+fig1.options linepat
+fig1.setelem(1) lcolor(blue) lwidth(2) lpat(2)
+fig1.setelem(2) lcolor(red) lwidth(2) lpat(2)
+fig1.name(1) Austerity (-1%)
+fig1.name(2) Profligacy (+1%)
+fig1.addtext(t,just(c),font(16)) C. Real GDP growth: alt. scenarios (diff. with baseline)
+fig1.options gridl gridb gridauto frameaxes("none")
+fig1.legend -inbox '-display
+
+' Figure 2: Net financial balances
+smpl 2015 2019
+graph fig2.line (nl_b_1/gdp_1)-(nl_b_0/gdp_0) (nl_f_1/gdp_1)-(nl_f_0/gdp_0) (nl_h_1/gdp_1)-(nl_h_0/gdp_0) (nl_row_1/gdp_1)-(nl_row_0/gdp_0)
+fig2.options linepat
+fig2.axis(right) range(0.96, 1.01)
+fig2.setelem(1) lcolor(purple) lwidth(2) lpat(2)
+fig2.setelem(2) lcolor(green) lwidth(2) lpat(3)
+fig2.setelem(3) lcolor(orange) lwidth(2) lpat(4)
+fig2.setelem(4) lcolor(blue) lwidth(2) lpat(5)
+fig2.name(1) Financial sector and banks
+fig2.name(2) Non-financial corporations
+fig2.name(3) Households '(right axis)
+fig2.name(4) Rest of the world
+fig2.addtext(t,just(c),font(16)) D. Impact of austerity on fin. balances as % of GDP (difference with baseline)
+fig2.options gridl gridb gridauto frameaxes("none")
+fig2.legend -inbox '-display
+
+' Figure 3: Nominal GDP growth
+smpl 2015 2019
+graph fig3.line d(log(gdp_0))+inflat_0 d(log(gdp_1))+inflat_1 d(log(gdp_2))+inflat_2
+fig3.options linepat
+fig3.setelem(1) lcolor(black) lwidth(2) lpat(1)
+fig3.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig3.setelem(3) lcolor(red) lwidth(2) lpat(2)
+fig3.name(1) Status quo
+fig3.name(2) Austerity (-1%)
+fig3.name(3) Profligacy (+1%)
+fig3.addtext(t,just(c),font(16)) A. Nominal GDP growth: alternative scenarios
+fig3.options gridl gridb gridauto frameaxes("none")
+fig3.legend -inbox '-display
+
+' Figure 4: Real GDP growth
+smpl 2015 2019
+graph fig4.line d(log(gdp_0)) d(log(gdp_1)) d(log(gdp_2))
+fig4.options linepat
+fig4.setelem(1) lcolor(black) lwidth(2) lpat(1)
+fig4.setelem(2) lcolor(blue) lwidth(2) lpat(2)
+fig4.setelem(3) lcolor(red) lwidth(2) lpat(2)
+fig4.name(1) Status quo
+fig4.name(2) Austerity (-1%)
+fig4.name(3) Profligacy (+1%)
+fig4.addtext(t,just(c),font(16)) B. Real GDP growth: alternative scenarios
+fig4.options gridl gridb gridauto frameaxes("none")
+fig4.legend -inbox '-display
+
+'-----------------------------------------------------------------
+'Group figures about net lending (as a % of GDP) (Figure 8 in paper)
+graph graphLENDING.merge figA figB figC figD figE figF
+graphLENDING.legend font(16)
+graphLENDING.axis(left) font(16)
+graphLENDING.axis(bottom) font(16)
+graphLENDING.axis ticksnone
+graphLENDING.options gridauto 
+graphLENDING.options fillcolor(white) backcolor(white)
+graphLENDING.datelabel format(yyyy)
+graphLENDING.datelabel interval(y,5,2000)
+graphLENDING.align(3, 1.8, 2.4)
+
+'Group additional figures about government debt experiments (Figure 10 in paper)
+graph graphDEBT.merge fig3 fig4 fig1 fig2
+graphDEBT.legend font(16)
+graphDEBT.axis(left) font(16)
+graphDEBT.axis(bottom) font(16)
+graphDEBT.axis ticksnone
+graphDEBT.options gridauto 
+graphDEBT.options fillcolor(white) backcolor(white)
+graphDEBT.datelabel format(yyyy)
+graphDEBT.datelabel interval(y,1,2016)
+graphDEBT.align(2, 1.8, 2.4)
+
+'Display graphs
+show graphDEBT
+show graphLENDING
+
+'Restore whole sample
+smpl @all
