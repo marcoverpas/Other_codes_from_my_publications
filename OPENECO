@@ -1,0 +1,2140 @@
+'**********************************************************************************************************************************************************************************************
+
+' OPENECO MODEL - PUBLIC
+' A two-country ecological model   
+
+' Last update: 14 April 2020
+
+' This code allows replicating the simulations conducted in: Carnevali, E., Deleidi, M., Pariboni, R. and Veronese Passarella, M. 2020.
+' Cross-Border Financial Flows and Global Warming in a Two-Area Ecological SFC Model. Socio-Economic Planning Sciences, DOI: 10.1016/j.seps.2020.100819
+
+' This code is free. Just remember to mention the source!
+
+'**********************************************************************************************************************************************************************************************
+'CREATE WORKFILE
+wfcreate(wf = openeco42, page = annual) a 1960 2060
+smpl @all
+
+'**********************************************************************************************************************************************************************************************
+'IMPORT OBSERVED DATA
+read(b15) "C:\ ... \data_seps.xls" y_bil gcons_bil inv_bil ny_bil v_bil theta_ob kappa_ob gov_bil temp_ob temp_ob_h temp_ob_l emis_ob emis_ob_west emis_ob_row co2_bil co2_bil_west co2_bil_row temp_at_ob
+
+'ADJUST UNIT OF MEASURE OF TIME SERIES
+series y_ob=y_bil/1000000000000
+series gcons_ob=gcons_bil/1000000000000
+series inv_ob=inv_bil/1000000000000
+series ny_ob=ny_bil/1000000000000
+series gov_ob=gov_bil/1000000000000
+series co2_ob=co2_bil/1000000000
+series co2_ob_west=co2_bil_west/1000000000
+series co2_ob_row=co2_bil_row/1000000000
+series cint_ob = inv_ob+gcons_ob+gov_ob-y_ob
+series cons_ob = gcons_ob-cint_ob 
+series k_ob = y_ob*kappa_ob/100
+series delta_ob = @recode(@date<@dateval("1961"),0.079,(inv_ob - d(k_ob))/k_ob(-1))
+series yd_ob = y_ob*(1-(theta_ob/100))
+series v_ob = @recode(@date<@dateval("1961"),0,v_ob(-1) + yd_ob - cons_ob) 
+
+'**********************************************************************************************************************************************************************************************
+'**********************************************************************************************************************************************************************************************
+
+'DEFINE EXCHANGE RATE MECHANISM
+series er_regime1 = 0   'Note: 0 = floating exchange rate; 1 = fixed exchange rate 
+series er_regime2 = 1   'Note: 0 = new mechanism for floating exchange rate; 1 = Godley and Lavoie (2007)
+
+'**********************************************************************************************************************************************************************************************
+'**********************************************************************************************************************************************************************************************
+
+' Endogenous variables for the open economy
+series yd_r_brown 
+ yd_r_brown.label(d) Disposable income of Brownland capitalists
+series yd_w_brown 
+ yd_w_brown.label(d) Disposable income of Brownland workers 
+series yd_r_green 
+ yd_r_green.label(d) Disposable income of Greenland capitalists
+series  yd_w_green
+ yd_w_green.label(d) Disposable income of Greenland workers 
+series yd_hs_r_brown
+yd_hs_r_brown.label(d) Haig-Simons disposable income capitalistsin Brownland 
+series yd_hs_r_green
+yd_hs_r_green.label(d) Haig-Simons disposable income capitalistsin Greenland 
+series y_r_brown 
+ y_r_brown.label(d) Total income of Brownland capitalists
+series y_w_brown 
+ y_w_brown.label(d) Total income of Brownland workers 
+series y_r_green
+ y_r_green.label(d) Total income of Greenland capitalists
+series y_w_green 
+ y_w_green.label(d) Total income of Greenland workers
+series f_bank_brown
+f_bank_brown.label(d) Profit of Brownland banks
+series f_bank_green
+f_bank_green.label(d) Profit of Greenland banks
+series cons_brown
+cons_brown.label(d) Total consumption in Brownland
+series cons_green
+cons_green.label(d) Total consumption in Greenland
+series cons_r_brown
+cons_r_brown.label(d) Consumption of capitalists in Brownland
+series cons_w_brown
+cons_w_brown.label(d) Consumption of workers in Brownland 
+series cons_r_green
+cons_r_green.label(d) Consumption of capitalists in Greenland 
+series cons_w_green
+cons_w_green.label(d) Consumption of workers in Greenland 
+series b_brownbrown_d
+b_brownbrown_d.label(d) Bills issued by Brownland acquired by Brownland: demand
+series b_brownbrown_s
+b_brownbrown_s.label(d) Bills issued by Brownland acquired by Brownland: supply
+series b_cb_brownbrown_s
+b_cb_brownbrown_s.label(d) Bills issued by Brownland, supplied to Brownland Central bank
+series b_brown_s
+b_brown_s.label(d) Bills issued by the Brownland - total supply
+series b_browngreen_d
+b_browngreen_d.label(d) Bills issued by Greenland acquired by Brownland: demand
+series b_browngreen_s
+b_browngreen_s.label(d) Bills issued by Greenland acquired by Brownland: supply
+series b_greenbrown_d
+b_greenbrown_d.label(d) Bills issued by Brownland acquired by Greenland: demand
+series b_greenbrown_s
+b_greenbrown_s.label(d) Bills issued by Brownland acquired by Greenland: supply
+series b_green_s
+b_green_s.label(d) Bills issued by the Greenland - total supply
+series b_greengreen_d
+b_greengreen_d.label(d) Bills issued by Greenland acquired by Greenland: demand
+series b_greengreen_s
+b_greengreen_s.label(d) Bills issued by Greenland acquired by Greenland: supply
+series b_cb_greengreen_s
+b_cb_greengreen_s.label(d) Bills issued by Greenland supplied to Greenland Central Bank
+series dep_r_brown
+dep_r_brown.label(d) Holding of money in bank deposits by capitalists in Brownland
+series dep_w_brown
+dep_w_brown.label(d) Holding of money in bank deposits by workers in Brownland
+series dep_r_green
+dep_r_green.label(d) Holding of money in bank deposits by capitalistsin Greenland
+series dep_w_green
+dep_w_green.label(d) Holding of money in bank deposits by workers in Greenland
+series h_brown_r_h 
+h_brown_r_h.label(d) Holding of money in cash by capitalists in Brownland
+series h_brown_w_h 
+h_brown_w_h.label(d) Holding of money in cash by workers in Brownland
+series h_green_r_h 
+h_green_r_h.label(d) Holding of money in cash by capitalists in Greenland
+series h_green_w_h 
+h_green_w_h.label(d) Holding of money in cash by workers in Greenland
+series b_brown_bank_not
+b_brown_bank_not.label(d) Brownland bills notionally bought by Brownland banks
+series b_green_bank_not
+b_green_bank_not.label(d) Greenland bills notionally bought by Greenland banks
+series b_brown_bank
+b_brown_bank.label(d) Brownland bills actually bought by Brownland banks
+series b_green_bank
+b_green_bank.label(d) Greenland bills actually bought by Greenland banks
+series cab_brown
+cab_brown.label(d) Current account balance in Brownland
+series cab_green
+cab_green.label(d) Current account balance of Greenland
+series f_cb_brown
+f_cb_brown.label(d) Profits of Central Bank in Brownland
+series f_cb_green
+f_cb_green.label(d) Profits of Central Bank of Greenland
+series h_brown_s
+h_brown_s.label(d) Supply of Brownland cash
+series h_green_s
+h_green_s.label(d) Supply of Greenland cash
+series im_brown
+im_brown.label(d) Imports of Brownland from Greenland
+series im_green
+im_green.label(d) Imports of Greenland from Brownland
+series kab_brown
+kab_brown.label(d) Capital account balance in Brownland
+series kab_green
+kab_green.label(d) Current account balance of Greenland
+series psbr_brown
+psbr_brown.label(d) Government deficit in Brownland
+series psbr_green
+psbr_green.label(d) Government deficit of Greenland
+series t_brown
+t_brown.label(d) Tax revenue in Brownland
+series t_green
+t_green.label(d) Tax revenue of Greenland
+series x_brown
+x_brown.label(d) Exports from Brownland to Greenland
+series x_green
+x_green.label(d) Exports from Greenland to Brownland
+series xr_brown
+xr_brown.label(d) Exchange rate: units of G currency against 1 unit of B currency
+series xr_green
+xr_green.label(d) Exchange rate: units of B currency against 1 unit of G currency
+series y_brown
+y_brown.label(d) Income in Brownland
+series y_green
+y_green.label(d) Income of Greenland
+series h_brown_h
+h_brown_h.label(d) Total holding of money in cash in Brownland
+series h_green_h
+h_green_h.label(d) Total holding of money in cash in Greenland
+series tb_brown
+tb_brown.label(d) Trade balance of Brownland
+series tb_green
+tb_green.label(d) Trade balance of Greenland
+series bp_brown
+bp_brown.label(d) Brownland balance of payment
+series bp_green
+bp_green.label(d) Greenland balance of payment
+series z_brown
+z_brown.label(d) Trigger for positive notional Brownland bills 
+series z_green
+z_green.label(d) Trigger for positive notional Greenland bills 
+series a_d_brown
+a_d_brown.label(d) Advances needed by Brownland banks from Brownland central bank 
+series a_d_green
+a_d_green.label(d) Advances needed by Greenland banks from Greenland central bank 
+series a_s_brown
+a_s_brown.label(d) Advances provided to Brownland commercial banks by Brownland central bank 
+series a_s_green
+a_s_green.label(d) Advances provided to Greenland commercial banks by Greenland central bank 
+series dep_bank_brown
+dep_bank_brown.label(d) Supply of deposits in Brownland (liabilities of Brownland banks)
+series dep_bank_green
+dep_bank_green.label(d) Supply of deposits in Greenland (liabilities of Greenland banks)
+series v_r_brown
+v_r_brown.label(d) Wealth accumulation of capitalists in Brownland
+series v_r_green
+v_r_green.label(d) Wealth accumulation of capitalists in Greenland
+series v_w_brown
+v_w_brown.label(d) Wealth accumulation of workers in Brownland (debt not included)
+series v_w_green
+v_w_green.label(d) Wealth accumulation of workers in Greenland (debt not included)
+series b_brown_bank
+b_brown_bank.label(d) Brownland bills bought by Brownland bank  
+series b_green_bank
+b_green_bank.label(d) Greenland bills bought by Greenland bank  
+series l_s_brown
+l_s_brown.label(d) Supply of loans in Brownland 
+series l_s_green
+l_s_green.label(d) Supply of loans in Greenland
+series gnp_brown
+gnp_brown.label(d) Gross National product of Brownland
+series gnp_green
+gnp_green.label(d) Gross National product US
+series yd_tot_brown
+yd_tot_brown.label(d) Total disposable income in Brownland
+series yd_tot_green
+yd_tot_green.label(d) Total disposable income in Greenland
+series gini_brown 
+gini_brown.label(d) Disposable income of capitalists over total disposable income in Brownland
+series gini_green
+gini_green.label(d) Disposable income of capitalists over total disposable income in Greenland
+series v_tot_brown
+v_tot_brown.label(d) Total net wealth in Brownland
+series v_tot_green
+v_tot_green.label(d) Total net wealth in Greenland
+series giniw_brown 
+giniw_brown.label(d) Net wealth of capitalists over total wealth in Brownland
+series giniw_green
+giniw_green.label(d) Net wealth of capitalists over total wealth in Greenland
+series y_tr_brown
+ y_tr_brown.label(d)  Total Brownland income for capital target equation 
+series y_tr_green
+ y_tr_brown.label(d)  Total Greenland income for capital target equation 
+series l_firm_brown
+l_firm_brown.label(d)  Demand for bank loans by Brownland firms 
+series l_firm_green
+l_firm_green.label(d)  Demand for bank loans by Greenland firms 
+series k_brown
+k_brown.label(d) Total accumulation of capital in Brownland 
+series k_green
+k_green.label(d) Total accumulation of capital in Greenland
+series k_gr_brown
+k_gr_brown.label(d) Accumulation of green capital in Brownland 
+series k_gr_green
+k_gr_green.label(d) Accumulation of green capital in Greenland
+series k_con_brown
+k_con_brown.label(d) Accumulation of conventional capital in Brownland 
+series k_con_green
+k_con_green.label(d) Accumulation of conventional capital in Greenland
+series da_brown
+da_brown.label(d) Total depreciation allowances in Brownland
+series da_green
+da_green.label(d) Total depreciation allowances in Greenland
+series da_gr_brown
+da_gr_brown.label(d) Depreciation allowances green capital in Brownland
+series da_gr_green
+da_gr_green.label(d) Depreciation allowances green capital in Greenland
+series da_con_brown
+da_gr_brown.label(d) Depreciation allowances conventional capital in Brownland
+series da_con_green
+da_gr_green.label(d) Depreciation allowances conventional capital in Greenland
+series af_brown
+af_brown.label(d) Amortization funds in Brownland 
+series af_green
+af_green.label(d) Amortization funds in Greenland 
+series inv_brown
+inv_brown.label(d) Investment in Brownland  
+series inv_green
+inv_green.label(d) Investment in Greenland
+series inv_gr_brown_t
+inv_gr_brown_t.label(d) Potential demand for green investment in Brownland  
+series inv_gr_green_t
+inv_gr_green_t.label(d) Potential demand for green investment in Greenland
+series inv_gr_brown
+inv_gr_brown.label(d) Demand for green investment in Brownland  
+series inv_gr_green
+inv_gr_green.label(d) Demand for green investment in Greenland
+series inv_con_brown
+inv_con_brown.label(d) Conventional investment in Brownland  
+series inv_con_green
+inv_con_green.label(d) Conventional investment in Greenland
+
+'Exogenous variables for the open economy
+series r_brown
+r_brown.label(d) Interest rate on Brownland bills
+series r_green
+r_green.label(d) Interest rate on Greenland bills
+series gov_tot_brown
+gov_tot_brown.label(d) Government expenditure in Brownland (total)
+series gov_tot_green
+gov_tot_green.label(d) Government expenditure of Greenland (total)
+series gov_gr_brown
+gov_gr_brown.label(d) Green government expenditure in Brownland
+series gov_gr_green
+gov_gr_green.label(d) Green government expenditure of Greenland
+series gov_con_brown
+gov_con_brown.label(d) Conventional government expenditure in Brownland
+series gov_con_green
+gov_con_green.label(d) Conventional government expenditure of Greenland
+series gov_con_brown_init
+gov_con_brown_init.label(d) Initial value of conventional government expenditure in Brownland
+series gov_con_green_init
+gov_con_green_init.label(d) Initial value of conventional government expenditure of Greenland
+
+' Parameters for the open economy
+series alpha1_r_brown
+alpha1_r_brown.label(d) Propensity to consume out of income for Brownland capitalists
+series alpha1_w_brown
+alpha1_w_brown.label(d) Propensity to consume out of income for Brownland workers 
+series alpha2_r_brown
+alpha2_r_brown.label(d) Propensity to consume out of capitalists wealth in Brownland
+series alpha2_w_brown
+alpha2_w_brown.label(d) Propensity to consume out of workers wealth in Brownland
+series alpha1_r_green
+alpha1_r_green.label(d) Propensity to consume out of income for Greenland capitalists
+series alpha1_w_green
+alpha1_w_green.label(d) Propensity to consume out of income for Greenland workers
+series alpha2_r_green
+alpha2_r_green.label(d) Propensity to consume out of capitalists wealth of Greenland
+series alpha2_w_green
+alpha2_w_green.label(d) Propensity to consume out of workers wealth of Greenland
+series eps0
+eps0.label(d) Parameter determining real exports in Brownland
+series eps1
+eps1.label(d) Parameter determining real exports in Brownland
+series eps2
+eps2.label(d) Parameter determining real exports in Brownland
+series lambda10
+lambda10.label(d) Parameter defining demand for B bills by B capitalists
+series lambda11
+lambda11.label(d) Parameter defining demand for B bills by B capitalists
+series lambda12
+lambda12.label(d) Parameter defining demand for B bills by B capitalists
+series lambda13 
+lambda13.label(d) Parameter defining demand for B bills by B capitalists
+series lambda14
+lambda14.label(d) Parameter defining demand for B bills by B capitalists
+series lambda20
+lambda20.label(d) Parameter defining demand for G bills by B capitalists
+series lambda21
+lambda21.label(d) Parameter defining demand for G bills by B capitalists
+series lambda22
+lambda22.label(d) Parameter defining demand for G bills by B capitalists
+series lambda23
+lambda23.label(d) Parameter defining demand for G bills by B capitalists
+series lambda24
+lambda24.label(d) Parameter defining demand for G bills by B capitalists
+series lambda40
+lambda40.label(d) Parameter defining demand for G bills by G capitalists
+series lambda41
+lambda41.label(d) Parameter defining demand for G bills by G capitalists
+series lambda42 
+lambda42.label(d) Parameter defining demand for G bills by G capitalists
+series lambda43 
+lambda43.label(d) Parameter defining demand for G bills by G capitalists
+series lambda44
+lambda44.label(d) Parameter defining demand for G bills by G capitalists
+series lambda50
+lambda50.label(d) Parameter defining demand for B bills by G capitalists
+series lambda51
+lambda51.label(d) Parameter defining demand for B bills by G capitalists
+series lambda52
+lambda52.label(d) Parameter defining demand for B bills by G capitalists
+series lambda53 
+lambda53.label(d) Parameter defining demand for B bills by G capitalists
+series lambda54
+lambda54.label(d) Parameter defining demand for B bills by G capitalists
+series lambda70 
+lambda70.label(d) Parameter defining demand for G shares by B capitalists
+series lambda71
+lambda71.label(d) Parameter defining demand for G shares by B capitalists
+series lambda72
+lambda72.label(d) Parameter defining demand for G shares by B capitalists
+series lambda73
+lambda73.label(d) Parameter defining demand for G shares by B capitalists
+series lambda74
+lambda74.label(d) Parameter defining demand for G shares by B capitalists
+series lambda80 
+lambda80.label(d) Parameter defining demand for B shares by G capitalists
+series lambda81
+lambda81.label(d) Parameter defining demand for B shares by G capitalists
+series lambda82
+lambda82.label(d) Parameter defining demand for B shares by G capitalists
+series lambda83
+lambda83.label(d) Parameter defining demand for B shares by G capitalists
+series lambda84
+lambda84.label(d) Parameter defining demand for B shares by G capitalists
+series lambda90 
+lambda90.label(d) Parameter defining demand for B shares by B capitalists
+series lambda91
+lambda91.label(d) Parameter defining demand for B shares by B capitalists
+series lambda92
+lambda92.label(d) Parameter defining demand for B shares by B capitalists
+series lambda93
+lambda93.label(d) Parameter defining demand for B shares by B capitalists
+series lambda94
+lambda94.label(d) Parameter defining demand for B shares by B capitalists
+series lambda100 
+lambda100.label(d) Parameter defining demand for G shares by G capitalists
+series lambda101
+lambda101.label(d) Parameter defining demand for G shares by G capitalists
+series lambda102
+lambda102.label(d) Parameter defining demand for G shares by G capitalists
+series lambda103
+lambda103.label(d) Parameter defining demand for G shares by G capitalists
+series lambda104
+lambda104.label(d) Parameter defining demand for G shares by G capitalists
+series mu0
+mu0.label(d) Parameter determining real imports in Brownland
+series mu1
+mu1.label(d) Parameter determining real imports in Brownland
+series mu2
+mu2.label(d) Parameter determining real imports in Brownland
+series theta_brown
+theta_brown.label(d) Tax rate in Brownland
+series theta_green
+theta_green.label(d) Tax rate of Greenland
+series omega_brown
+omega_brown.label(d) Wage share in Brownland 
+series omega_green
+omega_green.label(d) Wage share in Greenland 
+series depsh_brown
+depsh_brown.label(d) Percentage of money held as deposits in Brownland
+series depsh_green
+depsh_green.label(d) Percentage of money held as deposits in Greenland
+series delta_brown 
+delta_brown.label(d) Depreciation rate in Brownland
+series delta_green 
+delta_green.label(d) Depreciation rate in Greenland
+series delta0_brown 
+delta0_brown.label(d) Initial value of depreciation rate in Brownland
+series ad_k_brown
+ad_k_brown.label(d) Adaptation coefficient of capital in Brownland
+series delta0_green
+delta0_green.label(d) Initial value of depreciation rate in Greenland
+series ad_k_green
+ad_k_green.label(d) Adaptation coefficient of capital in Greenland
+series gamma1_green
+gamma1_green.label(d) Parameter of investment function of Greenland
+series gamma1_brown
+gamma1_brown.label(d) Parameter of investment function of Brownland
+series gamma2_green
+gamma2_green.label(d) Parameter of investment function of Greenland
+series gamma2_brown
+gamma2_brown.label(d) Parameter of investment function of Brownland
+series kappa
+kappa.label(d) Capital-output ratio
+series chi1_brown
+chi1_brown.label(d) Sensibility of Brownland green investment to green government spending 
+series chi1_green
+chi1_green.label(d) Sensibility of Greenland green investment to green government spending 
+series chi2_brown
+chi2_brown.label(d) Sensibility of Brownland green investment to GDP 
+series chi2_green
+chi2_green.label(d) Sensibility of Greenland green investment to GDP 
+series chi3_brown
+chi3_brown.label(d) Sensibility of Brownland green investment to damages 
+series chi3_green
+chi3_green.label(d) Sensibility of Greenland green investment to damages 
+
+'Variables and parameters for the ecosystem 
+series y_mat_brown
+y_mat_brown.label(d) Production of material goods in Brownland
+series y_mat_green
+y_mat_green.label(d) Production of material goods in Greenland
+series mat_brown
+mat_brown.label(d) Extraction of matter in Brownland
+series mat_green
+mat_green.label(d) Extraction of matter in Greenland
+series rec_brown
+rec_brown.label(d) Recycled socio-economic stock in Brownland
+series rho_brown 
+rho_brown.label(d) Percentage of recycling in Brownland
+series rec_green
+rec_green.label(d) Recycled socio-economic stock in Greenland
+series rho_green 
+rho_green.label(d) Percentage of recycling in Greenland
+series dis_brown
+dis_brown.label(d) Discarded socio-economic stock in Brownland
+series dis_green
+dis_green.label(d) Discarded socio-economic stock in Greenland
+series k_se_brown
+k_se_brown.label(d) Socio-economic stock in Brownland
+series k_se_green
+k_se_green.label(d) Socio-economic stock in Greenland
+series wa_brown
+wa_brown.label(d) Waste generated by production activities in Brownland
+series wa_green
+wa_green.label(d) Waste generated by production activities in Greenland
+series k_m_brown
+k_m_brown.label(d) Stock of material reserves in Brownland
+series k_m_green
+k_m_green.label(d) Stock of material reserves in Greenland
+series k_m
+k_m.label(d) World-wide stock of material reserves
+series conv_m_brown
+conv_m_brown.label(d) Material resources converted to reserves in Brownland 
+series sigma_m_brown
+sigma_m_brown.label(d) Percentage of material resources converted to reserves in Brownland 
+series conv_m_green
+conv_m_green.label(d) Material resources converted to reserves in Greenland 
+series sigma_m_green
+sigma_m_green.label(d) Percentage of material resources converted to reserves in Greenland 
+series res_m_brown
+res_m_brown.label(d) Stock of material resources in Brownland
+series res_m_green
+res_m_green.label(d) Stock of material resources in Greenland
+series res_m
+res_m.label(d) World-wide stock of material resources
+series cen_brown
+cen_brown.label(d) Carbon mass of (non-renewable) energy in Brownland
+series cen_green
+cen_green.label(d) Carbon mass of (non-renewable) energy in Greenland 
+series car 
+car.label(d) Coefficient defining carbon mass of energy
+series o2_brown
+o2_brown.label(d) Mass of oxygen in Brownland
+series o2_green
+o2_green.label(d) Mass of oxygen in Greenland
+series en_brown
+en_brown.label(d) Energy required for production in Brownland
+series en_green
+en_green.label(d) Energy required for production in Greenland
+series ed_brown
+ed_brown.label(d) Dissipated energy at the end of the period in Brownland
+series ed_green
+ed_green.label(d) Dissipated energy at the end of the period in Greenland
+series k_e_brown
+k_e_brown.label(d) Stock of energy reserves in Brownland
+series k_e_green
+k_e_green.label(d) Stock of energy reserves in Greenland
+series k_e
+k_e.label(d) World-wide stock of energy reserves
+series conv_e_brown
+conv_e_brown.label(d) Energy resources converted to reserves in Brownland
+series sigma_e_brown
+sigma_e_brown.label(d) Percentage of energy resources converted to reserves in Brownland
+series conv_e_green 
+conv_e_green.label(d) Energy resources converted to reserves in Greenland
+series sigma_e_green
+sigma_e_green.label(d) Percentage of energy resources converted to reserves in Greenland
+series res_e_brown
+res_e_brown.label(d) Stock of energy resources in Brownland
+series res_e_green
+res_e_green.label(d) Stock of energy resources in Greenland
+series res_e
+res_e.label(d) World-wide stock of energy resources
+series emis_brown
+emis_brown.label(d) Industrial emissions of CO2 in Brownland
+series emis_green
+emis_green.label(d) Industrial emissions of CO2 in Greenland
+series emis
+emis.label(d) World-wide industrial emissions of CO2
+series mu_brown
+mu_brown.label(d) Matter intensity coefficient in Brownland
+series mu_gr_brown
+mu_gr_brown.label(d) Matter intensity coefficient of green production in Brownland
+series mu_con_brown
+mu_brown.label(d) Matter intensity coefficient of conventional production in Brownland
+series mu_green
+mu_green.label(d) Matter intensity coefficient in Greenland
+series mu_gr_green
+mu_gr_green.label(d) Matter intensity coefficient of green production in Greenland
+series mu_con_green
+mu_con_green.label(d) Matter intensity coefficient of conventional production in Greenland
+series epsilon_brown
+epsilon_brown.label(d) Average energy intensity coefficient in Brownland
+series epsilon_gr_brown
+epsilon_gr_brown.label(d) Energy intensity coefficient of green production in Brownland
+series epsilon_con_brown 
+epsilon_con_brown.label(d) Energy intensity coefficient of conventional production in Brownland
+series epsilon_green
+epsilon_green.label(d) Average energy intensity coefficient in Greenland
+series epsilon_gr_green
+epsilon_gr_green.label(d) Energy intensity coefficient of green production in Greenland
+series epsilon_con_green 
+epsilon_con_green.label(d) Average energy intensity coefficient of conventional production in Greenland
+series beta_brown 
+beta_brown.label(d) Average CO2 intensity coefficient in Brownland
+series beta_brown0 
+beta_brown0.label(d) Initial value of CO2 emissions in Brownland
+series beta_gr_brown
+beta_gr_brown.label(d) CO2 intensity coefficient of green production in Brownland
+series beta_con_brown
+beta_con_brown.label(d) CO2 intensity coefficient of conventional production in Brownland
+series beta_green
+beta_green.label(d) Average CO2 intensity coefficient in Greenland
+series beta_green0 
+beta_green0.label(d) Initial value of CO2 emissions in Greenland
+series beta_gr_green
+beta_gr_green.label(d) CO2 intensity coefficient of green production in Greenland
+series beta_con_green
+beta_con_green.label(d) CO2 intensity coefficient of conventional production in Greenland
+series depl_m_brown
+depl_m_brown.label(d) Matter depletion ratio in Brownland
+series depl_m_green
+depl_m_green.label(d) Matter depletion ratio in Greenland
+series depl_e_brown
+depl_e_brown.label(d) Energy depletion ratio in Brownland
+series depl_e_green
+depl_e_green.label(d) Energy depletion ratio in Greenland
+series delta_brown
+delta_brown.label(d) Ecological impact on depreciation of capital stock in Brownland
+series delta11
+delta11.label(d) Sensitivity of capital depreciation to matter depletion in Brownland
+series delta12
+delta12.label(d) Sensitivity of capital depreciation to energy depletion in Brownland
+series delta13
+delta13.label(d) Sensitivity of capital depreciation to climate change in Brownland
+series delta_green
+delta_green.label(d) Ecological impact on depreciation of capital stock in Greenland
+series delta21
+delta21.label(d) Sensitivity of capital depreciation to matter depletion in Greenland
+series delta22
+delta22.label(d) Sensitivity of capital depreciation to energy depletion in Greenland
+series delta23
+delta23.label(d) Sensitivity of capital depreciation to climate change in Greenland
+series alpha1_w_brown
+alpha1_w_brown.label(d) Ecological impact on propensity to consume of workers in Brownland
+series alpha11
+alpha11.label(d) Sensitivity of Brownland workers propensity to consume to matter depletion
+series alpha12
+alpha12.label(d) Sensitivity of Brownland workers propensity to consume to energy depletion
+series alpha13
+alpha13.label(d) Sensitivity of Brownland workers propensity to consume to climate change
+series alpha1_w_green
+alpha1_w_green.label(d) Ecological impact on propensity to consume of workers in Greenland
+series alpha21
+alpha21.label(d) Sensitivity of Greenland workers propensity to consume to matter depletion
+series alpha22
+alpha22.label(d) Sensitivity of Greenland workers propensity to consume to energy depletion
+series alpha23
+alpha23.label(d) Sensitivity of Greenland workers propensity to consume to climate change
+series y_k_brown
+y_k_brown.label(d) Capital-determined real potential output in Brownland
+series a_brown
+a_brown.label(d) Product per unit of capital in Brownland
+series y_k_green
+y_k_green.label(d) Capital-determined real potential output in Greenland
+series a_green  
+a_green.label(d) Product per unit of capital in Greenland
+series y_m_brown
+y_m_brown.label(d) Matter-determined potential output in Brownland
+series y_m_green 
+y_m_green.label(d) Matter-determined potential output in Greenland
+series y_e_brown
+y_e_brown.label(d) Energy-determined potential output in Brownland
+series y_e_green
+y_e_green.label(d) Energy-determined potential output in Greenland
+series y_s_brown
+y_s_brown.label(d) Potential output (Leonfief function) in Brownland
+series y_s_green
+y_s_green.label(d) Potential output (Leonfief function) in Greenland
+series p_brown
+p_brown.label(d) Unit price of output in Brownland 
+series p_green
+p_green.label(d) Unit price of output in Greenland
+series g_beta_brown
+g_beta_brown.label(d) Rate of decline of CO2 intensity in Brownland
+series g_beta_green
+g_beta_green.label(d) Rate of decline of CO2 intensity in Greenland
+series iota_brown
+iota_brown.label(d) Sensitivity of Brownland price level to output gap
+series iota_green
+iota_green.label(d) Sensitivity of Greenland price level to output gap
+series eta_brown
+eta_brown.label(d) Share of renewable energy to total energy in Brownland
+series eta_con_brown
+eta_con_brown.label(d) Share of renewable energy to total energy in Brownland, conventional capital
+series eta_gr_brown
+eta_gr_brown.label(d) Share of renewable energy to total energy in Brownland, green capital
+series er_brown
+er_brown.label(d) Renewable energy in Brownland
+series eta_green
+eta_green.label(d) Share of renewable energy to total energy in Greenland
+series eta_con_green
+eta_con_green.label(d) Share of renewable energy to total energy in Greenland, conventional capital
+series eta_gr_green
+eta_gr_green.label(d) Share of renewable energy to total energy in Greenland, green capital
+series eta_world
+eta_world.label(d) Average share of renewable energy to total energy worldwide 
+series mu_world
+mu_world.label(d) Average matter-intensity coefficient worldwide 
+series epsilon_world
+epsilon_world.label(d) Average energy-intensity coefficient worldwide 
+series beta_world
+beta_world.label(d) Average share of renewable energy sources worldwide 
+series er_green
+er_green.label(d) Renewable energy in Greenland
+series en_brown
+en_brown.label(d) Non-renewable energy in Brownland
+series en_green
+en_green.label(d) Non-renewable energy in Greenland
+
+' Variables and parameters for the stock market
+series p_b_brown
+p_b_brown.label(d) Implicit unit price of Brownland T-bonds
+series p_b_green
+p_b_green.label(d) Implicit unit price of Greenland T-bonds
+series e_greengreen_d
+e_greengreen_d.label(d) Greenland shares held by Greenland capitalists
+series e_browngreen_d
+e_browngreen_d.label(d) Greenland shares held by Brownland capitalists
+series e_greengreen_s
+e_greengreen_s.label(d) Real issues of Greenland shares to Greenland
+series e_browngreen_s
+e_browngreen_s.label(d) Real issues of Greenland shares to Brownland
+series p_e_green
+p_e_green.label(d) Unit price of Greenland shares
+series e_brownbrown_d
+e_brownbrown_d.label(d) Brownland shares held by Brownland capitalists
+series e_greenbrown_d
+e_greenbrown_d.label(d) Brownland shares held by Greenland capitalists
+series e_brownbrown_s
+e_brownbrown_s.label(d) Issues of Brownland shares to Brownland
+series e_greenbrown_s
+e_greenbrown_s.label(d) Issues of Brownland shares to Greenland
+series p_e_brown
+p_e_brown.label(d) Unit price of Brownland shares
+series r_e_green
+r_e_green.label(d) Actual dividend yield of Greenland firms
+series r_e_green_t
+r_e_green_t.label(d) Notional dividend yield of Greenland firms
+series r_e_brown
+r_e_brown.label(d) Actual dividend yields of Brownland firms
+series r_e_brown_t
+r_e_brown_t.label(d) Notional dividend yields of Brownland firms
+series e_brown_real_s
+e_brown_real_s.label(d) Total issues of Brownland shares
+series e_green_real_s
+e_green_real_s.label(d) Total issues of Brownland shares
+series xi_green
+xi_green.label(d) Shares issues to investment ratio in Greenland
+series xi_brown
+xi_brown.label(d) Shares issues to investment ratio in Brownland
+series f_d_greengreen
+f_d_greengreen.label(d) Dividends paid by Greenland firms to Greenland shareholders
+series f_d_brownbrown
+f_d_brownbrown.label(d) Dividends paid by Brownland firms to Brownland shareholders
+series f_d_browngreen
+f_d_browngreen.label(d) Dividends paid by Greenland firms to Brownland shareholders
+series f_d_greenbrown
+f_d_greenbrown.label(d) Dividends paid by Brownland firms to Greenland shareholders
+series f_brown 
+f_brown.label(d) Profits made by Brownland firms
+series fu_brown  
+fu_brown.label(d) Brownland firms retained profits
+series fd_brown  
+fd_brown.label(d) Brownland firms distributed profits (dividends)
+series f_green 
+f_green.label(d) Profits made by Greenland firms
+series fu_green 
+fu_green.label(d) Greenland firms retained profits
+series fd_green 
+fd_green.label(d) Greenland firms distributed profits (dividends)
+series ret_brown 
+ret_brown.label(d) Profit retention rate of Brownland firms
+series ret_green 
+ret_green.label(d) Profit retention rate of Greenland firms
+series cg_b_green  
+cg_b_green.label(d) Total capital gains on bills in Greenland
+series cg_e_green 
+cg_e_green.label(d) Total capital gains on shares in Greenland
+series cg_b_brown 
+cg_b_brown.label(d) Total capital gains on bills in Brownland
+series cg_e_brown 
+cg_e_brown.label(d) Total capital gains on shares in Brownland
+series q_green
+q_green.label(d) Tobin q ratio of Greenland firms
+series q_brown
+q_brown.label(d) Tobin q ratio of Brownland firms
+series lev_f_green
+lev_f_green.label(d) Leverage ratio of Greenland firms
+series lev_f_brown
+lev_f_brown.label(d) Leverage ratio of Brownland firms
+series liq_b_green
+liq_b_green.label(d) Liquidity ratio of Greenland banks
+series liq_b_brown
+liq_b_brown.label(d) Liquidity ratio of Brownland banks
+series per_green
+per_green.label(d) Price earnings ratio of Greenland firms
+series per_brown
+per_brown.label(d) Price earnings ratio of Brownland firms
+series pi_dy_green
+pi_dy_green.label(d) Parameter of dividend yield in Greenland
+series pi_dy_brown
+pi_dy_brown.label(d) Parameter of dividend yield in Brownland
+series f_m_green
+f_m_green.label(d) Salary of Greenland firms managers 
+series f_m_brown
+f_m_brown.label(d) Salary of Brownland firms managers 
+series mu2_par
+mu2_par.label(d) Parameter defining Brownland propensity to import
+series r_l_green
+r_l_green.label(d) Interest rate of bank loans in Greenland
+series r_l_brown
+r_l_brown.label(d) Interest rate of bank loans in Brownland
+
+'New series for estimation
+series y
+y.label(d) Total output
+series cons
+cons.label(d) Total consumption
+series inv
+inv.label(d) Total investment
+series gov
+gov.label(d) Total government spending
+series yd
+yd.label(d) Total disposable income
+series v
+v.label(d) Total stock of wealth
+series k
+k.label(d) Total stock of fixed capital
+series alpha0_r_brown
+alpha0_r_brown.label(d) Trend component of capitalists consumption in Brownland
+series alpha0_w_brown
+alpha0_w_brown.label(d) Trend component of workers consumption in Brownland
+series alpha0_r_green
+alpha0_r_green.label(d) Trend component of capitalists consumption in Greenland
+series alpha0_w_green
+alpha0_w_green.label(d) Trend component of workers consumption in Greenland
+series gamma0_brown
+gamma0_brown.label(d) Trend component in Brownland investment 
+series gamma0_green
+gamma0_green.label(d) Trend component in Greenland investment 
+series parg0_brown
+parg0_brown.label(d) Coefficient in government conventional spending in Brownland
+series parg1_brown
+parg1_brown.label(d) Coefficient in government conventional spending in Brownland
+series parg0_green
+parg0_green.label(d) Coefficient in government conventional spending in Greenland
+series parg1_green
+parg1_green.label(d) Coefficient in government conventional spending in Greenland
+
+'Additional series for fixed exchange rate
+series or_brown 
+or_brown.label(d) Gold reserves of Brownland 
+series or_green 
+or_green.label(d) Gold reserves of Greenland
+
+'New ecological series
+series emis_l
+emis_l.label(d) Annual land emissions of CO2
+series g_land
+g_land.label(d) Rate of decline of land-use CO2 emissions
+series co2_at
+co2_at.label(d) Atmospheric CO2 concentration
+series phi11
+phi11.label(d) CO2 transfer coefficient
+series phi21 
+phi21.label(d) CO2 transfer coefficient
+series co2_up 
+co2_up.label(d) Upper ocean/biosphere CO2 concentration 
+series phi12
+phi12.label(d) CO2 transfer coefficient
+series phi22
+phi22.label(d) CO2 transfer coefficient
+series phi32 
+phi32.label(d) CO2 transfer coefficient
+series co2_lo 
+co2_lo.label(d) Lower ocean CO2 concentration
+series phi23
+phi23.label(d) CO2 transfer coefficient
+series phi33 
+phi33.label(d) CO2 transfer coefficient
+series temp_at
+temp_at.label(d) Atmosferic temperature
+series temp_lo
+temp_lo.label(d) Temperature of the lower ocean
+series f
+f.label(d) Radiative forcing over pre-industrial levels (W/m^2) 
+series f2
+f2.label(d) Increase in radiative forcing due to doubling of CO2 concentraton \n since pre-industrial levels (W/m^2)
+series co2_at_pre
+co2_at_pre.label(d) Pre-industrial CO2 concentration in atmosphere (Gt)
+series co2_lo_pre
+co2_lo_pre.label(d) Pre-industrial CO2 concentration in lower ocean (Gt)
+series co2_up_pre
+co2_up_pre.label(d) Pre-industrial CO2 concentration in upper ocean/biosphere (Gt) (Gt)
+series f_ex 
+f_ex.label(d) Radiative forcing over pre-industrial levels (W/m^2) \n due to non-CO2 greenhouse gases (W/m^2)
+series fex 
+fex.label(d) Annual increase in radiative forcing due to non-CO2 greenhouse \n gas emissions (W/m^2)
+series t1
+t1.label(d) Speed of adjustment parameter in atmospheric temperature function
+series t2
+t2.label(d) Coefficient of heat loss from the atmosphere to the lower ocean in \n atmospheric temperature function 
+series t3
+t3.label(d) Coefficient of heat loss from the atmosphere to the lower ocean in \n lower ocean temperature function
+series sens
+sens.label(d) Equilibrium climate sensitivity
+series d_t_brown
+d_t_brown.label(d) Proportional gross damage (0 = no damage; 1 = catastrophe)
+series dam1_brown
+dam1_brown.label(d) Parameter in damage function
+series dam2_brown
+dam2_brown.label(d) Parameter in damage function
+series dam3_brown
+dam3_brown.label(d) Parameter in damage function
+series dam4_brown
+dam4_brown.label(d) Parameter in damage function
+series d_t_green
+d_t_green.label(d) Proportional gross damage (0 = no damage; 1 = catastrophe)
+series dam1_green
+dam1_green.label(d) Parameter in damage function
+series dam2_green
+dam2_green.label(d) Parameter in damage function
+series dam3_green
+dam3_green.label(d) Parameter in damage function
+series dam4_green
+dam4_green.label(d) Parameter in damage function
+series ad_exp
+ad_exp.label(d) Parameter in Brownland export tuning damage impact
+series ad_im
+ad_im.label(d) Parameter in Brownland import tuning damage impact
+series dc_brown
+dc_brown.label(d) Stock of durable consumption goods in Brownland
+series dc_green
+dc_green.label(d) Stock of durable consumption goods in Greenland
+series zeta_brown
+zeta_brown.label(d) Proportion of durable discarded in Brownland every year
+series zeta_green 
+zeta_green.label(d) Proportion of durable discard in Greenland every year
+
+'**********************************************************************************************************************************************************************************************
+'Re-set sample
+smpl @all
+
+'Starting values for coefficients and related variables
+omega_brown = 0.62
+omega_green = 0.62
+cons_brown = cons_ob/2 
+cons_green = cons_ob/2 
+cons_w_brown = cons_brown*omega_brown 
+cons_r_brown = cons_brown - cons_w_brown 
+cons_w_green = cons_green*omega_green
+cons_r_green = cons_green - cons_w_green
+h_brown_r_h=@recode(er_regime1=0,0,5)  
+h_brown_w_h = 0
+h_brown_h = h_brown_r_h + h_brown_w_h  
+h_green_r_h=@recode(er_regime1=0,0,5)
+h_green_w_h= 0  
+h_green_h = h_green_r_h + h_green_w_h
+h_brown_s = @recode(er_regime1=0,h_brown_h,5)  
+h_green_s = @recode(er_regime1=0,h_green_h,5) 
+or_brown=5 
+or_green=5  
+a_s_brown = 0  
+a_s_green = 0 
+v_w_brown = 0 
+v_w_green = 0 
+v_r_brown = @recode(er_regime1=0,0,5) 
+v_r_green = @recode(er_regime1=0,0,5) 
+theta_brown = @recode(@date<@dateval("2018"),theta_ob/100,@mean(theta_ob/100,"2002 2017"))
+theta_green = @recode(@date<@dateval("2018"),theta_ob/100,@mean(theta_ob/100,"2002 2017"))
+k_gr_brown = 0
+k_gr_green = 0
+k_con_brown = k_ob/2
+k_con_green = k_ob/2
+k_brown = k_con_brown + k_gr_brown
+k_green = k_con_green + k_gr_green
+delta0_brown = @recode(@date<@dateval("2018"),delta_ob,@mean(delta_ob,"2002 2017"))
+delta0_green = @recode(@date<@dateval("2018"),delta_ob,@mean(delta_ob,"2002 2017"))
+delta_brown = delta0_brown
+delta_green = delta0_green
+ad_k_green = 0.75  
+ad_k_brown = 0.75
+kappa = @recode(@date<@dateval("2018"),kappa_ob,@mean(kappa_ob,"2002 2017"))
+gov_gr_brown = 1
+gov_gr_green = 1
+gov_con_brown_init = (gov_ob/2) - 1
+gov_con_green_init = (gov_ob/2) - 1 
+gov_con_brown = gov_con_brown_init
+gov_con_green = gov_con_green_init
+gov_tot_brown = gov_ob/2
+gov_tot_green = gov_ob/2
+gov = gov_ob
+emis_l = 4 
+g_land = @recode(@date<@dateval("2015"),0,0.044)  
+emis_brown = (emis_ob-emis_l)/2
+emis_green = (emis_ob-emis_l)/2
+inv_brown = inv_ob/2
+inv_green = inv_ob/2
+inv = inv_ob
+y_brown = y_ob/2
+y_green = y_ob/2
+y = y_ob
+v = y_ob
+cons = cons_ob
+yd = yd_ob
+alpha1_w_brown = 0.790919
+alpha1_r_brown = 0.490919
+alpha1_w_green = 0.790919
+alpha1_r_green = 0.490919
+alpha2_w_brown = 0.020834
+alpha2_r_brown = 0.020834
+alpha2_w_green = 0.020834
+alpha2_r_green = 0.020834
+yd_r_brown = yd_ob*(1-0.62)
+yd_w_brown = yd_ob*0.62
+yd_r_green = yd_ob*(1-0.62)
+yd_w_green = yd_ob*0.62
+emis = emis_ob
+
+' Starting values for parameters
+eps0 = - 2.1
+eps1 = 0.5
+eps2 = 1.228
+mu0 = - 2.1
+mu1 = 0.5
+mu2 = 1.228
+mu2_par = 0
+lambda10 = 0.3    
+lambda11 = 1  
+lambda12 = 1
+lambda13 = 0 
+lambda14 =0 
+lambda20 = 0.1 
+lambda21 = 1
+lambda22 = 1
+lambda23 =0 
+lambda24 =0 
+lambda40 = 0.3  
+lambda41 = 1
+lambda42 = 1
+lambda43 =0  
+lambda44 =0 
+lambda50 = 0.1   
+lambda51 = 1
+lambda52 = 1
+lambda53 =0 
+lambda54 =0 
+lambda70 = 0.05  
+lambda71 = 0 
+lambda72 = 0 
+lambda73 =0.01 
+lambda74 =0.01 
+lambda80 = 0.05    
+lambda81 = 0 
+lambda82 = 0 
+lambda83 =0.01 
+lambda84 =0.01 
+lambda90 = 0.05 
+lambda91 = 0 
+lambda92 = 0 
+lambda93 =0.01 
+lambda94 =0.01 
+lambda100 = 0.05  
+lambda101 = 0 
+lambda102 = 0 
+lambda103 =0.01 
+lambda104 =0.01 
+xi_green = 0.01  
+xi_brown = 0.01  
+e_brown_real_s = 1
+e_green_real_s = 1
+p_e_brown = 1
+p_e_green = 1
+gamma2_green = 0.005
+gamma2_brown = 0.005
+gamma1_green = 1.008213
+gamma1_brown = 1.008213
+gamma0_green = 0.093272 - 0.05
+gamma0_brown = 0.093272 - 0.05
+chi1_brown = 0.2 
+chi1_green = 0.2
+ret_brown = 0.02 
+ret_green = 0.02 
+depsh_brown = 0.7
+depsh_green = 0.7
+chi2_brown = 0.02 
+chi2_green = 0.02 
+chi3_brown = 30 
+chi3_green = 30 
+pi_dy_green = 0.00555 
+pi_dy_brown = 0.00555 
+
+'Coefficients for ecological variables
+beta_gr_brown = 0.048154 - 0.01 'CO2 intensity of green capital in Brownland (Gt/Ej)  
+beta_gr_green = 0.048154 - 0.02 'CO2 intensity of green capital in Greenland (Gt/Ej)
+beta_con_brown = 0.048154 + 0.01 'CO2 intensity of conventional capital in Brownland (Gt/Ej)
+beta_con_green = 0.048154 'CO2 intensity of conventional capital in Greenland (Gt/Ej)
+g_beta_brown = @recode(@date<@dateval("2020"),0,0.02) ''Rate of decline of CO2 intensity in Brownland  
+g_beta_green = @recode(@date<@dateval("2020"),0,0.04) 'Rate of decline of CO2 intensity in Greenland
+beta_brown0 = @recode(@date<@dateval("2020"),6.904820/2,(6.904820/2)*(1+g_beta_brown)^(-@trend+59)) 'Initial or autonomous value of CO2 emissions in Brownland (falling after 2020) 
+beta_green0 = @recode(@date<@dateval("2020"),6.904820/2,(6.904820/2)*(1+g_beta_green)^(-@trend+59)) 'Initial or autonomous value of CO2 emissions in Greenland (falling after 2020)
+
+'Starting values for variables and parameter values for the ecosystem
+mu_gr_brown = 0.71 ''Material intensity of green capital in Brownland (Kg/USD) 
+mu_gr_green = 0.51 ''Material intensity of green capital in Greenland (Kg/USD)
+mu_con_brown = 0.86 'Material intensity of conventional capital in Brownland (Kg/USD)
+mu_con_green = 0.66 'Material intensity of conventional capital in Greenland (Kg/USD)
+epsilon_gr_brown = 7.65 'Energy intensity of green capital in Brownland (Ej/USD)
+epsilon_gr_green = 5.65 'Energy intensity of green capital in Greenland (Ej/USD)
+epsilon_con_brown = 9.32 'Energy intensity of conventional capital in Brownland (Ej/USD)
+epsilon_con_green = 7.32 'Energy intensity of conventional capital in Greenland (Ej/USD)
+im_brown = 0 'Initial value of Brownland import
+im_green = 0 'Initial value of Greenland import
+x_brown = im_green 'Initial value of Brownland export
+x_green = im_brown 'Initial value of Greenland export
+rho_brown = 0.2 'Recycling rate in Brownland
+rho_green = 0.28 'Recycling rate in Greenland
+k_m_brown = 0 'Initial value of matter reserves of Brownland (Gt)  
+k_m_green = 0 'Initial value of matter reserves of Greenland (Gt) 
+k_e_brown = 0 'Initial value of non-renewable energy reserves of Brownland (Ej)  
+k_e_green = 0 'Initial value of non-renewable energy reserves of Greenland (Ej) 
+sigma_m_brown = 0.00034 'Conversion rate of material resources into reserves in Brownland  
+sigma_m_green = 0.00034 'Conversion rate of material resources into reserves in Greenland
+sigma_e_brown = 0.00177 'Conversion rate of non-renewable energy resources into reserves in Brownland  
+sigma_e_green = 0.00177 'Conversion rate of non-renewable energy resources into reserves in Greenland
+res_m_brown = 195000*(1-sigma_m_brown)^(-64)   'Initial value of matter resources of Brownland (Gt) - Note: 64 is the number of periods from 1951 to 2015 
+res_m_green = 195000*(1-sigma_m_green)^(-64) 'Initial value of matter resources of Greenland (Gt) 
+res_e_brown = 271000*(1-sigma_e_brown)^(-64) 'Initial value of non-renewable energy resources of Brownland (Ej)  
+res_e_green = 271000*(1-sigma_e_green)^(-64) 'Initial value of non-renewable energy resources of Greenland (Ej) 
+k_se_brown = 0 'Initial value of socio-economic stock of Brownland (Gt)   
+k_se_green = 0 'Initial value of socio-economic stock of Greenland (Gt)
+car = 3.67 'Coefficient converting Gt of carbon into Gt of CO2  
+delta11 = 0 'Initial value of sensitivity of capital depreciation rate of Brownland firms to matter depletion 
+delta12 = 0 'Initial value of sensitivity of capital depreciation rate of Brownland firms to energy depletion
+delta13 = 0 'Initial value of sensitivity of capital depreciation rate of Brownland firms to climate change
+delta21 = 0 'Initial value of sensitivity of capital depreciation rate of Greenland firms to matter depletion
+delta22 = 0 'Initial value of sensitivity of capital depreciation rate of Greenland firms to energy depletion
+delta23 = 0 'Initial value of sensitivity of capital depreciation rate of Greenland firms to climate change
+alpha11 = 0 'Initial value of sensitivity of propensity to consume of Brownland workers to matter depletion 
+alpha12 = 0 'Initial value of sensitivity of propensity to consume of Brownland workers to energy depletion 
+alpha13 = 0 'Initial value of sensitivity of propensity to consume of Brownland workers to climate change 
+alpha21 = 0 'Initial value of sensitivity of propensity to consume of Greenland workers to matter depletion 
+alpha22 = 0 'Initial value of sensitivity of propensity to consume of Greenland workers to energy depletion 
+alpha23 = 0  'Initial value of sensitivity of propensity to consume of Greenland workers to climate change 
+a_brown = 1.15 'Product per unit of capital in Brownland  
+a_green = 1.15 'Product per unit of capital in Greenland 
+iota_brown = 0.5 'Sensitivity of price level in Brownland to output gap 
+iota_green = 0.5 'Sensitivity of price level in Greenland to output gap 
+p_brown = 1 'Initial value of price level in Brownland 
+p_green = 1 'Initial value of price level in Greenland 
+eta_con_brown = 0 'Share of renewable energy to total energy in Brownland, conventional capital 
+eta_con_green = 0.05 'Share of renewable energy to total energy in Greenland, conventional capital
+eta_gr_brown = 0.075 'Share of renewable energy to total energy in Brownland, green capital
+eta_gr_green = 0.15 'Share of renewable energy to total energy in Greenland, green capital
+eta_brown = eta_con_brown 'Share of renewable energy to total energy in Brownland, average 
+eta_green = eta_con_green 'Share of renewable energy to total energy in Greenland, average
+
+' Starting values for exogenous variables for the open economy
+r_brown = 0.03
+r_green = 0.03
+r_e_brown = r_brown 
+r_e_green = r_green 
+r_l_green = 0.035
+r_l_brown = 0.035
+
+'Starting values for endogenous variables with lag for the open economy
+y_tr_brown = 0
+y_tr_green = 0
+xr_brown = 1
+xr_green = 1/xr_brown
+lev_f_green = 0
+lev_f_brown = 0
+liq_b_green = 0
+liq_b_brown = 0
+
+' Starting values for stocks for the open economy
+b_cb_brownbrown_s = 0
+b_cb_greengreen_s = 0
+b_brown_s = 0
+b_brownbrown_d = 0
+b_brownbrown_s = 0
+b_browngreen_d = 0
+b_browngreen_s = 0
+b_green_s = 0
+b_greenbrown_d = 0
+b_greenbrown_s = 0
+b_greengreen_d = 0
+b_greengreen_s = 0
+e_brownbrown_d = 0 
+e_brownbrown_s = 0 
+e_browngreen_d = 0 
+e_browngreen_s = 0 
+e_greenbrown_d = 0 
+e_greenbrown_s = 0 
+e_greengreen_d = 0 
+e_greengreen_s = 0 
+b_brown_bank=0
+b_green_bank=0
+l_s_brown = 0
+l_s_green = 0
+l_firm_brown = 0
+l_firm_green = 0
+f_d_greengreen = 0
+f_d_brownbrown = 0
+f_d_greenbrown = 0
+f_d_browngreen = 0
+
+'Set additional ecological coefficients and variables
+temp_at = temp_at_ob 'Atmospheric temperature over pre-industrial levels  
+temp_lo = 0 'Lower ocean temperature over pre-industrial levels  
+t1 = 0.027 'Speed of adjustment parameter in atmospheric temperature function  
+t2 = 0.018 'Coefficient of heat loss from the atmosphere to the lower ocean in atmospheric temperature function  
+t3 = 0.005 'Coefficient of heat loss from the atmosphere to the lower ocean in lower ocean temperature function 
+sens = 3  'Equilibrium climate sensitivity  
+co2_at_pre = 2156.2 ' Pre-industrial CO2 concentration in atmosphere (Gt) 
+co2_up_pre = 4950.5 ' Pre-industrial CO2 concentration in upper ocean/biosphere (Gt) 
+co2_lo_pre = 36670 ' Pre-industrial CO2 concentration in lower ocean (Gt)
+co2_at = co2_at_pre 'Initial level of atmospheric CO2 concentration in 1960
+co2_up = co2_up_pre  'Upper ocean/biosphere CO2 concentration  
+co2_lo = co2_lo_pre  'Lower ocean CO2 concentration
+phi11 = 0.9817 'CO2 transfer coefficient 
+phi21 = 0.0080 'CO2 transfer coefficient
+phi12 = 0.0183 'CO2 transfer coefficient
+phi22 = 0.9915 'CO2 transfer coefficient
+phi23 = 0.0005 'CO2 transfer coefficient
+phi32 = 0.0001 'CO2 transfer coefficient
+phi33 = 0.9999 'CO2 transfer coefficient
+f = 2.3 ' Radiative forcing over pre-industrial levels (W/m^2)  
+f2 = 3.8 ' Increase in radiative forcing due to doubling of CO2 concentraton since pre-industrial levels (W/m^2)
+f_ex = 0.28 ' Radiative forcing over pre-industrial levels (W/m^2) due to non-CO2 greenhouse gases (W/m^2) 
+fex = 0.005 ' Annual increase in radiative forcing due to non-CO2 greenhouse gas emissions (W/m^2) 
+wa_brown = 11/2 'Waste generated by production activities (Gt)  
+wa_green = 11/2 'Waste generated by production activities (Gt)  
+
+' Set coefficients for damages due to global warming
+dam1_brown = 0 'Parameter of damage function  
+dam2_brown = 0.00284 'Parameter of damage function 
+dam3_brown = 0.000005 'Parameter of damage function 
+dam4_brown = 6.6754 'Parameter of damage function 
+d_t_brown = 0.0028 'Percentage of damages (initial value) 
+dam1_green = 0 'Parameter of damage function  
+dam2_green = 0.00284 'Parameter of damage function 
+dam3_green = 0.000005 'Parameter of damage function 
+dam4_green = 6.6754 'Parameter of damage function 
+d_t_green = 0.0028 'Percentage of damages (initial value) 
+ad_exp = 0.05 'Coefficient tuning impact of damages on Brownland export 
+ad_im = 0.05 'Coefficient tuning impact of damages on Brownland import 
+dc_brown = cons_brown 'Stock of durable consumption goods in Brownland
+dc_green = cons_green 'Stock of durable consumption goods in Greenland
+zeta_brown = 0.015 'Proportion of durable discarded in Brownland every year  
+zeta_green = 0.015 'Proportion of durable discard in Greenland every year  
+tb_brown = 0 'Initial value for trade balance of Brownland
+tb_green = 0 'Initial value for trade balance of Greenland
+
+'**********************************************************************************************************************************************************************************************
+'CREATE THE MODEL
+model openeco
+
+' I - DISPOSABLE INCOME AND WEALTH
+
+' Disposable income capitalists in Brownland - eq. 1
+openeco.append yd_r_brown = y_r_brown *(1 - theta_brown) 
+
+' Disposable income workers in Brownland - eq. 2 
+openeco.append yd_w_brown = y_w_brown*(1 - theta_brown) 
+
+' Haig-Simons disposable income capitalists in Brownland - eq. 3
+openeco.append yd_hs_r_brown = yd_r_brown + cg_b_brown + cg_e_brown 
+
+' Total capital gains on bills in Brownland - eq. 4
+openeco.append cg_b_brown = d(xr_green)*b_browngreen_s(-1)     
+
+' Total capital gains on shares in Brownland - eq. 5
+openeco.append cg_e_brown = d(xr_green)*e_browngreen_s(-1) 
+
+' Wealth accumulation capitalists in Brownland - eq. 6
+openeco.append v_r_brown = v_r_brown(-1) + yd_hs_r_brown - cons_r_brown 
+
+' Wealth accumulation workers in Brownland - eq. 7
+openeco.append v_w_brown = v_w_brown(-1) + yd_w_brown - cons_w_brown
+
+' Disposable income capitalists in Greenland - eq. 8
+openeco.append yd_r_green = y_r_green*(1 - theta_green)  
+
+' Disposable income workers in Greenland - eq. 9
+openeco.append yd_w_green = y_w_green*(1 - theta_green) 
+
+' Haig-Simons disposable income capitalists in Greenland - eq. 10
+openeco.append yd_hs_r_green = yd_r_green + cg_b_green + cg_e_green 
+
+' Total capital gains on bills in Greenland - eq. 11
+openeco.append cg_b_green = d(xr_brown)*b_greenbrown_s(-1)   
+
+' Total capital gains on shares in Greenland - eq. 12
+openeco.append cg_e_green = d(xr_brown)*e_greenbrown_s(-1) 
+
+' Wealth accumulation capitalists in Greenland - eq. 13
+openeco.append v_r_green = v_r_green(-1) + yd_hs_r_green - cons_r_green
+
+' Wealth accumulation workers in Greenland - eq. 14
+openeco.append v_w_green = v_w_green(-1) + yd_w_green - cons_w_green  
+
+' Taxes paid in Brownland - eq. 15
+openeco.append t_brown = (y_r_brown + y_w_brown)*theta_brown 
+
+ 'Taxes paid in in Greenland - eq. 16
+openeco.append t_green = (y_r_green + y_w_green)*theta_green 
+
+'**********************************************************************************************************************************************************************************************
+'II - CONSUMPTION AND INCOME SHARES 
+
+'Global consumption - eq. 17
+openeco.append cons = cons_brown + cons_green 
+
+'Total consumption in Brownland - eq. 17bis
+openeco.append cons_brown = @recode(@date<@dateval("2018"),cons_ob/2, cons_r_brown+cons_w_brown) 
+
+'Total consumption in Greenland - eq. 17ter
+openeco.append cons_green = @recode(@date<@dateval("2018"),cons_ob/2, cons_r_green+cons_w_green) 
+
+' Consumption of workers in Brownland - eq. 18
+openeco.append cons_w_brown  =  @recode(@date<@dateval("2018"),cons_brown-cons_r_brown, (alpha1_w_brown*yd_w_brown + alpha2_w_brown*v_w_brown(-1))*(1 - d_t_brown(-1)))
+
+'Consumption of workers in Greenland - eq. 21
+openeco.append cons_w_green  = @recode(@date<@dateval("2018"),cons_green-cons_r_green, (alpha1_w_green*yd_w_green + alpha2_w_green*v_w_green(-1))*(1 - d_t_green(-1)))
+
+' Consumption of capitalists in Brownland - eq. 17
+openeco.append cons_r_brown = (alpha1_r_brown*yd_r_brown + alpha2_r_brown*v_r_brown(-1))*(1 - d_t_brown(-1)) 
+
+' Consumption of capitalists in Greenland - eq. 20
+openeco.append cons_r_green = (alpha1_r_brown*yd_r_green + alpha2_r_brown*v_r_green(-1))*(1 - d_t_green(-1)) 
+
+' Total income in Brownland - eq. 19
+openeco.append y_brown = cons_r_brown + cons_w_brown + gov_tot_brown + x_brown - im_brown + inv_brown
+
+' Total income in Greenland - eq. 22
+openeco.append y_green = cons_r_green + cons_w_green + gov_tot_green + x_green - im_green + inv_green
+
+' Total income of Brownland workers - eq. 23
+openeco.append y_w_brown = y_brown*omega_brown 
+
+' Total income Greenland workers - eq. 24
+openeco.append y_w_green = omega_green*y_green 
+
+' Profit of Brownland firms - eq. 25
+openeco.append f_brown = y_brown - y_w_brown - da_brown - r_l_brown(-1)*l_firm_brown(-1)  
+
+' Profit retained by Brownland firms - eq. 26
+openeco.append fu_brown = f_brown*ret_brown 
+
+' Profit distributed by Brownland firms - eq. 27
+openeco.append fd_brown = r_e_brown(-1)*(e_brownbrown_s(-1)+e_greenbrown_s(-1)) 
+
+' Salary of Brownland firms managers - eq. 28
+openeco.append f_m_brown = f_brown - fu_brown - fd_brown '
+
+' Total income of Brownland capitalists - eq. 29
+openeco.append y_r_brown = f_m_brown +  f_bank_brown + r_brown(-1)*b_brownbrown_s(-1) + xr_green(-1)*r_green(-1)*b_browngreen_s(-1) + f_d_brownbrown(-1) + f_d_browngreen(-1)  
+
+'Dividends paid by Greenland firms to Brownland shareholders - eq. 30
+openeco.append f_d_browngreen = xr_green*r_e_green*e_browngreen_s  
+
+'Dividends paid by Brownland firms to Brownland shareholders - eq. 31
+openeco.append f_d_brownbrown = r_e_brown*e_brownbrown_s  
+
+' Profit of Greenland firms - eq. 32
+openeco.append f_green = y_green - y_w_green - da_green - r_l_green(-1)*l_firm_green(-1) 
+
+' Profit retained by Greenland firms - eq. 33 
+openeco.append fu_green = f_green*ret_green 
+
+' Profit distributed by Greenland firms - eq. 34
+openeco.append fd_green = r_e_green(-1)*(e_greengreen_s(-1)+e_browngreen_s(-1)) 
+
+' Salary of Brownland firms managers - eq. 35
+openeco.append f_m_green = f_green - fu_green - fd_green 
+
+' Total income of Greenland capitalists eq. 36
+openeco.append y_r_green = f_m_green + f_bank_green + r_green(-1)*b_greengreen_s(-1) + xr_brown(-1)*r_brown(-1)*b_greenbrown_s(-1) + f_d_greengreen(-1) + f_d_greenbrown(-1) 
+
+'Dividends paid by Brownland firms to Greenland shareholders - eq. 37
+openeco.append f_d_greenbrown = xr_brown*r_e_brown*e_greenbrown_s ' 
+
+'Dividends paid by Greenland firms to Greenland shareholders - eq. 38
+openeco.append f_d_greengreen = r_e_green*e_greengreen_s  
+
+'*********************************************************************************************************************************************
+'III - FIRMS' INVESTMENT PLANS
+
+' Total accumulation capital in Brownland - eq. 39
+openeco.append k_brown = k_gr_brown + k_con_brown
+
+'Accumulation of green capital in Brownland - eq. 40
+openeco.append k_gr_brown = k_gr_brown(-1) + inv_gr_brown - da_gr_brown
+
+'Accumulation of conventional capital in Brownland - eq. 41
+openeco.append k_con_brown = k_con_brown(-1) + inv_con_brown - da_con_brown
+
+' Total depreciation allowances in Brownland  - eq. 42
+openeco.append da_brown = da_gr_brown + da_con_brown 
+
+'Depreciation allowances of green capital in Brownland  - eq. 43
+openeco.append da_gr_brown = delta_brown*k_gr_brown(-1)
+
+'Depreciation allowances of conventional capital in Brownland  - eq. 44
+openeco.append da_con_brown = delta_brown*k_con_brown(-1)
+
+'Brownland total income for capital target equation - Note: not included in paper
+openeco.append y_tr_brown=y_brown
+
+'Amortization funds in Brownland - eq. 45
+openeco.append af_brown = da_brown
+
+'Demand for investment goods in Brownland  - eq. 46
+openeco.append inv_brown = (gamma0_brown + gamma1_brown*inv_brown(-1) + gamma2_brown*gov_tot_brown(-1))*(@recode(@date<@dateval("2018"),1,(1 - d_t_brown(-1))))  
+
+'Potential demand for green investment in Brownland - eq. 47A
+openeco.append inv_gr_brown_t =  (chi1_brown*gov_gr_brown+chi2_brown*y_brown + chi3_brown*d_t_brown(-1))*(1 - d_t_brown(-1))
+
+'Actual demand for green investment in Greenland - eq. 47B
+openeco.append inv_gr_brown = @recode(inv_gr_brown_t>inv_brown,inv_brown,inv_gr_brown_t)
+
+' Conventional investment in Brownland - eq. 48
+openeco.append inv_con_brown = inv_brown - inv_gr_brown
+
+' Demand for bank loans by Brownland firms - eq. 49 
+openeco.append l_firm_brown  = l_firm_brown(-1) + inv_brown - af_brown  - fu_brown - d(e_greenbrown_s) - d(e_brownbrown_s)
+
+' Total accumulation of capital in Greenland eq. 50
+openeco.append k_green = k_gr_green + k_con_green
+
+'Accumulation of green capital in Greenland eq. 51
+openeco.append k_gr_green = k_gr_green(-1) + inv_gr_green - da_gr_green
+
+'Accumulation of conventional capital in Greenland eq. 52
+openeco.append k_con_green = k_con_green(-1) + inv_con_green - da_con_green
+
+'Depreciation allowances in Greenland  - eq. 53
+openeco.append da_green = da_gr_green + da_con_green
+
+'Depreciation allowances of green capital in Greenland  - eq. 54
+openeco.append da_gr_green = delta_green*k_gr_green(-1)
+
+'Depreciation allowances of conventional capital in Greenland  - eq. 55
+openeco.append da_con_green = delta_green*k_con_green(-1)
+
+'Greenland total income for capital target equation - Note: not included in paper
+openeco.append y_tr_green=y_green
+
+' Amortization funds in Brownland - eq. 56
+openeco.append af_green = da_green
+
+' Demand for investment goods in Greenland - eq. 57
+openeco.append inv_green = (gamma0_green + gamma1_green*inv_green(-1)  + gamma2_green*gov_tot_green(-1))*(@recode(@date<@dateval("2018"),1,(1 - d_t_green(-1))))      
+
+'Potential demand for green investment in Greenland - eq. 58A
+openeco.append inv_gr_green_t = (chi1_green*gov_gr_green+chi2_green*y_green + chi3_green*d_t_green(-1))*(1 - d_t_green(-1))
+
+'Actual demand for green investment in Greenland - eq. 58B
+openeco.append inv_gr_green = @recode(inv_gr_green_t>inv_green,inv_green,inv_gr_green_t)
+
+' Conventional investment in Greenland - eq. 59
+openeco.append inv_con_green = inv_green - inv_gr_green
+
+' Demand for bank loans by Greenland firms - eq. 60  
+openeco.append l_firm_green  = l_firm_green(-1) + inv_green - af_green  - fu_green - d(e_browngreen_s) - d(e_greengreen_s)
+
+'**********************************************************************************************************************************************************************************************
+'IV - INTERNATIONAL TRADE
+
+' Exports of Brownland - eq. 61
+openeco.append x_brown = (exp(eps0 - eps1*log(xr_brown(-1)) + eps2*log(y_green)))*(1 - ad_exp*d_t_brown(-1))
+
+' Imports of Brownland - eq. 62
+openeco.append im_brown = (exp(mu0 + mu1*log(xr_brown(-1)) + mu2*log(y_brown)))*(1 + ad_im*d_t_brown(-1))
+
+' Exports of Greenland - eq. 63
+openeco.append x_green = im_brown*xr_brown
+
+' Imports of Greenland - eq. 64
+openeco.append im_green = x_brown*xr_brown
+
+'***********************************************************************************************************************************************************************************************************
+' V - DEMAND FOR FINANCIAL ASSETS (PORTFOLIO EQUATIONS)  
+
+' Demand for Brownland bills by Brownland capitalists - eq. 65
+openeco.append b_brownbrown_d = v_r_brown*(lambda10 + lambda11*r_brown(-1) - lambda12* r_green(-1) - lambda13*r_e_brown(-1) - lambda14*r_e_green(-1))
+
+' Demand for Greenland bills by Brownland capitalists - eq. 66
+openeco.append b_browngreen_d = v_r_brown*(lambda20 - lambda21*r_brown(-1) + lambda22*r_green(-1) - lambda23*r_e_brown(-1) - lambda24*r_e_green(-1))
+
+' NOMINAL Demand for Greenland shares by Brownland capitalists - eq. 67 
+openeco.append e_browngreen_d = @recode(@date<@dateval("1961"),0,v_r_brown*(lambda70 - lambda71*r_brown(-1) - lambda72*r_green(-1) - lambda73*r_e_brown(-1) + lambda74*r_e_green(-1)))
+
+' NOMINAL Demand for Brownland shares by Brownland capitalists - eq. 68 
+openeco.append e_brownbrown_d = @recode(@date<@dateval("1961"),0,v_r_brown*(lambda90 - lambda91*r_brown(-1) - lambda92*r_green(-1) + lambda93*r_e_brown(-1) - lambda94*r_e_green(-1)))
+
+' Holding of money in bank deposits by capitalists in Brownland - eq. 69 
+openeco.append dep_r_brown = (v_r_brown - b_brownbrown_s - e_brownbrown_s - ((b_browngreen_s + e_browngreen_s)*xr_green))*depsh_brown  
+
+' Holding of money in cash by capitalists in Brownland - eq. 70 
+openeco.append h_brown_r_h = v_r_brown - b_brownbrown_s - e_brownbrown_s - ((b_browngreen_s + e_browngreen_s)*xr_green) - dep_r_brown   
+
+' Holding of money in bank deposits by workers in Brownland - eq. 71
+openeco.append dep_w_brown = v_w_brown*depsh_brown
+
+' Holding of money in cash by workers in Brownland - eq. 72
+openeco.append h_brown_w_h = v_w_brown - dep_w_brown
+
+'Total holding of money in cash in Brownland - eq. 73
+openeco.append h_brown_h = h_brown_w_h + h_brown_r_h
+
+' Demand for Greenland bills by Greenland capitalists - eq. 74 
+openeco.append b_greengreen_d = v_r_green*(lambda40 - lambda41*r_brown(-1) + lambda42*r_green(-1) - lambda43*r_e_brown(-1) - lambda44*r_e_green(-1))
+
+' Demand for Brownland bills by Greenland capitalists - eq. 75 
+openeco.append b_greenbrown_d = v_r_green*(lambda50 + lambda51*r_brown(-1) - lambda52*r_green(-1) - lambda53*r_e_brown(-1) - lambda54*r_e_green(-1))
+
+' NOMINAL Demand for Brownland shares by Greenland capitalists - eq. 76
+openeco.append e_greenbrown_d = @recode(@date<@dateval("1961"),0,v_r_green*(lambda80 - lambda81*r_brown(-1) - lambda82*r_green(-1) + lambda83*r_e_brown(-1) - lambda84*r_e_green(-1)))
+
+' NOMINAL Demand for Greenland shares by Greenland capitalists - eq. 77 
+openeco.append e_greengreen_d = @recode(@date<@dateval("1961"),0,v_r_green*(lambda100 - lambda101*r_brown(-1) - lambda102*r_green(-1) - lambda103*r_e_brown(-1) + lambda104*r_e_green(-1)))
+
+' Holding of money in bank deposits by capitalists in Greenland - eq. 78
+openeco.append dep_r_green = (v_r_green - b_greengreen_s - e_greengreen_s - ((b_greenbrown_s + e_greenbrown_s)*xr_brown))*depsh_green 
+
+' Holding of money in cash by capitalists in Greenland - eq. 79
+openeco.append h_green_r_h = v_r_green - b_greengreen_s - e_greengreen_s - ((b_greenbrown_s + e_greenbrown_s)*xr_brown) - dep_r_green 
+
+' Holding of money in bank deposits by workers in Greenland - eq. 80
+openeco.append dep_w_green = v_w_green*depsh_green
+
+' Holding of money in cash by workers in Brownland - eq. 81
+openeco.append h_green_w_h = v_w_green - dep_w_green
+
+'Total holding of money in cash in Greenland - eq. 82
+openeco.append h_green_h = h_green_w_h + h_green_r_h
+
+'**********************************************************************************************************************************************************************************************
+' VI - SUPPLIES AND PRICES OF FINANCIAL ASSETS (EQUILIBRIUM CONDITIONS)
+
+' Supply of Brownland bills to Brownland households (capitalists) - eq. 83
+openeco.append b_brownbrown_s = b_brownbrown_d                                                                
+
+if (er_regime2=0) then
+
+' Suplly of Brownland bills to Greenland households (capitalists) - eq. 84
+openeco.append b_greenbrown_s = b_greenbrown_d*xr_green               
+
+else
+
+' Supply of Brownland bills to Greenland households (capitalists) - eq. 84
+openeco.append b_greenbrown_s = b_brown_s - b_brownbrown_s - b_cb_brownbrown_s - b_brown_bank                                                             
+
+endif
+
+' Supply of Greenland bills to Greenland households (capitalists) - eq. 85
+openeco.append b_greengreen_s = b_greengreen_d
+
+' Supply of Greenland bills to Brownland households (capitalists) - eq. 86
+openeco.append b_browngreen_s = b_browngreen_d*xr_brown
+
+' NOMINAL Supply of Greenland shares to Brownland households (capitalists) - eq. 87
+openeco.append e_browngreen_s = e_browngreen_d*xr_brown
+
+' NOMINAL Supply of Greenland shares to Greenland households (capitalists) - eq. 88 
+openeco.append e_greengreen_s = e_greengreen_d
+
+'REAL Quantity of new shares issued by Greenland firms - eq. 89 	
+openeco.append e_green_real_s = @recode(@date<@dateval("1961"),10,e_green_real_s(-1) + xi_green*inv_green(-1)/p_e_green(-1))
+
+'Unit price of shares of Greenland firms	 - eq. 90 
+openeco.append p_e_green = @recode(@date<@dateval("1961"),1,(e_greengreen_d+e_browngreen_d)/e_green_real_s)
+
+' NOMINAL Supply of Brownland shares to Greenland households (capitalists) - eq. 91 
+openeco.append e_greenbrown_s = e_greenbrown_d*xr_green
+
+' NOMINAL Supply of Brownland shares to Brownland households (capitalists) - eq. 92 
+openeco.append e_brownbrown_s = e_brownbrown_d
+
+' REAL Quantity of new shares issued by Brownland firms - eq. 93 	
+openeco.append e_brown_real_s = @recode(@date<@dateval("1961"),10,e_brown_real_s(-1) + xi_brown*inv_brown(-1)/p_e_brown(-1))
+
+'Unit price of shares of Brownland firms - eq. 94 
+openeco.append p_e_brown = @recode(@date<@dateval("1961"),1,(e_brownbrown_d+e_greenbrown_d)/e_brown_real_s)
+
+'Actual return rate on Greenland shares - eq. 95
+openeco.append r_e_green = (1-pi_dy_green)*r_green + pi_dy_green*r_e_green_t  
+
+'Theoretical or notional return rate on Greenland shares - eq. 96
+openeco.append r_e_green_t = @recode(@date<@dateval("1961"),r_e_green,(f_green/(e_green_real_s(-1)*p_e_green(-1)))) 
+
+'Actual return rate on Brownland shares - eq. 97
+openeco.append r_e_brown = (1-pi_dy_brown)*r_brown + pi_dy_brown*r_e_brown_t    
+
+'Theoretical or notional return rate on Brownland shares - eq. 98
+openeco.append r_e_brown_t = @recode(@date<@dateval("1961"),r_e_brown,(f_brown/(e_brown_real_s(-1)*p_e_brown(-1))))   
+
+'**********************************************************************************************************************************************************************************************
+'VII - THE BANKING SECTOR 
+
+' Supply of deposits in Brownland (liabilities of Brownland banks) - eq. 99
+openeco.append dep_bank_brown = dep_w_brown + dep_r_brown
+
+' Supply of loans in Brownland - eq. 100
+openeco.append l_s_brown= l_firm_brown 
+
+' Brownland bills notionally bought by Brownland bank - eq. 101
+openeco.append b_brown_bank_not = dep_bank_brown - l_s_brown
+ 
+'Trigger for notional Brownland bills bought by Brownland bank - eq. 102
+openeco.append z_brown = 0 + (b_brown_bank_not>0)
+
+' Brownland bills actually bought by Brownland bank - eq. 103
+openeco.append b_brown_bank = b_brown_bank_not*z_brown
+
+' Advances needed by Brownland banks from Brownland central bank  - eq. 104
+openeco.append a_d_brown = -b_brown_bank_not*(1- z_brown)
+
+' Advances provided to Brownland commercial banks by Brownland central bank  - eq. 105
+openeco.append a_s_brown = a_d_brown
+
+' Profits of banks in Brownland - eq. 106
+openeco.append f_bank_brown = r_brown(-1)*b_brown_bank(-1) + r_l_brown(-1)*l_s_brown(-1)
+
+' Supply of deposits in Greenland (liabilities of Brownland banks)  - eq. 107
+openeco.append dep_bank_green = dep_w_green + dep_r_green
+
+' Supply of loans in Greenland eq. 108
+openeco.append l_s_green= l_firm_green 
+
+' Greenland bills notionally bought by Greenland bank - eq. 109
+openeco.append b_green_bank_not = dep_bank_green - l_s_green
+
+' Trigger for notional Greenland bills bought by Greenland bank - eq. 110
+openeco.append z_green = 0 + (b_green_bank_not>0)
+
+' Greenland bills actually bought by Greenland bank - eq. 111
+openeco.append b_green_bank = b_green_bank_not*z_green
+
+'Advances needed by Greenland banks from Greenland central bank - eq. 112
+openeco.append a_d_green = -b_green_bank_not*(1- z_green)
+
+'Advances provided to Greenland commercial banks by Greenland central bank - eq. 113
+openeco.append a_s_green = a_d_green
+
+' Profits of banks in Greenland - eq. 114
+openeco.append f_bank_green = r_green(-1)*b_green_bank(-1) + r_l_green(-1)*l_s_green(-1)
+
+'**********************************************************************************************************************************************************************************************
+'VIII - THE CENTRAL BANK AND THE GOVERNMENT SECTOR
+
+if (er_regime2=0) then
+
+'Supply of Brownland bills to Brownland central bank (Brownland central bank as lender of last resort) - eq. 115
+openeco.append b_cb_brownbrown_s = b_brown_s - b_brownbrown_s - b_greenbrown_s - b_brown_bank   
+
+' Supply of cash in Brownland - eq. 116
+openeco.append h_brown_s = @recode(er_regime1=0,b_cb_brownbrown_s + a_s_brown, h_brown_s(-1) + d(b_cb_brownbrown_s) + d(a_s_brown) + d(or_brown))
+
+else
+
+'Supply of Brownland bills to Brownland central bank (Brownland central bank as lender of last resort) - eq. 115
+openeco.append b_cb_brownbrown_s = h_brown_s - a_s_brown   
+
+' Supply of cash in Brownland - eq. 116
+openeco.append h_brown_s = h_brown_h
+
+endif
+
+' Profits of Central Bank in Brownland - eq. 117
+openeco.append f_cb_brown = r_brown(-1)*b_cb_brownbrown_s(-1) 
+
+'Supply of Greenland bills to Greenland central bank  (Greenland central bank as lender of last resort) - eq. 118
+openeco.append b_cb_greengreen_s = b_green_s - b_greengreen_s - b_browngreen_s - b_green_bank
+
+' Supply of cash in Greenland - eq. 119
+openeco.append h_green_s = @recode(er_regime1=0,b_cb_greengreen_s + a_s_green, h_green_s(-1)+ d( b_cb_greengreen_s) + d(a_s_green) + d(or_green))
+
+' Profits of Central Bank in Greenland eq. 120
+openeco.append f_cb_green = r_green(-1)*b_cb_greengreen_s(-1)
+
+' Total Goverment expenditure in Brownland - eq. 121
+openeco.append gov_tot_brown = gov_con_brown + gov_gr_brown
+
+' Total Goverment expenditure in Greenland - eq. 122
+openeco.append gov_tot_green = gov_con_green + gov_gr_green
+
+' Conventional Goverment expenditure in Brownland - eq. 123
+openeco.append gov_con_brown = @recode(@date<@dateval("2018"),(gov_ob/2)-1, 0.076167 + 1.003373*gov_con_brown(-1))
+
+' Conventional Goverment expenditure in Greenland - eq. 124
+openeco.append gov_con_green = @recode(@date<@dateval("2018"),(gov_ob/2)-1, 0.076167 + 1.003373*gov_con_green(-1))      
+
+' Government budget constraint in Brownland - eq. 125
+openeco.append b_brown_s = b_brown_s(-1) + gov_tot_brown + r_brown(-1)*b_brown_s(-1) - t_brown - f_cb_brown
+
+' Government budget constraint in Greenland - eq. 126
+openeco.append b_green_s = b_green_s(-1) + gov_tot_green + r_green(-1)*b_green_s(-1) - t_green - f_cb_green
+
+'**********************************************************************************************************************************************************************************************
+'IX - EXCHANGE RATES 
+
+if (er_regime2=0) then
+
+' Brownland Exchange rate - eq. 127
+openeco.append xr_green = @recode(er_regime1=0,(r_brown(-1)*b_greenbrown_s(-1) + r_e_brown(-1)*e_greenbrown_s(-1) - d(b_greenbrown_s) - d(e_greenbrown_s) - x_brown + im_brown)/(r_green(-1)*b_browngreen_s(-1) + r_e_green(-1)*e_browngreen_s(-1) - d(b_browngreen_s) - d(e_browngreen_s)),1)
+
+else
+
+' Brownland Exchange rate - eq. 127
+openeco.append xr_green = b_greenbrown_s/b_greenbrown_d
+
+endif
+
+' Greenland exchange rate - eq. 128
+openeco.append xr_brown = 1/xr_green
+
+'Gold reserves in Brownland under fixed exchange rate regime - 127bis
+openeco.append or_brown = @recode(er_regime1=0,0,or_brown(-1) + cab_brown + kabp_brown)
+
+'Gold reserves in Greenland under fixed exchange rate regime - 127ter
+openeco.append or_green = @recode(er_regime1=0,0,or_green(-1) - d(or_brown))
+
+'*****************************************************************************************************************
+'X - THE ECOSYSTEM: MATERIAL RESOURCES AND RESERVES (equations 129 to 154)
+
+openeco.append y_mat_brown = mu_brown*y_brown 'Production of material goods in Brownland
+openeco.append y_mat_green = mu_green*y_green 'Production of material goods in Greenland
+
+openeco.append mat_brown = y_mat_brown - rec_brown 'Extraction of matter in Brownland
+openeco.append mat_green = y_mat_green - rec_green 'Extraction of matter in Greenland
+
+openeco.append rec_brown = rho_brown*dis_brown 'Recycled socio-economic stock in Brownland
+openeco.append rec_green = rho_green*dis_green 'Recycled socio-economic stock in Greenland
+
+openeco.append dis_brown = mu_brown*(da_brown + zeta_brown*dc_brown(-1)) 'Discarded socio-economic stock in Brownland
+openeco.append dis_green = mu_green*(da_green + zeta_green*dc_green(-1)) 'Discarded socio-economic stock in Greenland
+
+openeco.append dc_brown = dc_brown(-1) + cons_brown - tb_brown - zeta_brown*dc_brown(-1) 'Stock of durable goods in Brownland
+openeco.append dc_green = dc_green(-1) + cons_green - tb_green - zeta_green*dc_green(-1) 'Stock of durable goods in Brownland
+
+openeco.append k_se_brown = k_se_brown(-1) + y_mat_brown - dis_brown 'Socio-economic stock in Brownland
+openeco.append k_se_green = k_se_green(-1) + y_mat_green - dis_green 'Socio-economic stock in Greenland
+
+openeco.append wa_brown = mat_brown - d(k_se_brown) 'Waste generated by production activities in Brownland
+openeco.append wa_green = mat_green - d(k_se_green) 'Waste generated by production activities in Greenland
+
+openeco.append k_m_brown = k_m_brown(-1) + conv_m_brown - mat_brown 'Stock of material reserves in Brownland
+openeco.append k_m_green = k_m_green(-1) + conv_m_green - mat_green 'Stock of material reserves in Greenland
+openeco.append k_m = k_m_brown + k_m_green 'World-wide stock of material reserves
+
+openeco.append conv_m_brown = sigma_m_brown*res_m_brown(-1)  'Material resources converted to reserves in Brownland 
+openeco.append conv_m_green = sigma_m_green*res_m_green(-1) 'Material resources converted to reserves in Greenland 
+
+openeco.append res_m_brown = res_m_brown(-1) - conv_m_brown 'Stock of material resources in Brownland
+openeco.append res_m_green = res_m_green(-1) - conv_m_green 'Stock of material resources in Greenland
+openeco.append res_m = res_m_brown + res_m_green 'World-wide stock of material resources
+
+openeco.append cen_brown = emis_brown/car 'Carbon mass of (non-renewable) energy in Brownland 
+openeco.append cen_green = emis_green/car 'Carbon mass of (non-renewable) energy in Greenland 
+
+openeco.append o2_brown = emis_brown - cen_brown 'Mass of oxygen in Brownland
+openeco.append o2_green = emis_green - cen_green 'Mass of oxygen in Greenland
+
+'**********************************************************************************************************************************************************************************************
+'XI - THE ECOSYSTEM: ENERGY RESOURCES AND RESERVES (equations 155 to 170)
+
+openeco.append e_brown = epsilon_brown*y_brown 'Energy required for production in Brownland
+openeco.append er_brown = eta_brown*e_brown 'Renewable energy in Brownland
+openeco.append en_brown = e_brown - er_brown 'Non-renewable energy in Brownland
+openeco.append ed_brown = er_brown + en_brown 'Dissipated energy at the end of the period in Brownland
+
+openeco.append e_green = epsilon_green*y_green 'Energy required for production in Greenland
+openeco.append er_green = eta_green*e_green 'Renewable energy in Greenland
+openeco.append en_green = e_green - er_green 'Non-renewable energy in Greenland
+openeco.append ed_green = er_green + en_green 'Dissipated energy at the end of the period in Greenland
+
+openeco.append k_e_brown = k_e_brown(-1) + conv_e_brown - en_brown 'Stock of energy reserves in Brownland
+openeco.append k_e_green = k_e_green(-1) + conv_e_green - en_green 'Stock of energy reserves in Greenland
+openeco.append k_e = k_e_brown + k_e_green 'World-wide stock of energy reserves
+
+openeco.append conv_e_brown = sigma_e_brown*res_e_brown(-1) 'Energy resources converted to reserves in Brownland
+openeco.append conv_e_green = sigma_e_green*res_e_green(-1) 'Energy resources converted to reserves in Greenland
+
+openeco.append res_e_brown = res_e_brown(-1) - conv_e_brown 'Stock of energy resources in Brownland
+openeco.append res_e_green = res_e_green(-1) - conv_e_green 'Stock of energy resources in Greenland
+openeco.append res_e = res_e_brown + res_e_green 'World-wide stock of energy resources
+
+'**********************************************************************************************************************************************************************************************
+'XII - THE ECOSYSTEM: EMISSIONS AND CLIMATE CHANGE (equations 171 to 181)
+
+openeco.append emis_brown = @recode(beta_brown0 + beta_brown*en_brown<(emis-emis_l)/2,(emis-emis_l)/2,beta_brown0 + beta_brown*en_brown) 'Industrial emissions of CO2 in Brownland 
+openeco.append emis_green = @recode(@date<@dateval("2018"),emis - emis_brown - emis_l, (beta_green0-4) + beta_green*en_green) 'Industrial emissions of CO2 in Greenland 
+openeco.append emis_l = emis_l(-1)*(1-g_land) 'Annual CO2 emissions from land
+openeco.append emis = @recode(@date<@dateval("2018"),emis_ob, emis_brown + emis_green + emis_l) 'World-wide industrial emissions of CO2 
+openeco.append co2_at = emis + phi11*co2_at(-1) + phi21*co2_up(-1) 'Atmospheric CO2 concentration
+openeco.append co2_up = phi12*co2_at(-1) + phi22*co2_up(-1) + phi32*co2_lo(-1) 'Upper ocean/biosphere CO2 concentration 
+openeco.append co2_lo = phi23*co2_up(-1) + phi33*co2_lo(-1) 'Lower ocean CO2 concentration
+openeco.append f = f2*@logx(co2_at/co2_at_pre,2) + f_ex 'Radiative forcing over pre-industrial levels (W/m^2)
+openeco.append f_ex = f_ex(-1) + fex  'Radiative forcing over pre-industrial levels (W/m^2) due to non-CO2 greenhouse gases (W/m^2)
+openeco.append temp_at = @recode(@date<@dateval("2018"),temp_at_ob,temp_at(-1) + t1*(f - (f2/sens)*temp_at(-1)-t2*(temp_at(-1) - temp_lo(-1)))) 'Atmospheric temperature
+openeco.append temp_lo = temp_lo(-1) + t3*(temp_at(-1)-temp_lo(-1)) 'Lower ocean temperature
+
+'Note: maximum temperature rise depends also on non_CO2 radiative forcing due to methane, nitrous oxide, aerosols and other anthropogenic factors (see IPCC 2018, p. 7)
+
+'**********************************************************************************************************************************************************************************************
+'XIII - THE ECOSYSTEM: ECOLOGICAL EFFICIENCY (equations 182 to 193)
+
+'NOTE: starting from 1990 in Greenland, while starting from 2010 in Brownland
+
+openeco.append mu_brown = @recode(@date<@dateval("2010"),mu_con_brown,(mu_gr_brown*k_gr_brown/k_brown + mu_con_brown*k_con_brown/k_brown)) 'Matter intensity coefficient in Brownland 
+openeco.append mu_green = @recode(@date<@dateval("1990"),mu_con_green,(mu_gr_green*k_gr_green/k_green + mu_con_green*k_con_green/k_green)) 'Matter intensity coefficient in Greenland
+
+openeco.append epsilon_brown = @recode(@date<@dateval("2010"),epsilon_con_brown,(epsilon_gr_brown*k_gr_brown/k_brown + epsilon_con_brown*k_con_brown/k_brown)) 'Energy intensity coefficient in Brownland
+openeco.append epsilon_green = @recode(@date<@dateval("1990"),epsilon_con_green,(epsilon_gr_green*k_gr_green/k_green + epsilon_con_green*k_con_green/k_green)) 'Energy intensity coefficient in Greenland
+
+openeco.append beta_brown = @recode(@date<@dateval("2010"),beta_con_brown,(beta_gr_brown*k_gr_brown/k_brown + beta_con_brown*k_con_brown/k_brown)*(1+g_beta_brown)^(-@trend+59)) 'CO2 intensity coefficient in Brownland (declining after 2020)
+openeco.append beta_green = @recode(@date<@dateval("1990"),beta_con_green,(beta_gr_green*k_gr_green/k_green + beta_con_green*k_con_green/k_green)*(1+g_beta_green)^(-@trend+59)) 'CO2 intensity coefficient in Greenland (declining after 2020)
+
+openeco.append eta_brown = @recode(@date<@dateval("2010"),eta_con_brown,(eta_gr_brown*k_gr_brown/k_brown + eta_con_brown*k_con_brown/k_brown)) 'Renewable energy share in Brownland
+openeco.append eta_green = @recode(@date<@dateval("1990"),eta_con_green,(eta_gr_green*k_gr_green/k_green + eta_con_green*k_con_green/k_green)) 'Renewable energy share in Greenland
+
+openeco.append depl_m_brown = @recode(@date<@dateval("1962"),0.24,mat_brown/k_m_brown(-1)) 'Matter depletion ratio in Brownland (starting from 1962)
+openeco.append depl_m_green = @recode(@date<@dateval("1962"),0.24,mat_green/k_m_green(-1)) 'Matter depletion ratio in Greenland (starting from 1962)
+
+openeco.append depl_e_brown = @recode(@date<@dateval("1962"),0,en_brown/k_e_brown(-1)) 'Energy depletion ratio in Brownland (starting from 1962)
+openeco.append depl_e_green = @recode(@date<@dateval("1962"),0,en_green/k_e_green(-1)) 'Energy depletion ratio in Greenland (starting from 1962)
+
+'**********************************************************************************************************************************************************************************************
+'XIV - THE ECOSYSTEM: ECOLOGICAL FEEDBACKS (equations 194 to 197)
+
+openeco.append d_t_brown = @recode(temp_at>0,1 - 1/(1 + dam1_brown*temp_at + dam2_brown*temp_at^2 + dam3_brown*temp_at^(dam4_brown)),1 - 1/(1 + dam1_brown*temp_at)) 'Proportion of gross damage in Brownland due to changes in atmospheric temperature
+
+openeco.append d_t_green = @recode(temp_at>0,1 - 1/(1 + dam1_green*temp_at + dam2_green*temp_at^2 + dam3_green*temp_at^(dam4_green)),1 - 1/(1 + dam1_green*temp_at)) 'Proportion of gross damage in Greenland due to changes in atmospheric temperature
+
+openeco.append delta_brown = @recode(@date<@dateval("2018"),delta0_brown,delta0_brown + (1-delta0_brown)*(1 - ad_k_brown)*d_t_brown(-1)) 'Capital depreciation rate in Brownland, depending on climate change-related damages
+openeco.append delta_green = @recode(@date<@dateval("2018"),delta0_green,delta0_green + (1-delta0_green)*(1 - ad_k_green)*d_t_green(-1)) 'Captial depreciation rate in Greenland, depending on climate change-related damages
+
+'**********************************************************************************************************************************************************************************************
+'XV - AUXILIARY EQUATIONS FOR DOMESTIC AND FOREIGN BALANCES
+
+' Government deficit in the Brownland - eq. 198
+openeco.append psbr_brown = gov_tot_brown + r_brown(-1)*b_brown_s(-1) - t_brown - f_cb_brown
+
+' Government deficit in the Greenland - eq. 199
+openeco.append psbr_green = gov_tot_green + r_green(-1)*b_green_s(-1) - t_green - f_cb_green
+
+' Net accumulation of financial assets in the Brownland - eq. 200
+openeco.append nafa_brown = psbr_brown + cab_brown
+
+' Net accumulation of financial assets in the Greenland - eq. 201
+openeco.append nafa_green = psbr_green + cab_green
+
+' Current account balance - Brownland - eq. 202
+openeco.append cab_brown = x_brown - im_brown + xr_green(-1)*(r_green(-1)*b_browngreen_s(-1) + r_e_green(-1)*e_browngreen_s(-1)) - r_brown(-1)*b_greenbrown_s(-1) - r_e_brown(-1)*e_greenbrown_s(-1) 
+
+' Current account balance in Greenland - eq. 203
+openeco.append cab_green = x_green - im_green + xr_brown(-1)*(r_brown(-1)*b_greenbrown_s(-1) + r_e_brown(-1)*e_greenbrown_s(-1)) - r_green(-1)*b_browngreen_s(-1) - r_e_green(-1)*e_browngreen_s(-1) 
+
+' Financial account balance in Brownland - eq. 204
+openeco.append kabp_brown = - d(b_browngreen_s)*xr_green - d(e_browngreen_s)*xr_green + d(b_greenbrown_s) + d(e_greenbrown_s) 
+
+' Financial account balance in Greenland - eq. 205
+openeco.append kabp_green = - d(b_greenbrown_s)*xr_brown - d(e_greenbrown_s)*xr_brown + d(b_browngreen_s) + d(e_browngreen_s) 
+
+'Trade balance Brownland - eq. 206
+openeco.append tb_brown =  x_brown - im_brown
+
+'Trade balance Greenland - eq. 207
+openeco.append tb_green = x_green - im_green
+
+'Balance of payment Brownland - eq. 208
+openeco.append bp_brown = cab_brown + kabp_brown 
+
+'Balance of payment Greenland - eq. 209
+openeco.append bp_green = cab_green + kabp_green
+
+'Gross National product Brownland - eq. 210
+openeco.append gnp_brown = y_brown + xr_green(-1)*r_green(-1)*b_browngreen_s(-1) - r_brown(-1)*b_greenbrown_s(-1) + xr_green(-1)*r_e_green(-1)*e_browngreen_s(-1) - r_e_brown(-1)*e_greenbrown_s(-1)
+
+'Gross National product Greenland - eq. 211
+openeco.append gnp_green = y_green + xr_brown(-1)*r_brown(-1)*b_greenbrown_s(-1) - r_green(-1)*b_browngreen_s(-1) + xr_brown(-1)*r_e_brown(-1)*e_greenbrown_s(-1) - r_e_green(-1)*e_browngreen_s(-1)
+
+'Endogenous propensity to import of Brownland private sector - eq. 212
+openeco.append mu2 = mu2(-1) + mu2_par*d(gov_gr_brown) 
+
+'**********************************************************************************************************************************************************************************************
+'XVI - INEQUALITY INDICES
+
+'Total disposable income in Brownland - eq. 213
+openeco.append  yd_tot_brown = yd_w_brown + yd_hs_r_brown
+
+'Disposable income of capitalists over total disposable income in Brownland - eq. 214
+openeco.append  gini_brown  = yd_hs_r_brown/yd_tot_brown
+
+'Total disposable income in Greenland - eq. 215
+openeco.append  yd_tot_green = yd_w_green + yd_hs_r_green
+
+'Disposable income of capitalists over total disposable income in Greenland - eq. 216
+openeco.append  gini_green  = yd_hs_r_green/yd_tot_green
+
+'Total net wealth in Brownland - eq. 217
+openeco.append v_tot_brown = v_r_brown + v_w_brown
+
+'Net wealth of capitalists over total wealth in Brownland - eq. 218
+openeco.append  giniw_brown  = v_r_brown/v_tot_brown
+
+'Total net wealth in Greenland - eq. 219
+openeco.append v_tot_green = v_r_green + v_w_green
+
+'Net wealth of capitalists over total wealth in Brownland - eq. 220
+openeco.append  giniw_green  = v_r_green/v_tot_green
+
+
+'**********************************************************************************************************************************************************************************************
+'XVII - ADDITIONAL FINANCIAL VARIABLES AND INDICES
+
+'Tobin q of Greenland firms - eq. 221
+openeco.append q_green = @recode(@date<@dateval("1961"),0.81,(e_green_real_s*p_e_green + l_firm_green)/k_green)
+
+'Tobin q of Brownland firms - eq. 222
+openeco.append q_brown = @recode(@date<@dateval("1961"),0.81,(e_brown_real_s*p_e_brown + l_firm_brown)/k_brown)
+
+'Leverage ratio of Greenland firms (debt to equity) - eq. 223
+openeco.append lev_f_green = @recode(@date<@dateval("1961"),0.05,l_firm_green/k_green)
+
+'Leverage ratio of Brownland firms (debt to equity) - eq. 224
+openeco.append lev_f_brown = @recode(@date<@dateval("1961"),0.05,l_firm_brown/k_brown)
+
+'Price earnings ratio of Greenland firms' shares - eq. 225
+openeco.append per_green = @recode(@date<@dateval("1961"),0.28,p_e_green/(f_green/e_green_real_s(-1))) 
+
+'Price earnings ratio of Brownland firms' shares - eq. 226
+openeco.append per_brown = @recode(@date<@dateval("1961"),0.28,p_e_brown/(f_brown/e_brown_real_s(-1)))
+
+'Liquidity ratio of Greenland banks (actual or gross ratio) - eq. 227
+openeco.append liq_b_green = (a_s_green+dep_bank_green-l_s_green)/dep_bank_green
+
+'Liquidity ratio of Brownland banks (actual or gross ratio) - eq. 228
+openeco.append liq_b_brown = (a_s_brown+dep_bank_brown-l_s_brown)/dep_bank_brown
+
+'**********************************************************************************************************************************************************************************************
+'**********************************************************************************************************************************************************************************************
+'ECOLOGICAL EFFICIENCY: ADDITIONAL CALCULATIONS
+
+openeco.append mu_world = @recode(@date<@dateval("1961"),0,mu_brown*k_brown/(k_brown+k_green)+mu_green*k_green/(k_brown+k_green)) 'Global matter intensity
+openeco.append epsilon_world = @recode(@date<@dateval("1961"),0,epsilon_brown*k_brown/(k_brown+k_green)+epsilon_green*k_green/(k_brown+k_green)) 'Global energy intensity
+openeco.append beta_world = @recode(@date<@dateval("1961"),0,beta_brown*k_brown/(k_brown+k_green)+beta_green*k_green/(k_brown+k_green)) 'Global CO2 intensity
+openeco.append eta_world = @recode(@date<@dateval("1961"),0,eta_brown*k_brown/(k_brown+k_green)+eta_green*k_green/(k_brown+k_green)) 'Global share of renewable energy
+
+'**********************************************************************************************************************************************************************************************
+'ADDITIONAL EQUATIONS FOR BOND MARKET
+
+'Additional calculations: implicit price of Brownland government bills
+openeco.append p_b_brown = (b_brownbrown_d + b_greenbrown_d)/(b_brown_s)   
+
+'Additional calculations: implicit price of Greenland government bills
+openeco.append p_b_green = (b_greengreen_d + b_browngreen_d)/(b_green_s)  
+
+'**********************************************************************************************************************************************************************************************
+'EQUATIONS FOR GLOBAL VARIABLES (DENOMINATED IN GREENLAND CURRENCY)
+openeco.append inv = inv_green + inv_brown*xr_brown
+openeco.append gov = gov_con_green + gov_con_brown*xr_brown + gov_gr_green + gov_gr_brown*xr_brown
+openeco.append yd = yd_w_brown*xr_brown + yd_w_green + yd_r_brown*xr_brown + yd_r_green
+openeco.append k = k_green + k_brown*xr_brown
+openeco.append v = v_w_brown*xr_brown + v_w_green + v_r_brown*xr_brown + v_r_green
+openeco.append y = inv + cons + gov
+
+'**********************************************************************************************************************************************************************************************
+
+'SELECT BASELINE SCENARIO
+openeco.scenario "baseline"
+
+'Define the sample
+smpl 1961 @last
+
+'Solve the model
+openeco.solve(i=a, s=d, d=d)
+
+'*****************************************************************************************************************************************************************************************************************
+'CREATE ALTERNATIVE SCENARIOS
+
+' 1. Business as usual
+openeco.scenario "Scenario 1"
+openeco.override g_beta_brown g_beta_green
+copy g_beta_brown g_beta_brown_1
+copy g_beta_green g_beta_green_1
+smpl 1961 @last
+g_beta_brown_1 = 0
+g_beta_green_1 = 0
+smpl 1961 @last
+openeco.solve
+
+'*****************************************************************************************************************************************************************************************************************
+
+'CONSISTENCY CHECK: REDUNDANT EQUATIONS
+smpl @all
+graph check.line h_brown_s_0-h_brown_h_0 h_green_s_0-h_green_h_0    
+check.options linepat
+check.axis mirror
+check.axis(left) range(-0.1,0.1)
+check.addtext(t,just(c),font(16)) Consistency check
+show check
+
+'*****************************************************************************************************************************************************************************************************************
+'CREATE BASELINE CHARTS
+
+'GDP (baseline)
+smpl 1962 2060
+graph gdp.area(s) y_green_0 y_brown_0
+gdp.draw(shade, bottom, color(220,255,215)) 1960 2018
+gdp.draw(line, bottom, top, color(black),width(1),pattern(2)) 2018
+gdp.axis mirror
+gdp.setelem(1) fillcolor(128,255,128) 
+gdp.setelem(2) fillcolor(orange)
+gdp.name(1) Greenland (trillion USD, baseline)
+gdp.name(2) Brownland (trillion USD, baseline)
+gdp.addtext(t,just(c),font(16)) (a) Total output: predicted value after 2018
+
+'Temperature (baseline)
+smpl 1962 2060
+graph temper.line temp_at_0 temp_at_1 temp_lo_0 temp_lo_1 
+temper.draw(shade, bottom, color(220,255,215)) 1960 2018
+temper.draw(line, left, top, color(black),width(1),pattern(2)) 0.95
+temper.draw(line, left, top, color(black),width(1),pattern(2)) 1.45
+temper.draw(line, left, top, color(black),width(1),pattern(2)) 1.95
+temper.draw(line, bottom, top, color(black),width(1),pattern(2)) 2018
+temper.options linepat
+temper.axis mirror
+temper.setelem(1) lcolor(blue) lwidth(1) lpat(1)
+temper.setelem(2) lcolor(blue) lwidth(1) lpat(2) 
+temper.setelem(3) lcolor(24,168,209) lwidth(1) lpat(1)
+temper.setelem(4) lcolor(24,168,209) lwidth(1) lpat(2) 
+temper.name(1) Atmospheric temperature (C, baseline)
+temper.name(2) Atmospheric temperature (C, business as usual)
+temper.name(3) Lower ocean temperature (C, baseline)
+temper.name(4) Lower ocean temperature (C, business as usual)
+temper.addtext(t,just(c),font(16)) (b) Change in temperature (anomaly): predicted value after 2018
+
+'CO2 emissions per year (baseline)
+smpl 1962 2060
+graph yemi.area(s) emis_green_0 emis_brown_0 emis_l_0 emis_1-emis_0
+yemi.draw(shade, bottom, color(220,255,215)) 1960 2018
+yemi.draw(line, left, top, color(black),width(1),pattern(2)) 19.95
+yemi.draw(line, bottom, top, color(black),width(1),pattern(2)) 2018
+yemi.axis mirror range(0,60)
+yemi.setelem(1) fillcolor(128,255,128)
+yemi.setelem(2) fillcolor(orange) 
+yemi.setelem(3) fillcolor(blue)
+yemi.setelem(4) fillcolor(128,128,255)
+yemi.name(1) Greenland industry (bn Gt/yr, baseline)
+yemi.name(2) Brownland industry (bn Gt/yr, baseline)
+yemi.name(3) Land emissions (bn Gt/yr, baseline)
+yemi.name(4) Additional emissions under business as usual sceario (bn Gt/yr)
+yemi.addtext(t,just(c),font(16)) (c) CO2 emissions per year: predicted value after 2018 
+
+'Cumulative emissions (baseline)
+smpl 1962 2060
+graph emi.area(s) co2_at_0 co2_at_1-co2_at_0
+emi.draw(shade, bottom, color(220,255,215)) 1960 2018
+emi.draw(line, bottom, top, color(black),width(1),pattern(2)) 2018
+emi.options linepat
+emi.axis mirror
+emi.setelem(1) fillcolor(189,189,255)
+emi.setelem(2) fillcolor(128,128,255) 
+emi.name(1) World-wide (bn Gt, baseline)
+emi.name(2) Additional emissions under business as usual scenario (bn Gt)
+emi.addtext(t,just(c),font(16)) (d) CO2 concentration in atmosphere: predicted value
+
+'Energy and matter reserves (baseline)
+smpl 1962 2060
+graph reserves.area k_e_0 k_m_0
+reserves.draw(shade, bottom, color(220,255,215)) 1960 2018
+reserves.draw(line, bottom, top, color(black),width(1),pattern(2)) 2018
+reserves.axis mirror
+reserves.setelem(2) fillcolor(purple)  
+reserves.setelem(1) fillcolor(255,0,128)  
+reserves.name(2) Matter (Gt, baseline)
+reserves.name(1) Energy (Ej, baseline)
+reserves.addtext(t,just(c),font(16)) (e) World-wide reserves of matter and n.r. energy: predicted value 
+
+'Energy and matter resources (baseline)
+smpl 1962 2060
+graph resources.area res_e_0 res_m_0
+resources.draw(shade, bottom, color(220,255,215)) 1960 2018
+resources.draw(line, bottom, top, color(black)) 2018
+resources.axis mirror
+resources.setelem(2) fillcolor(purple)  
+resources.setelem(1) fillcolor(255,0,128)  
+resources.name(2) Matter (Gt, baseline)
+resources.name(1) Energy (Ej, baseline)
+resources.addtext(t,just(c),font(16)) (f) World-wide resources of matter and n.r. energy: predicted value
+
+'Greenland agents' portfolio composition
+smpl 2020 2020
+graph gfig2.pie h_green_r_h_0 dep_r_green_0 b_greengreen_d_0 b_greenbrown_d_0 e_greengreen_d_0 e_greenbrown_d_0 h_green_w_h_0 dep_w_green_0
+gfig2.options gridl gridb gridauto frameaxes("none")
+gfig2.name(1) Cash (capitalists)
+gfig2.name(2) Banks deposits (capitalists)
+gfig2.name(3) Greenland government bills (capitalists)
+gfig2.name(4) Brownland government bills (capitalists)
+gfig2.name(5) Greenland equity & shares (capitalists)
+gfig2.name(6) Brownland equity & shares (capitalists)
+gfig2.name(7) Cash (workers)
+gfig2.name(8) Banks deposits (workers)
+gfig2.axis(left) 
+gfig2.addtext(t,just(c),font(16)) (g) Portfolio composition of Greenland households (2020)
+gfig2.legend -inbox 
+
+'Brownland agents' portfolio composition
+smpl 2020 2020
+graph bfig2.pie h_brown_r_h_0 dep_r_brown_0 b_browngreen_d_0 b_brownbrown_d_0 e_browngreen_d_0 e_brownbrown_d_0 h_brown_w_h_0 dep_w_brown_0
+bfig2.options gridl gridb gridauto frameaxes("none")
+bfig2.name(1) Cash (capitalists)
+bfig2.name(2) Banks deposits (capitalists)
+bfig2.name(3) Greenland government bills (capitalists)
+bfig2.name(4) Brownland government bills (capitalists)
+bfig2.name(5) Greenland equity & shares (capitalists)
+bfig2.name(6) Brownland equity & shares (capitalists)
+bfig2.name(7) Cash (workers)
+bfig2.name(8) Banks deposits (workers)
+bfig2.axis(left) 
+bfig2.addtext(t,just(c),font(16)) (h) Portfolio composition of Brownland households (2020)
+bfig2.legend -inbox 
+
+'*****************************************************************************************************************************************************************************************************************
+'GROUP AND DISPLAY CHARTS
+
+graph graph1.merge gdp temper yemi emi reserves resources gfig2 bfig2
+graph1.legend font(16)
+graph1.label font(16)
+graph1.axis(left) font(16)
+graph1.axis(right) font(16)
+graph1.axis(bottom) font(16)
+graph1.axis(top) font(16)
+graph1.axis ticksnone
+graph1.options gridauto
+graph1.options fillcolor(white) backcolor(white) gridcolor(200,255,240)
+graph1.datelabel format(yyyy)
+graph1.align(4, 2.2, 3)
+graph1.legend -inbox
+show graph1
+
+'*****************************************************************************************************************************************************************************************************************
+'Reset sample
+smpl @all
