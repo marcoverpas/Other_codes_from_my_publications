@@ -1,0 +1,1068 @@
+' MODEL OPENECOSHORT
+
+' based on:
+'1) OPEN, developed by Zezza for Godley & Lavoie, 2006, Monetary Economics, Chapter 6
+'2) OPENECO, developed by EC and MVP, november 2018 (note: OPENECOSHORT is a simplified version of OPENECO)
+ 
+'NOTE: Carb = Carbonland, Ecol = Ecoland
+
+'Updated: 7/04/2019
+
+'********************************************************************************************************************************************************************************************************************************
+
+' Create a workfile, named OPENSHORT, to hold annual data from 1960 to 2100
+wfcreate(wf=openecoshort, page=annual) a 1960 2100
+
+' Create series
+series b_cb_carb
+b_cb_carb.displayname Bills held by the Central bank in Carbonland
+series b_cb_ecol
+b_cb_ecol.displayname Bills held by the Central bank in Ecoland
+series b_h_carb
+b_h_carb.displayname Bills held by households, Carbonland
+series b_h_ecol
+b_h_ecol.displayname Bills held by households, Ecoland
+series b_s_carb
+b_s_carb.displayname Supply of government bills in Carbonland
+series b_s_ecol
+b_s_ecol.displayname Supply of government bills in Ecoland
+series b_s
+b_s.displayname Total supply of Ecoland government bills '<--- NEW
+series cons_carb
+cons_carb.displayname Households consumption, Carbonland
+series cons_ecol
+cons_ecol.displayname Households consumption, Ecoland
+series gov_carb
+gov_carb.displayname Government expenditure, Carbonland
+series gov_ecol
+gov_ecol.displayname Government expenditure, Ecoland
+series h_h_carb
+h_h_carb.displayname Cash held by households, Carbonland
+series h_h_ecol
+h_h_ecol.displayname Cash held by households, Ecoland
+series h_ecol_carb
+h_ecol_carb.displayname Supply of cash in Carbonland
+series h_ecol_ecol
+h_ecol_ecol.displayname Supply of cash in Ecoland
+series im_carb
+im_carb.displayname Imports, Carbonland
+series im_ecol
+im_ecol.displayname Imports, Ecoland
+series or_carb
+or_carb.displayname Gold holding by Central bank in Carbonland
+series or_ecol
+or_ecol.displayname Gold holding by Central bank in Ecoland
+series p_g_bar
+p_g_bar.displayname Price of gold, set exogenously
+series p_g_carb
+p_g_carb.displayname Price of gold in Carbonland
+series p_g_ecol
+p_g_ecol.displayname Price of gold in Ecoland
+series r_carb
+r_carb.displayname Interest rate on bills in Carbonland
+series r_ecol
+r_ecol.displayname Interest rate on bills in Ecoland
+series r_bar_carb
+r_bar_carb.displayname Interest rate on bills set exogenously in Carbonland
+series r_bar_ecol
+r_bar_ecol.displayname Interest rate on bills set exogenously in Ecoland
+series t_carb
+t_carb.displayname Tax payments, Carbonland
+series t_ecol
+t_ecol.displayname Tax payments, Ecoland
+series v_carb
+v_carb.displayname Households wealth, Carbonland
+series v_ecol
+v_ecol.displayname Households wealth, Ecoland
+series x_carb
+x_carb.displayname Exports, Carbonland
+series x_ecol
+x_ecol.displayname Exports, Ecoland
+series xr
+xr.displayname Exchange rate (units of Green currency for one unit of Brown currency)
+series xr_bar
+xr_bar.displayname Exchange rate, set exogenously
+series y_carb
+y_carb.displayname National income, Carbonland
+series y_ecol
+y_ecol.displayname National income, Ecoland
+series yd_carb
+yd_carb.displayname National disposable income, Carbonland
+series yd_ecol
+yd_ecol.displayname National disposable income, Ecoland
+
+' Generate parameters
+series alpha1_carb
+alpha1_carb.displayname Propensity to consume out of income in Carbonland
+series alpha1_ecol
+alpha1_ecol.displayname Propensity to consume out of income in Ecoland
+series alpha2_carb
+alpha2_carb.displayname Propensity to consume out of wealth in Carbonland
+series alpha2_ecol
+alpha2_ecol.displayname Propensity to consume out of wealth in Ecoland
+series lambda0_carb
+lambda0_carb.displayname Parameter in asset demand function, Carbonland
+series lambda0_ecol
+lambda0_ecol.displayname Parameter in asset demand function, Ecoland
+series lambda1_carb
+lambda1_carb.displayname Parameter in asset demand function, Carbonland
+series lambda1_ecol
+lambda1_ecol.displayname Parameter in asset demand function, Ecoland
+series lambda2_carb
+lambda2_carb.displayname Parameter in asset demand function, Carbonland
+series lambda2_ecol
+lambda2_ecol.displayname Parameter in asset demand function, Ecoland
+series m_carb
+m_carb.displayname Import propensity, Carbonland
+series m0_carb
+m0_carb.displayname Parameter of import propensity function, Carbonland
+series m1_carb
+m1_carb.displayname Parameter of import propensity function, Carbonland
+series m_ecol
+m_ecol.displayname Import propensity, Ecoland
+series m0_ecol
+m0_ecol.displayname Parameter of import propensity function, Ecoland
+series m1_ecol
+m1_ecol.displayname Parameter of import propensity function, Ecoland
+series theta_carb
+theta_carb.displayname Tax rate in Carbonland
+series theta_ecol
+theta_ecol.displayname Tax rate in Ecoland
+
+'Create additional series for government budget variables
+series def_carb
+def_carb.displayname Government deficit in Carbonland
+series def_ecol
+def_ecol.displayname Government deficit in Ecoland
+series nafa_carb
+nafa_carb.displayname Net accumulation of financial assets in Carbonland
+series nafa_ecol
+nafa_ecol.displayname Net accumulation of financial assets in Ecoland
+series cab_carb
+cab_carb.displayname Current account balance - Carbonland
+series cab_ecol
+cab_ecol.displayname Current account balance in Ecoland
+series kabp_carb
+kabp_carb.displayname Financial account balance in Carbonland
+series kabp_ecol
+kabp_ecol.displayname Financial account balance in Ecoland
+series tb_carb
+tb_carb.displayname Trade balance Carbonland
+series tb_ecol
+tb_ecol.displayname Trade balance Ecoland
+series bp_carb
+bp_carb.displayname Balance of payment Carbonland
+series bp_ecol
+bp_ecol.displayname Balance of payment Ecoland
+
+'Create additional series for the ecosystem 
+series y_mat_carb
+y_mat_carb.displayname Production of material goods in Carbonland
+series y_mat_ecol
+y_mat_ecol.displayname Production of material goods in Ecoland
+series mat_carb
+mat_carb.displayname Extraction of matter in Carbonland
+series mat_ecol
+mat_ecol.displayname Extraction of matter in Ecoland
+series rec_carb
+rec_carb.displayname Recycled socio-economic stock in Carbonland
+series rho_carb 
+rho_carb.displayname Percentage of recycling in Carbonland
+series rec_ecol
+rec_ecol.displayname Recycled socio-economic stock in Ecoland
+series rho_ecol 
+rho_ecol.displayname Percentage of recycling in Ecoland
+series dis_carb
+dis_carb.displayname Discarded socio-economic stock in Carbonland
+series dis_ecol
+dis_ecol.displayname Discarded socio-economic stock in Ecoland
+series k_se_carb
+k_se_carb.displayname Socio-economic stock in Carbonland
+series k_se_ecol
+k_se_ecol.displayname Socio-economic stock in Ecoland
+series wa_carb
+wa_carb.displayname Waste generated by production activities in Carbonland
+series wa_ecol
+wa_ecol.displayname Waste generated by production activities in Ecoland
+series k_m_carb
+k_m_carb.displayname Stock of material reserves in Carbonland
+series k_m_ecol
+k_m_ecol.displayname Stock of material reserves in Ecoland
+series k_m
+k_m.displayname World-wide stock of material reserves
+series conv_m_carb
+conv_m_carb.displayname Material resources converted to reserves in Carbonland 
+series sigma_m_carb
+sigma_m_carb.displayname Percentage of material resources converted to reserves in Carbonland 
+series conv_m_ecol
+conv_m_ecol.displayname Material resources converted to reserves in Ecoland 
+series sigma_m_ecol
+sigma_m_ecol.displayname Percentage of material resources converted to reserves in Ecoland 
+series res_m_carb
+res_m_carb.displayname Stock of material resources in Carbonland
+series res_m_ecol
+res_m_ecol.displayname Stock of material resources in Ecoland
+series res_m
+res_m.displayname World-wide stock of material resources
+series cen_carb
+cen_carb.displayname Carbon mass of (non-renewable) energy in Carbonland
+series cen_ecol
+cen_ecol.displayname Carbon mass of (non-renewable) energy in Ecoland 
+series car 
+car.displayname Coefficient defining carbon mass of energy
+series o2_carb
+o2_carb.displayname Mass of oxygen in Carbonland
+series o2_ecol
+o2_ecol.displayname Mass of oxygen in Ecoland
+series e_carb
+e_carb.displayname Energy required for production in Carbonland
+series e_ecol
+e_ecol.displayname Energy required for production in Ecoland
+series ed_carb
+ed_carb.displayname Dissipated energy at the end of the period in Carbonland
+series ed_ecol
+ed_ecol.displayname Dissipated energy at the end of the period in Ecoland
+series k_e_carb
+k_e_carb.displayname Stock of energy reserves in Carbonland
+series k_e_ecol
+k_e_ecol.displayname Stock of energy reserves in Ecoland
+series k_e
+k_e.displayname World-wide stock of energy reserves
+series conv_e_carb
+conv_e_carb.displayname Energy resources converted to reserves in Carbonland
+series sigma_e_carb
+sigma_e_carb.displayname Percentage of energy resources converted to reserves in Carbonland
+series conv_e_ecol 
+conv_e_ecol.displayname Energy resources converted to reserves in Ecoland
+series sigma_e_ecol
+sigma_e_ecol.displayname Percentage of energy resources converted to reserves in Ecoland
+series res_e_carb
+res_e_carb.displayname Stock of energy resources in Carbonland
+series res_e_ecol
+res_e_ecol.displayname Stock of energy resources in Ecoland
+series res_e
+res_e.displayname World-wide stock of energy resources
+series emis_carb
+emis_carb.displayname Annual industrial emissions of CO2 in Carbonland
+series emis_ecol
+emis_ecol.displayname Annual industrial emissions of CO2 in Ecoland
+series emis
+emis.displayname Annual industrial emissions of CO2 worldwide
+series emis_l
+emis_l.label(d) Annual land emissions of CO2
+series emis
+emis.label(d) Annual total emissions of CO2
+series g_land
+g_land.label(d) Rate of decline of land-use CO2 emissions
+series o2
+o2.label(d) Mass of oxygen
+series beta
+beta.label(d) CO2 intensity coefficient
+series beta_gr
+beta_gr.label(d) CO2 intensity coefficient of green capital
+series beta_c
+beta_c.label(d) CO2 intensity coefficient of conventional capital
+series co2_at
+co2_at.label(d) Atmospheric CO2 concentration
+series phi11
+phi11.label(d) CO2 transfer coefficient
+series phi21 
+phi21.label(d) CO2 transfer coefficient
+series co2_up 
+co2_up.label(d) Upper ocean/biosphere CO2 concentration 
+series phi12
+phi12.label(d) CO2 transfer coefficient
+series phi22
+phi22.label(d) CO2 transfer coefficient
+series phi32 
+phi32.label(d) CO2 transfer coefficient
+series co2_lo 
+co2_lo.label(d) Lower ocean CO2 concentration
+series phi23
+phi23.label(d) CO2 transfer coefficient
+series phi33 
+phi33.label(d) CO2 transfer coefficient
+series temp_at
+temp_at.label(d) Atmosferic temperature
+series temp_lo
+temp_lo.label(d) Temperature of the lower ocean
+'series adp
+'adp.label(d) Sensitivity of capital depreciation to climate change
+series cen
+cen.label(d) Carbon mass of (non-renewable) energy
+series car
+car.label(d) Conversion rate of Gt of carbon into Gt of CO2
+series h_past
+h_past.label(d) Already created cash (inherited government debt)
+series f
+f.label(d) Radiative forcing over pre-industrial levels (W/m^2) 
+series f2
+f2.label(d) Increase in radiative forcing due to doubling of CO2 concentraton \n since pre-industrial levels (W/m^2)
+series co2_at_pre
+co2_at_pre.label(d) Pre-industrial CO2 concentration in atmosphere (Gt)
+series co2_lo_pre
+co2_lo_pre.label(d) Pre-industrial CO2 concentration in lower ocean (Gt)
+series co2_up_pre
+co2_up_pre.label(d) Pre-industrial CO2 concentration in upper ocean/biosphere (Gt) (Gt)
+series f_ex 
+f_ex.label(d) Radiative forcing over pre-industrial levels (W/m^2) \n due to non-CO2 greenhouse gases (W/m^2)
+series fex 
+fex.label(d) Annual increase in radiative forcing due to non-CO2 greenhouse \n gas emissions (W/m^2)
+series t1
+t1.label(d) Speed of adjustment parameter in atmospheric temperature function
+series t2
+t2.label(d) Coefficient of heat loss from the atmosphere to the lower ocean in \n atmospheric temperature function 
+series t3
+t3.label(d) Coefficient of heat loss from the atmosphere to the lower ocean in \n lower ocean temperature function
+series sens
+sens.label(d) Equilibrium climate sensitivity
+
+series d_t_carb
+d_t_carb.label(d) Proportional gross damage (0 = no damage; 1 = catastrophe)
+series dam1_carb
+dam1_carb.label(d) Parameter in damage function
+series dam2_carb
+dam2_carb.label(d) Parameter in damage function
+series dam3_carb
+dam3_carb.label(d) Parameter in damage function
+series dam4_carb
+dam4_carb.label(d) Parameter in damage function
+'series dam_p_carb
+'dam_p_carb.label(d) Share of productivity damage in total damage due to global warming
+
+series d_t_ecol
+d_t_ecol.label(d) Proportional gross damage (0 = no damage; 1 = catastrophe)
+series dam1_ecol
+dam1_ecol.label(d) Parameter in damage function
+series dam2_ecol
+dam2_ecol.label(d) Parameter in damage function
+series dam3_ecol
+dam3_ecol.label(d) Parameter in damage function
+series dam4_ecol
+dam4_ecol.label(d) Parameter in damage function
+'series dam_p_ecol
+'dam_p_ecol.label(d) Share of productivity damage in total damage due to global warming
+
+'series co2_carb
+'co2_carb.displayname Cumulative emissions of CO2 in Carbonland
+'series co2_ecol
+'co2_ecol.displayname Cumulative emissions of CO2 in Ecoland
+'series co2
+'co2.displayname Cumulative emissions of CO2 worldwide
+'series co2_l
+'co2_l.displayname Cumulative land emissions of CO2
+series mu_carb
+mu_carb.displayname Matter intensity coefficient in Carbonland
+series mu_init_carb
+mu_init_carb.displayname Initial value of matter intensity coefficient in Carbonland
+series mu_ecol
+mu_ecol.displayname Matter intensity coefficient in Ecoland
+series mu_init_ecol
+mu_init_ecol.displayname Initial value of matter intensity coefficient in Ecoland
+series epsilon_carb
+epsilon_carb.displayname Energy intensity coefficient in Carbonland
+series epsilon_init_carb
+epsilon_init_carb.displayname Initial value of energy intensity coefficient in Carbonland
+series epsilon_ecol
+epsilon_ecol.displayname Energy intensity coefficient in Ecoland
+series epsilon_init_ecol
+epsilon_init_ecol.displayname Initial value of energy intensity coefficient in Ecoland
+series beta_carb 
+beta_carb.displayname Average CO2 intensity coefficient in Carbonland
+series beta_init_carb
+beta_init_carb.displayname Initial value of CO2 intensity coefficient in Carbonland
+series beta_ecol
+beta_ecol.displayname Average CO2 intensity coefficient in Ecoland
+series beta_init_ecol
+beta_init_ecol.displayname Initial value of CO2 intensity coefficient in Ecoland
+series depl_m_carb
+depl_m_carb.displayname Matter depletion ratio in Carbonland
+series depl_m_ecol
+depl_m_ecol.displayname Matter depletion ratio in Ecoland
+series depl_e_carb
+depl_e_carb.displayname Energy depletion ratio in Carbonland
+series depl_e_ecol
+depl_e_ecol.displayname Energy depletion ratio in Ecoland
+series g_beta_carb
+g_beta_carb.displayname Rate of decline of CO2 intensity in Carbonland
+series g_beta_ecol
+g_beta_ecol.displayname Rate of decline of CO2 intensity in Ecoland
+series g_mu_carb
+g_mu_carb.displayname Rate of decline of matter intensity in Carbonland
+series g_mu_ecol
+g_mu_ecol.displayname Rate of decline of matter intensity in Ecoland
+series g_eps_carb
+g_eps_carb.displayname Rate of decline of energy intensity in Carbonland
+series g_eps_ecol
+g_eps_ecol.displayname Rate of decline of energy intensity in Ecoland
+series eta_carb
+eta_carb.displayname Share of renewable energy to total energy in Carbonland
+series er_carb
+er_carb.displayname Renewable energy in Carbonland
+series eta_ecol
+eta_ecol.displayname Share of renewable energy to total energy in Ecoland
+series er_ecol
+er_ecol.displayname Renewable energy in Ecoland
+series en_carb
+en_carb.displayname Non-renewable energy in Carbonland
+series en_ecol
+en_ecol.displayname Non-renewable energy in Ecoland
+
+'************************************************
+' Set sample size to all workfile range
+smpl @all
+
+'************************************************
+
+' Set parameter values
+alpha1_carb = 0.7 '0.6
+alpha1_ecol = 0.7
+alpha2_carb = 0.3 '0.4
+alpha2_ecol = 0.3
+lambda0_carb = 0.67 '0.635
+lambda0_ecol = 0.67
+lambda1_carb = 5
+lambda1_ecol = 5 '6
+lambda2_carb = 0.01
+lambda2_ecol = 0.01 '0.07
+m_carb = 0.18781 '***
+m_ecol = 0.18781 '***
+m0_carb = 0 '***
+m0_ecol = 0 '***
+m1_carb = 0.1 '***
+m1_ecol = 0.1 '***
+theta_carb = 0.2
+theta_ecol = 0.2
+
+' Set exogenous variables
+gov_carb = 20/2.65 'Godley & Lavoie exogenous variables re-tuned in such a way to obtain a gross worl product equal to 80 trillion USD ca in the baseline
+gov_ecol = 20/2.65
+p_g_bar = 1
+r_bar_carb = 0.025
+r_carb = r_bar_carb
+r_bar_ecol = 0.025
+r_ecol = r_bar_ecol
+xr_bar = 1
+
+' Set starting values for stocks
+b_cb_carb = 11.622/2.65 'Re-tuned at their new initial values
+b_cb_ecol = 11.622/2.65
+b_h_carb = 64.865/2.65
+b_h_ecol = 64.865/2.65
+b_s_carb = 76.486/2.65
+b_s_ecol = 76.486/2.65
+or_carb = 30 
+or_ecol = 30
+v_carb = 86.487/2.65
+v_ecol = 86.487/2.65
+h_h_carb = v_carb - b_h_carb
+h_h_ecol = v_ecol - b_h_ecol
+h_ecol_carb = h_h_carb
+h_ecol_ecol = h_h_ecol
+b_s = b_s_carb + b_s_ecol
+
+' Set tarting values for ecological variables and parameter values (Note: Ecoland processes/products are cleaner than Carbonland processes/products)
+mu_init_carb = 0.60 'Material intensity of production in Carbonland (Kg/USD) --- Dafermos et al. 2017 use 0.61
+mu_init_ecol = 0.56 'Material intensity of production in Ecoland (Kg/USD)
+g_mu_carb = @recode(@date<@dateval("2020"),0,0.005) 'Rate of decline of matter intensity in Carbonland --- fine-tuned   
+g_mu_ecol = @recode(@date<@dateval("2020"),0,0.005) 'Rate of decline of matter intensity in Ecoland
+epsilon_init_carb = 7 'Energy intensity of green capital in Carbonland (Ej/USD) Dafermos et al. 2017 use 6.65
+epsilon_init_ecol = 6.5 'Energy intensity of green capital in Ecoland (Ej/USD) 
+g_eps_carb = @recode(@date<@dateval("2020"),0,0.01) 'Rate of decline of matter energy in Carbonland --- fine-tuned   
+g_eps_ecol = @recode(@date<@dateval("2020"),0,0.01) 'Rate of decline of matter energy in Ecoland
+beta_init_carb = 0.06 'CO2 intensity of production in Carbonland (Gt/Ej) --- Dafermos et al. 2017 use 0.07 as initial value, but intensity ratios are declining over time
+beta_init_ecol = 0.06 'CO2 intensity of production in Ecoland (Gt/Ej)
+g_beta_carb = @recode(@date<@dateval("2020"),0,0.03) 'Rate of decline of CO2 intensity in Carbonland --- Note: 0.03 is in line with Guttmann seminar and Paris Agreenment 2015   
+g_beta_ecol = @recode(@date<@dateval("2020"),0,0.03) 'Rate of decline of CO2 intensity in Ecoland
+'co2_carb = 0 '300 'Approximate value of cumulative CO2 emissions of Carbonland in 1950s (billion tonnes CO2, Gt) ---  value taken from IPCC 2018
+'co2_ecol = 0 '300 'Approximate value of cumulative CO2 emissions of Ecoland in 1950s (billion tonnes CO2, Gt)
+'co2_l = 0 'Approximate value of cumulative CO2 emissions of land in 1950s (billion tonnes CO2, Gt) ***
+rho_carb = 0.24 'Recycling rate in Carbonland --- Dafermos et al. 2017 use 0.24 as recycling rate of conventional activities (capital)
+rho_ecol = 0.24 'Recycling rate in Ecoland
+k_m_carb = 0 'Initial value of matter reserves of Carbonland (Gt) 
+k_m_ecol = 0 'Initial value of matter reserves of Ecoland (Gt)
+k_e_carb = 0 'Initial value of non-renewable energy reserves of Carbonland (Ej)  
+k_e_ecol = 0 'Initial value of non-renewable energy reserves of Ecoland (Ej)
+res_m_carb = 201500 'Initial value of matter resources of Carbonland (Gt) --- our calculations to obtain (390000/2)Gt ca = 195000Gt ca in 2015 (like in Dafermos et al. 2017)
+res_m_ecol = 201500 'Initial value of matter resources of Ecoland (Gt)
+res_e_carb = 329000 'Initial value of non-renewable energy resources of Carbonland (Ej) --- our calculations to obtain (542000/2)Ej ca = 271000Ej ca in 2015 (like in Dafermos et al. 2017)
+res_e_ecol =329000 'Initial value of non-renewable energy resources of Ecoland (Ej)
+sigma_m_carb = 0.00031 'Conversion rate of material resources into reserves in Carbonland --- our calculations to obtain k_m = 6000Gt worldwide in 2015 (like Dafermos et al. 2017, who use 0.0005)
+sigma_m_ecol = 0.00031 'Conversion rate of material resources into reserves in Ecoland
+sigma_e_carb = 0.0016 'Conversion rate of non-renewable energy resources into reserves in Carbonland --- our calculations to obtain k_e = 37000Ej worldwide in 2015 (like Dafermos et al. 2017)
+sigma_e_ecol = 0.0016 'Conversion rate of non-renewable energy resources into reserves in Ecoland
+k_se_carb = 325 'Initial value of socio-economic stock of Carbonland (Gt) --- our calculations to obtain 1135Gt ca worldwide in 2015 (like Dafermos et al. 2017) 
+k_se_ecol = 325 'Initial value of socio-economic stock of Ecoland (Gt)
+car = 3.67 'Coefficient converting Gt of carbon into Gt of CO2 --- taken from Dafermos et al. 2017
+eta_carb = 0.07 'Share of renewable energy to total energy in Carbonland --- Note: Dafermos et al. 2017 Ecolande 0.14 as average value
+eta_ecol = 0.21 'Share of renewable energy to total energy in Ecoland
+
+'Set additional ecological coefficients (Version: SHORT 7)
+'temp_at = 0 'Atmospheric temperature over pre-industrial levels (1C in 2020) ***
+'temp_lo = 0 'Lower ocean temperature over pre-industrial levels (0.0068C in 2020, from Dafermos et al. 2017) ***
+t1 = 0.027 	'Speed of adjustment parameter in atmospheric temperature function (from Dafermos et al. 2017) ***
+t2 = 0.018   	'Coefficient of heat loss from the atmosphere to the lower ocean in atmospheric temperature function ***
+t3 = 0.005   	'Coefficient of heat loss from the atmosphere to the lower ocean in lower ocean temperature function ***
+sens = 2.5 		'Equilibrium climate sensitivity (Dafermos et al. 2017 use 3) *** <===RE-TUNED
+co2_at = 3120 'Initial level of atmospheric CO2 concentration (cumulative level in 1960) ***
+co2_up = 5628.8 'Upper ocean/biosphere CO2 concentration. Calculations based on Dafermos et al. 2017 (and Nordhaus and Sztorz 2013) ***
+co2_lo = 36706.7 'Lower ocean CO2 concentration ***
+phi11 = 0.9817 'CO2 transfer coefficient (taken from Dafermos et al. 2017) ***
+phi12 = 0.0183 'CO2 transfer coefficient***
+phi21 = 0.0080 'CO2 transfer coefficient***
+phi22 = 0.9915 'CO2 transfer coefficient***
+phi23 = 0.0005 'CO2 transfer coefficient***
+phi32 = 0.0001 'CO2 transfer coefficient***
+phi33 = 0.9999 'CO2 transfer coefficient***
+emis_l = 4 'Land-use CO2 emissions (Gt, against 36 Gt from industrial activities - taken from Dafermos et at. 2017) ***
+g_land = 0.044 'Rate of decline of land-use CO2 emissions (taken from Dafermos et al. 2017) ***
+f = 2.3 ' Radiative forcing over pre-industrial levels (W/m^2) (taken from Dafermos et al. 2017)*** 
+f2 = 3.8 ' Increase in radiative forcing due to doubling of CO2 concentraton since pre-industrial levels (W/m^2)***
+co2_at_pre = 2156.2 ' Pre-industrial CO2 concentration in atmosphere (Gt) ***
+co2_up_pre = 4950.5 ' Pre-industrial CO2 concentration in upper ocean/biosphere (Gt)***
+co2_lo_pre = 36670 ' Pre-industrial CO2 concentration in lower ocean (Gt)***
+f_ex = 0.28 ' Radiative forcing over pre-industrial levels (W/m^2) due to non-CO2 greenhouse gases (W/m^2) ***
+fex = 0.005 ' Annual increase in radiative forcing due to non-CO2 greenhouse gas emissions (W/m^2) ***
+wa_carb = 11/2 'Waste generated by production activities (Gt) (Dafermos et al. 2017) ***
+wa_ecol = 11/2 'Waste generated by production activities (Gt) (Dafermos et al. 2017) ***
+
+' Set coefficients for damages due to global warming: Carbonland
+dam1_carb = 0 'Parameter of damage function (from Dafermos et al 2017; based, in turn, on Weitzman 2012, so that d_t = 0.5 when temp_at = 6C)
+dam2_carb = 0.00284 'Parameter of damage function ***
+dam3_carb = 0.000005 'Parameter of damage function ***
+dam4_carb = 6.6754 'Parameter of damage function ***
+'dam_p_carb = 0.1 ' Share of productivity damage in total damage due to global warming (from Dafermos et al 2017) ***
+d_t_carb = 0.0028 'Percentage of damages (initial value) ***
+
+' Set coefficients for damages due to global warming: Ecoland
+dam1_ecol = 0 'Parameter of damage function (from Dafermos et al 2017; based, in turn, on Weitzman 2012, so that d_t = 0.5 when temp_at = 6C)
+dam2_ecol = 0.00284 'Parameter of damage function ***
+dam3_ecol = 0.000005 'Parameter of damage function ***
+dam4_ecol = 6.6754 'Parameter of damage function ***
+
+'dam_p_ecol = 0.1 ' Share of productivity damage in total damage due to global warming (from Dafermos et al 2017) ***
+d_t_ecol = 0.0028 'Percentage of damages (initial value) ***
+
+'************************************************
+
+' Create a model object, and name it openecoshort
+
+model openecoshort
+
+' Define basic equations
+openecoshort.append y_carb = cons_carb + gov_carb + x_carb - im_carb ' Determination of national income in Carbonland 
+openecoshort.append y_ecol = cons_ecol + gov_ecol + x_ecol - im_ecol ' Determination of national income in Ecoland 
+openecoshort.append im_carb = (m_carb*y_carb)*(1 - d_t_carb(-1)) ' Imports in Carbonland (including damages) *** 
+openecoshort.append im_ecol = (m_ecol*y_ecol)*(1 - d_t_ecol(-1)) ' Imports in Ecoland (including damages) ***
+openecoshort.append x_carb = im_ecol/xr ' Exports of EU 
+openecoshort.append x_ecol = im_carb*xr ' Exports of Ecoland 
+openecoshort.append yd_carb = y_carb - t_carb + r_carb(-1)*b_h_carb(-1) ' Disposable income in Carbonland 
+openecoshort.append yd_ecol = y_ecol - t_ecol + r_ecol(-1)*b_h_ecol(-1) ' Disposable income in Ecoland 
+openecoshort.append t_carb = theta_carb*(y_carb + r_carb(-1)*b_h_carb(-1)) ' Tax payments in Carbonland 
+openecoshort.append t_ecol = theta_ecol*(y_ecol + r_ecol(-1)*b_h_ecol(-1)) ' Tax payments in Ecoland
+openecoshort.append v_carb = v_carb(-1) + (yd_carb - cons_carb) ' Wealth accumulation in Carbonland 
+openecoshort.append v_ecol = v_ecol(-1) + (yd_ecol - cons_ecol) ' Wealth accumulation in Ecoland 
+openecoshort.append cons_carb = (alpha1_carb*yd_carb + alpha2_carb*v_carb(-1))*(1 - d_t_carb(-1)) ' Consumption function in Carbonland (including damages) ***
+openecoshort.append cons_ecol = (alpha1_ecol*yd_ecol + alpha2_ecol*v_ecol(-1))*(1 - d_t_ecol(-1)) ' Consumption function in Ecoland (including damages) ***
+openecoshort.append h_h_carb = v_carb - b_h_carb ' Cash money held in Carbonland 
+openecoshort.append h_h_ecol = v_ecol - b_h_ecol ' Cash money held in Ecoland 
+openecoshort.append b_h_carb = v_carb*(lambda0_carb + lambda1_carb*r_carb - lambda2_carb*(yd_carb/v_carb)) ' Demand for government bills in Carbonland 
+openecoshort.append b_h_ecol = v_ecol*(lambda0_ecol + lambda1_ecol*r_ecol - lambda2_ecol*(yd_ecol/v_ecol)) ' Demand for government bills in Ecoland 
+openecoshort.append b_s_carb = b_s_carb(-1) + (gov_carb + r_carb(-1)*b_s_carb(-1)) - (t_carb + r_carb(-1)*b_cb_carb(-1)) ' Supply of government bills in Carbonland 
+openecoshort.append b_s_ecol = b_s_ecol(-1) + (gov_ecol + r_ecol(-1)*b_s_ecol(-1)) - (t_ecol + r_ecol(-1)*b_cb_ecol(-1)) ' Supply of government bills in Ecoland
+openecoshort.append b_cb_carb = b_s_carb - b_h_carb ' Bills held by Central bank in Carbonland 
+openecoshort.append b_cb_ecol = b_s_ecol - b_h_ecol ' Bills held by Central bank in Ecoland 
+openecoshort.append or_carb = or_carb(-1) + (h_ecol_carb - h_ecol_carb(-1) -(b_cb_carb - b_cb_carb(-1)))/p_g_carb ' Gold holding by Central bank in Carbonland
+openecoshort.append or_ecol = or_ecol(-1) + (h_ecol_ecol - h_ecol_ecol(-1) -(b_cb_ecol - b_cb_ecol(-1)))/p_g_ecol ' Gold holding by Central bank in Ecoland 
+openecoshort.append h_ecol_carb = h_h_carb ' Supply of cash in Carbonland 
+openecoshort.append h_ecol_ecol = h_h_ecol ' Supply of cash in Ecoland
+openecoshort.append p_g_carb = p_g_bar ' Price of gold in Carbonland
+openecoshort.append p_g_ecol = p_g_carb*xr ' Price of gold in Ecoland 
+openecoshort.append xr = xr_bar ' Exchange rate
+openecoshort.append r_carb = r_bar_carb ' Interest rate in Carbonland 
+openecoshort.append r_ecol = r_bar_ecol ' Interest rate in Ecoland 
+
+
+'************************************************
+' Add equations for government balance and BoP 
+openecoshort.append b_s = b_s_carb + b_s_ecol 'Total supply of Ecoland government bills <--- TO BE CHECKED
+openecoshort.append def_carb = (gov_carb + r_carb(-1)*b_s_carb(-1)) - (t_carb + r_carb(-1)*b_cb_carb(-1)) ' Government deficit in Carbonland
+openecoshort.append def_ecol = (gov_ecol + r_ecol(-1)*b_s_ecol(-1)) - (t_ecol + r_ecol(-1)*b_cb_ecol(-1))  ' Government deficit in Ecoland
+openecoshort.append nafa_carb = def_carb + cab_carb ' Net accumulation of financial assets in Carbonland
+openecoshort.append nafa_ecol = def_ecol + cab_ecol ' Net accumulation of financial assets in Ecoland
+openecoshort.append cab_carb = tb_carb ' Current account balance - Carbonland
+openecoshort.append cab_ecol = tb_ecol ' Current account balance in Ecoland
+openecoshort.append kabp_carb = (d(or_carb))*p_g_carb ' Financial account balance in Carbonland
+openecoshort.append kabp_ecol =(d( or_ecol))*p_g_ecol ' Financial account balance in Ecoland
+openecoshort.append tb_carb =  x_carb - im_carb 'Trade balance Carbonland
+openecoshort.append tb_ecol = x_ecol - im_ecol 'Trade balance Ecoland
+openecoshort.append bp_carb = cab_carb  'Balance of payment Carbonland
+openecoshort.append bp_ecol = cab_ecol 'Balance of payment Ecoland
+
+
+'************************************************
+' Add equations for the ecosystem (based on OPENECO)
+
+'1. MATERIAL RESOURCES AND RESERVES
+openecoshort.append y_mat_carb = mu_carb*y_carb 'Production of material goods in Carbonland
+openecoshort.append y_mat_ecol = mu_ecol*y_ecol 'Production of material goods in Ecoland
+openecoshort.append mat_carb = y_mat_carb - rec_carb 'Extraction of matter in Carbonland
+openecoshort.append mat_ecol = y_mat_ecol - rec_ecol 'Extraction of matter in Ecoland
+openecoshort.append rec_carb = rho_carb*dis_carb 'Recycled socio-economic stock in Carbonland
+openecoshort.append rec_ecol = rho_ecol*dis_ecol 'Recycled socio-economic stock in Ecoland
+openecoshort.append dis_carb = mu_carb*(cons_carb - x_carb + im_carb) 'Discarded socio-economic stock in Carbonland --- Note: including imported goods minus exported goods
+openecoshort.append dis_ecol = mu_ecol*(cons_ecol - x_ecol + im_ecol) 'Discarded socio-economic stock in Ecoland
+openecoshort.append k_se_carb = k_se_carb(-1) + y_mat_carb - mu_carb*(x_carb - im_carb) - dis_carb 'Socio-economic stock in Carbonland --- Note: including imported goods minus exported goods
+openecoshort.append k_se_ecol = k_se_ecol(-1) + y_mat_ecol - mu_carb*(x_ecol - im_ecol) - dis_ecol 'Socio-economic stock in Ecoland
+openecoshort.append wa_carb = mat_carb - d(k_se_carb) 'Waste generated by production activities in Carbonland
+openecoshort.append wa_ecol = mat_ecol - d(k_se_ecol) 'Waste generated by production activities in Ecoland
+openecoshort.append k_m_carb = k_m_carb(-1) + conv_m_carb - mat_carb 'Stock of material reserves in Carbonland
+openecoshort.append k_m_ecol = k_m_ecol(-1) + conv_m_ecol - mat_ecol 'Stock of material reserves in Ecoland
+openecoshort.append k_m = k_m_carb + k_m_ecol 'World-wide stock of material reserves
+openecoshort.append conv_m_carb = sigma_m_carb*res_m_carb(-1)  'Material resources converted to reserves in Carbonland 
+openecoshort.append conv_m_ecol = sigma_m_ecol*res_m_ecol(-1) 'Material resources converted to reserves in Ecoland 
+openecoshort.append res_m_carb = res_m_carb(-1) - conv_m_carb 'Stock of material resources in Carbonland
+openecoshort.append res_m_ecol = res_m_ecol(-1) - conv_m_ecol 'Stock of material resources in Ecoland
+openecoshort.append res_m = res_m_carb + res_m_ecol 'World-wide stock of material resources
+openecoshort.append cen_carb = emis_carb/car 'Carbon mass of (non-renewable) energy in Carbonland 
+openecoshort.append cen_ecol = emis_ecol/car 'Carbon mass of (non-renewable) energy in Ecoland 
+openecoshort.append o2_carb = emis_carb - cen_carb 'Mass of oxygen in Carbonland
+openecoshort.append o2_ecol = emis_ecol - cen_ecol 'Mass of oxygen in Ecoland
+
+'2. ENERGY RESOURCES AND RESERVES
+openecoshort.append e_carb = epsilon_carb*y_carb 'Energy required for production in Carbonland
+openecoshort.append er_carb = eta_carb*e_carb 'Renewable energy in Carbonland
+openecoshort.append en_carb = e_carb - er_carb 'Non-renewable energy in Carbonland
+openecoshort.append ed_carb = er_carb + en_carb 'Dissipated energy at the end of the period in Carbonland
+openecoshort.append e_ecol = epsilon_ecol*y_ecol 'Energy required for production in Ecoland
+openecoshort.append er_ecol = eta_ecol*e_ecol 'Renewable energy in Ecoland
+openecoshort.append en_ecol = e_ecol - er_ecol 'Non-renewable energy in Ecoland
+openecoshort.append ed_ecol = er_ecol + en_ecol 'Dissipated energy at the end of the period in Ecoland
+openecoshort.append k_e_carb = k_e_carb(-1) + conv_e_carb - en_carb 'Stock of energy reserves in Carbonland
+openecoshort.append k_e_ecol = k_e_ecol(-1) + conv_e_ecol - en_ecol 'Stock of energy reserves in Ecoland
+openecoshort.append k_e = k_e_carb + k_e_ecol 'World-wide stock of energy reserves
+openecoshort.append conv_e_carb = sigma_e_carb*res_e_carb(-1) 'Energy resources converted to reserves in Carbonland
+openecoshort.append conv_e_ecol = sigma_e_ecol*res_e_ecol(-1) 'Energy resources converted to reserves in Ecoland
+openecoshort.append res_e_carb = res_e_carb(-1) - conv_e_carb 'Stock of energy resources in Carbonland
+openecoshort.append res_e_ecol = res_e_ecol(-1) - conv_e_ecol 'Stock of energy resources in Ecoland
+openecoshort.append res_e = res_e_carb + res_e_ecol 'World-wide stock of energy resources
+
+'3. EMISSIONS AND CLIMATE CHANGE
+openecoshort.append emis_carb = beta_carb*en_carb 'Annual industrial emissions of CO2 in Carbonland
+openecoshort.append emis_ecol = beta_ecol*en_ecol 'Annual industrial emissions of CO2 in Ecoland
+openecoshort.append emis_l = emis_l(-1)*(1 - g_land) 'Annual land emissions of CO2 ***
+openecoshort.append emis = emis_carb + emis_ecol + emis_l 'Annual (total) emissions of CO2 worldwide ***
+'openecoshort.append co2_carb = co2_carb(-1) + emis_carb 'Cumulative industrial emissions of CO2 in Carbonland ****
+'openecoshort.append co2_ecol = co2_ecol(-1) + emis_ecol 'Cumulative industrial emissions of CO2 in Ecoland ***
+'openecoshort.append co2_l = co2_l(-1) + emis_l  'Cumulative land emissions of CO2 ***
+'openecoshort.append co2 = co2_carb + co2_ecol + co2_l 'Cumulative (total) emissions of CO2 worldwide ***
+openecoshort.append co2_at = emis + phi11*co2_at(-1) + phi21*co2_up(-1) 'Atmospheric CO2 concentration ***
+openecoshort.append co2_up = phi12*co2_at(-1) + phi22*co2_up(-1) + phi32*co2_lo(-1) 'Upper ocean/biosphere CO2 concentration *** 
+openecoshort.append co2_lo = phi23*co2_up(-1) + phi33*co2_lo(-1) 'Lower ocean CO2 concentration ***
+openecoshort.append f = f2*@logx(co2_at/co2_at_pre,2) + f_ex 'Radiative forcing over pre-industrial levels (W/m^2) ***
+openecoshort.append f_ex = f_ex(-1) + fex  'Radiative forcing over pre-industrial levels (W/m^2) due to non-CO2 greenhouse gases (W/m^2) ***
+openecoshort.append temp_at = @recode(@date<@dateval("2020"),(1+0.067)^(@TREND-59),temp_at(-1) + t1*(f - (f2/sens)*temp_at(-1)-t2*(temp_at(-1) - temp_lo(-1)))) 'Atmospheric temperature ***
+openecoshort.append temp_lo = @recode(@date<@dateval("2020"),0.0068*(1+0.055)^(@TREND-59),temp_lo(-1) + t3*(temp_at(-1)-temp_lo(-1))) 'Lower ocean temperature ***
+
+'4. ECOLOGICAL EFFICIENCY
+openecoshort.append mu_carb = @recode(@date<@dateval("1962"),mu_init_carb,mu_init_carb*(1+g_mu_carb)^(-@trend+60)) 'Matter intensity coefficient in Carbonland (declining after 2020 at 0.5%, i.e. after 60 periods) 
+openecoshort.append mu_ecol = @recode(@date<@dateval("1962"),mu_init_ecol,mu_init_ecol*(1+g_mu_ecol)^(-@trend+60)) 'Matter intensity coefficient in Ecoland (declining after 2020 at 0.5%, i.e. after 60 periods)
+openecoshort.append epsilon_carb = @recode(@date<@dateval("1962"),epsilon_init_carb,epsilon_init_carb*(1+g_eps_carb)^(-@trend+60)) 'Energy intensity coefficient in Carbonland (declining after 2020 at 0.5%, i.e. after 60 periods)
+openecoshort.append epsilon_ecol = @recode(@date<@dateval("1962"),epsilon_init_ecol,epsilon_init_ecol*(1+g_eps_ecol)^(-@trend+60)) 'Energy intensity coefficient in Carbonland (declining after 2020 at 0.5%, i.e. after 60 periods)
+openecoshort.append beta_carb = @recode(@date<@dateval("1962"),beta_init_carb,beta_init_carb*(1+g_beta_carb)^(-@trend+60)) 'CO2 intensity coefficient in Carbonland (declining after 2020 at 3%, i.e. after 60 periods)
+openecoshort.append beta_ecol = @recode(@date<@dateval("1962"),beta_init_ecol,beta_init_ecol*(1+g_beta_ecol)^(-@trend+60)) 'CO2 intensity coefficient in Ecoland (declining after 2020 at 3%, i.e. after 60 periods)
+
+'NOTE: IPCC report shows that emissions grow from 1960 (15Gt per year) to 2020 (45Gt per year) and then degrow rapidly (0Gt by 2060); cumulative emissions from 600Gt to 3000Gt and then stabilise 
+
+'5. DEPLETION RATIOS, DAMAGES AND FEEDBACKS
+openecoshort.append depl_m_carb = @recode(@date<@dateval("1962"),0,mat_carb/k_m_carb(-1)) 'Matter depletion ratio in Carbonland (starting from 1947)
+openecoshort.append depl_m_ecol = @recode(@date<@dateval("1962"),0,mat_ecol/k_m_ecol(-1)) 'Matter depletion ratio in Ecoland 
+openecoshort.append depl_e_carb = @recode(@date<@dateval("1962"),0,en_carb/k_e_carb(-1)) 'Energy depletion ratio in Carbonland
+openecoshort.append depl_e_ecol = @recode(@date<@dateval("1962"),0,en_ecol/k_e_ecol(-1)) 'Energy depletion ratio in Ecoland
+openecoshort.append d_t_carb = 1 - 1/(1 + dam1_carb*temp_at + dam2_carb*temp_at^2 + dam3_carb*temp_at^(dam4_carb)) 'Proportion of gross damage in Carbonland due to changes in atmospheric temperature (0 < d_t < 1, see Dafermos et al. 2017, Moyer et al. 2014, Weitzman 2012) ***
+openecoshort.append d_t_ecol = 1 - 1/(1 + dam1_ecol*temp_at + dam2_ecol*temp_at^2 + dam3_ecol*temp_at^(dam4_ecol)) 'Proportion of gross damage in Ecoland due to changes in atmospheric temperature (0 < d_t < 1, see Dafermos et al. 2017, Moyer et al. 2014, Weitzman 2012) ***
+openecoshort.append m_carb = m_carb(-1) + m0_carb + m1_carb*d(gov_carb) 'Carbonland propensity to import increses as (green) gov. sp. increases ***
+openecoshort.append m_ecol = m_ecol(-1) + m0_ecol - m1_ecol*d(gov_ecol) 'Greenland propensity to import increses as (green) gov. sp. increases ***
+
+
+'********************************************************************************************************************************************************************************************************************************
+
+' End of model
+
+' Select the baseline scenario
+
+' Select the baseline Scenario
+openecoshort.scenario "baseline"
+
+'Define the sample
+smpl 1960 @last
+
+'Solve the model
+openecoshort.solve(i=p, s=d, d=d) 'Deterministic solution
+'openecoshort.solve(i=p, s=b, d=d) @Stochastic solution
+
+'********************************************************************************************************************************************************************************************************************************
+
+'Shock the model
+
+'Select Scenario 1: "business as usual", i.e no change in CO2 intensity coefficients after 2020
+openecoshort.scenario "Scenario 1"
+openecoshort.override g_beta_carb g_beta_ecol
+copy g_beta_carb g_beta_carb_1
+copy g_beta_ecol g_beta_ecol_1
+smpl 1960 @last
+g_beta_carb_1 = 0
+g_beta_ecol_1 = 0
+smpl 1960 @last
+openecoshort.solve
+
+'Select Scenario 2: shock to the exchange rate (5% devaluation)
+openecoshort.scenario(n) "Scenario 2"
+openecoshort.override xr_bar
+copy xr_bar xr_bar_2
+smpl 2020 @last
+xr_bar_2 = 1.05 'from 1
+smpl 1960 @last
+openecoshort.solve
+
+'Select Scenario 3: climate change reduces Ecoland propensity to consume 
+openecoshort.scenario(n) "Scenario 3"
+openecoshort.override alpha1_ecol
+copy alpha1_ecol alpha1_ecol_3
+smpl 2020 @last
+alpha1_ecol_3 = 0.65 'from 0.7
+smpl 1960 @last
+openecoshort.solve
+
+'Select Scenario 4: climate change reduces Ecoland propensity to import 
+openecoshort.scenario(n) "Scenario 4"
+openecoshort.override m0_ecol
+copy m0_ecol m0_ecol_4
+smpl 2020 2021						' note: one year only, because shock to change (not to level)
+m0_ecol_4 = -0.01*0.18781       	' -1% of initial value
+smpl 1960 @last
+openecoshort.solve
+
+'Select Scenario 5: negative shock to Carbonland government spending (incentives)
+openecoshort.scenario(n) "Scenario 5"
+openecoshort.override gov_carb
+copy gov_carb gov_carb_5
+smpl 2020 @last
+gov_carb_5 = gov_carb_5*(1 - 0.01)  ' -1%
+smpl 1960 @last
+openecoshort.solve
+
+
+'********************************************************************************************************************************************************************************************************************************
+'Create figures
+
+'BASELINE
+
+' Create the chart of GDP (baseline)
+smpl 1962 2100 
+graph gdp1.line y_carb_0 y_ecol_0 y_ecol_0+y_carb_0
+gdp1.draw(shade, bottom, color(220,255,215)) 2019 @last
+gdp1.options linepat
+gdp1.axis mirror
+gdp1.setelem(1) lcolor(red) lwidth(2) lpat(1)
+gdp1.setelem(2) lcolor(green) lwidth(2) lpat(2)
+gdp1.setelem(3) lcolor(orange) lwidth(2) lpat(2)
+gdp1.name(1) Carbonland (trillion USD, baseline)
+gdp1.name(2) Ecoland (trillion USD, baseline)
+gdp1.name(3) World-wide (trillion USD, baseline)
+gdp1.addtext(t,just(c),font(18)) 0a - Total output
+gdp1.legend -inbox
+'show gdp1
+
+' Create the chart of temperature (baseline)
+smpl 1962 2100 
+graph temper.line temp_at_0 temp_at_1 temp_lo_0 temp_lo_1
+temper.draw(shade, bottom, color(220,255,215)) 2019 @last
+temper.draw(line, left, color(black),width(1),pattern(2)) 1.5
+temper.options linepat
+temper.axis mirror
+temper.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+temper.setelem(2) lcolor(purple) lwidth(2) lpat(2)
+temper.setelem(3) lcolor(orange) lwidth(2) lpat(1)
+temper.setelem(4) lcolor(orange) lwidth(2) lpat(2)
+temper.name(1) Change in atmospheric temperature per year (C, baseline)
+temper.name(2) Change in atmospheric temperature per year (C, business as usual)
+temper.name(3) Change in lower ocean temperature per year (C, baseline)
+temper.name(4) Change in lower ocean per year (C, business as usual)
+temper.addtext(t,just(c),font(18)) 0b - Average atmospheric temperature since end of 1950s (IPCC 2018)
+temper.legend -inbox
+'show temper
+
+' Create the chart of emissions per year (baseline)
+smpl 1962 2100 
+graph yemi.line emis_carb_0 emis_ecol_0 emis_0 emis_1
+yemi.draw(shade, bottom, color(220,255,215)) 2019 @last
+yemi.draw(line, left, color(black),width(1),pattern(2)) 14.9
+yemi.options linepat
+yemi.axis mirror
+yemi.setelem(1) lcolor(red) lwidth(2) lpat(1)
+yemi.setelem(2) lcolor(green) lwidth(2) lpat(1)
+yemi.setelem(3) lcolor(orange) lwidth(2) lpat(1)
+yemi.setelem(4) lcolor(orange) lwidth(2) lpat(2)
+yemi.name(1) Carbonland (bn Gt/yr, baseline)
+yemi.name(2) Ecoland (bn Gt/yr, baseline)
+yemi.name(3) World-wide (bn Gt/yr, baseline)
+yemi.name(4) World-wide (bn Gt/yr, business as usual)
+yemi.addtext(t,just(c),font(18)) 0c - CO2 emissions per year (IPCC 2018)
+yemi.legend -inbox
+'show yemi
+
+' Create the chart of cumulative emissions (baseline)
+smpl 1962 2100 
+graph emi.line co2_at_0 co2_at_1
+emi.draw(shade, bottom, color(220,255,215)) 2019 @last
+emi.options linepat
+emi.axis mirror
+emi.setelem(1) lcolor(red) lwidth(2) lpat(1)
+emi.setelem(2) lcolor(green) lwidth(2) lpat(1)
+emi.name(1) World-wide, baseline (bn Gt)
+emi.name(2) World-wide, business as usual (bn Gt)
+emi.addtext(t,just(c),font(18)) 0d - CO2 atmospheric concentration (IPCC 2018)
+emi.legend -inbox
+'show emi
+
+' Create the chart of reserves (baseline)
+smpl 1962 2100 
+graph reserves.line k_m_0 k_e_0
+reserves.draw(shade, bottom, color(220,255,215)) 2019 @last
+reserves.options linepat
+reserves.setelem(2) axis(right)
+reserves.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+reserves.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+reserves.name(1) Matter (Gt, baseline)
+reserves.name(2) Energy (Ej, baseline, right axis)
+reserves.addtext(t,just(c),font(18)) 0e - World-wide reserves of matter and n.r. energy 
+reserves.legend -inbox
+'show reserves
+
+' Create the chart of resources (baseline)
+smpl 1962 2100 
+graph resources.line res_m_0 res_e_0
+resources.draw(shade, bottom, color(220,255,215)) 2019 @last
+'resources.draw(line, left, color(purple),width(1),pattern(2)) 390000
+'resources.draw(line, right, color(orange),width(1),pattern(2)) 542000
+resources.options linepat
+resources.setelem(2) axis(right)
+resources.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+resources.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+resources.name(1) Matter (Gt, baseline)
+resources.name(2) Energy (Ej, baseline, right axis)
+resources.addtext(t,just(c),font(18)) 0f - World-wide resources of matter and n.r. energy 
+resources.legend -inbox
+'show resources
+
+'********************************************************************************************************************************************************************************************************************************
+'EXPERIMENT 1 (Scenario 4)
+
+' Create the chart of GDP when climate change affects Ecoland import 
+smpl 2010 2150 
+graph gdp2.line y_carb_4-y_carb_0 y_ecol_4-y_ecol_0 (y_carb_4+y_ecol_4)-(y_carb_0+y_ecol_0)
+gdp2.draw(shade, bottom, color(220,255,215)) 2010 2018
+gdp2.options linepat
+gdp2.axis mirror
+gdp2.setelem(1) lcolor(red) lwidth(2) lpat(1)
+gdp2.setelem(2) lcolor(green) lwidth(2) lpat(1)
+gdp2.setelem(3) lcolor(orange) lwidth(2) lpat(2)
+gdp2.name(1) Carbonland GDP (trillion USD)
+gdp2.name(2) Ecoland GDP (trillion USD)
+gdp2.name(3) World-wide output (trillion USD)
+gdp2.addtext(t,just(c),font(18)) 1a - Change in output when climate change \n affects Ecoland propensity to import
+gdp2.legend -inbox
+
+' Create chart of current account, trade balance, government deficit and net accumulation of financial assets when climate change affects Ecoland import
+smpl 2010 2150 
+graph CAB2.line nafa_carb_4-nafa_carb_0 cab_carb_4-cab_carb_0 def_carb_4-def_carb_0 'tb_carb_4-tb_carb_0
+CAB2.draw(shade, bottom, color(220,255,215)) 2010 2018
+CAB2.options linepat
+CAB2.axis mirror
+CAB2.setelem(1) lcolor(blue) lwidth(2) lpat(1)
+CAB2.setelem(2) lcolor(green) lwidth(2) lpat(2)
+CAB2.setelem(3) lcolor(red) lwidth(2) lpat(3)
+'CAB2.setelem(4) lcolor(black) lwidth(2) lpat(4)
+CAB2.name(1) Change in Carbonland net acquisition of financial assets (trillion USD)
+CAB2.name(2) Change in Carbonland current account balance (trillion USD)
+CAB2.name(3) Change in Carbonland budget deficit (trillion USD)
+'CAB2.name(4) Change in Carbonland trade balance (trillion USD)
+CAB2.addtext(t,just(c),font(18)) 1b - Change in Carbonland balance of payment when climate \n change affects Ecoland propensity to import
+CAB2.legend -inbox
+
+' Create the chart of temperature when climate change affects Ecoland import
+smpl 2010 2150 
+graph temper2.line temp_at_4-temp_at_0 temp_lo_4-temp_lo_0 
+temper2.draw(shade, bottom, color(220,255,215)) 2010 2018
+temper2.options linepat
+temper2.axis mirror
+temper2.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+temper2.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+temper2.name(1) Atmospheric temperature (C)
+temper2.name(2) Lower ocean temperature (C)
+temper2.addtext(t,just(c),font(18)) 1c - Change in temperature when climate change \n affects Ecoland propensity to import
+temper2.legend -inbox
+
+' Create the chart of cumulative emissions when climate change affects Ecoland import
+smpl 2010 2150 
+graph emi2.line emis_carb_4-emis_carb_0 emis_ecol_4-emis_ecol_0 emis_4-emis_0
+emi2.draw(shade, bottom, color(220,255,215)) 2010 2018
+emi2.options linepat
+emi2.axis mirror
+emi2.setelem(1) lcolor(red) lwidth(2) lpat(1)
+emi2.setelem(2) lcolor(green) lwidth(2) lpat(1)
+emi2.setelem(3) lcolor(orange) lwidth(2) lpat(2)
+emi2.name(1) Carbonland emissions (bn Gt)
+emi2.name(2) Ecoland emissions (bn Gt)
+emi2.name(3) Annual emissions worldwide (bn Gt)
+emi2.addtext(t,just(c),font(18)) 1d - Change in industrial CO2 emissions when climate change \n affects Ecoland propensity to import
+emi2.legend -inbox
+
+' Create the chart of depletion rates when climate change affects Ecoland import
+smpl 2010 2150 
+graph depl2.line depl_m_carb_4-depl_m_carb_0 depl_m_ecol_4-depl_m_ecol_0 depl_e_carb_4-depl_e_carb_0 depl_e_ecol_4-depl_e_ecol_0
+depl2.draw(shade, bottom, color(220,255,215)) 2010 2018
+depl2.options linepat
+depl2.axis mirror
+depl2.setelem(1) lcolor(red) lwidth(2) lpat(1)
+depl2.setelem(2) lcolor(green) lwidth(2) lpat(1)
+depl2.setelem(3) lcolor(red) lwidth(2) lpat(2)
+depl2.setelem(4) lcolor(green) lwidth(2) lpat(2)
+depl2.name(1) Matter depletion rate in Carbonland
+depl2.name(2) Matter depletion rate in Ecoland
+depl2.name(3) Energy depletion rate in Carbonland
+depl2.name(4) Energy depletion rate in Ecoland
+depl2.addtext(t,just(c),font(18)) 1e - Change in depletion rates when climate change \n affects Ecoland propensity to import
+depl2.legend -inbox
+
+' Create the chart of reserves when climate change affects Ecoland import
+smpl 2010 2150 
+graph reserves2.line k_m_4/k_m_0 k_e_4/k_e_0
+reserves2.draw(shade, bottom, color(220,255,215)) 2010 2018
+reserves2.options linepat
+reserves2.setelem(2) axis(right)
+reserves2.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+reserves2.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+reserves2.name(1) Matter (relative to baseline)
+reserves2.name(2) Energy (relative to baseline, right axis)
+reserves2.addtext(t,just(c),font(18)) 1f - Change in world-wide reserves of matter and n.r. energy when \n climate change affects Ecoland propensity to import
+reserves2.legend -inbox
+
+'********************************************************************************************************************************************************************************************************************************
+'EXPERIMENT 2 (Scenario 5)
+
+' Create the chart of GDP when Carbonland green incentives fall
+smpl 2010 2150 
+graph gdp3.line y_carb_5-y_carb_0 y_ecol_5-y_ecol_0 (y_carb_5+y_ecol_5)-(y_carb_0+y_ecol_0)
+gdp3.draw(shade, bottom, color(220,255,215)) 2010 2018
+gdp3.options linepat
+gdp3.axis mirror
+gdp3.setelem(1) lcolor(red) lwidth(2) lpat(1)
+gdp3.setelem(2) lcolor(green) lwidth(2) lpat(1)
+gdp3.setelem(3) lcolor(orange) lwidth(2) lpat(2)
+gdp3.name(1) Carbonland GDP (trillion USD)
+gdp3.name(2) Ecoland GDP (trillion USD)
+gdp3.name(3) World-wide output (trillion USD)
+gdp3.addtext(t,just(c),font(18)) 2a - Change in output when Carbonland \n green incentives are dropped
+gdp3.legend -inbox
+
+' Create chart of current account, trade balance, government deficit and net accumulation of financial assets when Carbonland government spending falls
+smpl 2010 2150 
+graph CAB3.line nafa_carb_5-nafa_carb_0 cab_carb_5-cab_carb_0 def_carb_5-def_carb_0 'tb_carb_5-tb_carb_0
+CAB3.draw(shade, bottom, color(220,255,215)) 2010 2018
+CAB3.options linepat
+CAB3.axis mirror
+CAB3.setelem(1) lcolor(blue) lwidth(2) lpat(1)
+CAB3.setelem(2) lcolor(green) lwidth(2) lpat(2)
+CAB3.setelem(3) lcolor(red) lwidth(2) lpat(3)
+'CAB3.setelem(4) lcolor(black) lwidth(2) lpat(4)
+CAB3.name(1) Change in Carbonland net acquisition of financial assets (trillion USD)
+CAB3.name(2) Change in Carbonland current account balance (trillion USD)
+CAB3.name(3) Change in Carbonland budget deficit (trillion USD)
+'CAB3.name(4) Change in Carbonland trade balance (trillion USD)
+CAB3.addtext(t,just(c),font(18)) 2b - Change in Carbonland balance of payment when \n Carbonland green incentives are dropped
+CAB3.legend -inbox
+
+' Create the chart of temperature when Carbonland government spending falls
+smpl 2010 2150 
+graph temper3.line temp_at_5-temp_at_0 temp_lo_5-temp_lo_0 
+temper3.draw(shade, bottom, color(220,255,215)) 2010 2018
+temper3.options linepat
+temper3.axis mirror
+temper3.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+temper3.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+temper3.name(1) Atmospheric temperature (C)
+temper3.name(2) Lower ocean temperature (C)
+temper3.addtext(t,just(c),font(18)) 2c - Change in temperature when \n Carbonland green incentives are dropped
+temper3.legend -inbox
+
+' Create the chart of cumulative emissions when Carbonland government spending falls
+smpl 2010 2150 
+graph emi3.line emis_carb_5-emis_carb_0 emis_ecol_5-emis_ecol_0 emis_5-emis_0
+emi3.draw(shade, bottom, color(220,255,215)) 2010 2018
+emi3.options linepat
+emi3.axis mirror
+emi3.setelem(1) lcolor(red) lwidth(2) lpat(1)
+emi3.setelem(2) lcolor(green) lwidth(2) lpat(1)
+emi3.setelem(3) lcolor(orange) lwidth(2) lpat(2)
+emi3.name(1) Carbonland emissions (bn Gt)
+emi3.name(2) Ecoland emissions (bn Gt)
+emi3.name(3) Annual emissions world-wide (bn Gt)
+emi3.addtext(t,just(c),font(18)) 2d - Change in industrial CO2 emissions when \n Carbonland green incentives are dropped
+emi3.legend -inbox
+
+' Create the chart of depletion rates when Carbonland government spending falls
+smpl 2010 2150 
+graph depl3.line depl_m_carb_5-depl_m_carb_0 depl_m_ecol_5-depl_m_ecol_0 depl_e_carb_5-depl_e_carb_0 depl_e_ecol_5-depl_e_ecol_0
+depl3.draw(shade, bottom, color(220,255,215)) 2010 2018
+depl3.options linepat
+depl3.axis mirror
+depl3.setelem(1) lcolor(red) lwidth(2) lpat(1)
+depl3.setelem(2) lcolor(green) lwidth(2) lpat(1)
+depl3.setelem(3) lcolor(red) lwidth(2) lpat(2)
+depl3.setelem(4) lcolor(green) lwidth(2) lpat(2)
+depl3.name(1) Matter depletion rate in Carbonland
+depl3.name(2) Matter depletion rate in Ecoland
+depl3.name(3) Energy depletion rate in Carbonland
+depl3.name(4) Energy depletion rate in Ecoland
+depl3.addtext(t,just(c),font(18)) 2e - Change in depletion rates when \n Carbonland green incentives are dropped
+depl3.legend -inbox
+
+' Create the chart of reserves when Carbonland government spending falls
+smpl 2010 2150 
+graph reserves3.line k_m_5/k_m_0 k_e_5/k_e_0
+reserves3.draw(shade, bottom, color(220,255,215)) 2010 2018
+reserves3.options linepat
+reserves3.setelem(2) axis(right)
+reserves3.setelem(1) lcolor(purple) lwidth(2) lpat(1)
+reserves3.setelem(2) lcolor(orange) lwidth(2) lpat(2)
+reserves3.name(1) Matter (relative to baseline)
+reserves3.name(2) Energy (relative to baseline, right axis)
+reserves3.addtext(t,just(c),font(18)) 2f - Change in world-wide reserves of matter and n.r. energy \n when Carbonland green incentives are dropped
+reserves3.legend -inbox
+
+
+'********************************************************************************************************************************************************************************************************************************
+' Group and plot figures
+
+graph graph0.merge gdp1 temper yemi emi reserves resources
+graph0.legend font(18)
+graph0.axis(all) font(18) ticksout
+graph0.options -gridl -gridr gridcolor(white)
+graph0.align(3, 2.5, 3.1)
+'show graph0 
+
+graph graph1.merge gdp2 CAB2 temper2 emi2 depl2 reserves2
+graph1.legend font(18) 
+graph1.axis(all) font(18) ticksout
+graph1.options -gridl -gridr gridcolor(white)
+graph1.align(3, 2.5, 3.1)
+show graph1
+
+graph graph2.merge gdp3 CAB3 temper3 emi3 depl3 reserves3
+graph2.legend font(18) 
+graph2.axis(all) font(18) ticksout
+graph2.options -gridl -gridr gridcolor(white)
+graph2.align(3, 2.5, 3.1)
+show graph2
