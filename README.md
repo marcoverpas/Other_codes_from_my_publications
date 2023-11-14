@@ -1,6 +1,6 @@
 # Other_codes_from_my_publications
 
-A colection of `R` and `EViews` codes from my old publications:
+A colection of `R` and `EViews` codes from my publications:
 
 
 **CODES USED IN JOURNAL ARTICLES**
