@@ -33,3 +33,8 @@ A colection of `R` and `EViews` codes from my publications:
 1. <a href="https://www.palgrave.com/gp/book/9783030239282" target="_blank" rel="noopener noreferrer">SFC dynamic models: features, limitations and developments</a> (with E. Carnevali, M. Deleidi and R. Pariboni), in P. Arestis and M. Sawyer (eds.), Frontiers of Heterodox Economics, Series: International Papers in Political Economy, Basingstoke &amp; New York: Palgrave Macmillan, 2019, pp. 223-276. [Go to the <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/OPENECO_short" target="_blank" rel="noopener">EViews code</a>]
 
 1. <a href="https://www.routledge.com/Economic-Crisis-and-Economic-Thought-Alternative-Theoretical-Perspectives/Gabellini-Gasperin-Moneta/p/book/9781138665378" target="_blank" rel="noopener noreferrer">A Marx “crises” Model. The reproduction schemes revisited</a>, in A. Moneta, T. Gabellini and S. Gasperin (eds.), Economic Crisis and Economic Thought: Alternative Theoretical Perspectives on the Economic Crisis, London: Routledge, 2019, pp. 135-165. [Go to the <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/Reprod_schemes_EViews" target="_blank" rel="noopener">EViews-code</a>; go to the <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/Reprod_schemes_R" target="_blank" rel="noopener">R-code</a>]
+
+
+**FULL LIST OF PUBLICATIONS**
+
+Go to the [list](https://www.marcopassarella.it/en/publications/) on my website.
