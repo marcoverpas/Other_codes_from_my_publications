@@ -5,6 +5,8 @@ A colection of `R` and `EViews` codes from my publications:
 
 **CODES USED IN JOURNAL ARTICLES**
 
+1. <a href="https://www.sciencedirect.com/journal/energy-economics" target="_blank" rel="noopener noreferrer">Energy crisis, economic growth and public finance in Italy</a> (with R. Canelli, G. Fontana and R. Realfonzo), <em>Energy Economics</em>, 2024, forthcoming. [Go to the R code: <a href="https://github.com/marcoverpas/Italy-SFC-Model" target="_blank" rel="noopener">Italy-SFC-Model</a>]
+
 1. <a href="https://www.tandfonline.com/doi/full/10.1080/09538259.2023.2217776" target="_blank" rel="noopener">Economy-Finance-Environment-Society Interconnections in a Stock-Flow Consistent Dynamic Model</a> (with E. Carnevali, M. Deleidi and R. Pariboni), <em>Review of Political Economy </em>, 2023. [go to the EViews code: <a href="https://github.com/marcoverpas/SFC-models-EViews/blob/master/supermultiplier" target="_blank" rel="noopener">model</a>; dowload the dataset: <a href="https://www.dropbox.com/scl/fi/xfaindcblsyo9xxevubt3/data_ref.xls?rlkey=hj9y1244ixb708ikaqi842kkj&amp;dl=0" target="_blank" rel="noopener">data</a>]
 
 1. <a href="https://www.elgaronline.com/view/journals/ejeep/aop/article-10.4337-ejeep.2022.0084/article-10.4337-ejeep.2022.0084.xml" target="_blank" rel="noopener">It is not <em>la vie en rose</em>. New insights from Graziani's theory of the monetary circuit</a>, <em>European Journal of Economics and Economic Policies: Intervention</em>, 2022. [Go to the R code: <a href="https://github.com/marcoverpas/TMC-SFC-Model-R" target="_blank" rel="noopener">TMC-SFC-Model-R</a>; go to the (tentative) Python code: <a href="https://github.com/marcoverpas/TMC-SFC-Model-Python" target="_blank" rel="noopener">TMC-SFC-Model-Python</a>]
