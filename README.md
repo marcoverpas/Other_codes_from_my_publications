@@ -13,7 +13,7 @@ A colection of `R` and `EViews` codes from my publications:
 
 1. <a href="https://academic.oup.com/cje/advance-article-abstract/doi/10.1093/cje/beac014/6584486" target="_blank" rel="noopener">Is the Italian government debt sustainable? Scenarios after the Covid-19 shock</a> (with R. Canelli, G. Fontana and R. Realfonzo), <em>Cambridge Journal of Economics</em>, 2022, 46(3), pp. 581-587. [Go to the R code: <a href="https://github.com/marcoverpas/Italy-SFC-Model" target="_blank" rel="noopener">Italy-SFC-Model</a>]
 
-1. <a href="https://www.tandfonline.com/doi/full/10.1080/09538259.2022.2062961" target="_blank" rel="noopener">Inequality and exchange rate movements in an open-economy macroeconomic model</a> (with E. Carnevali and F. Ruggeri), <em>Review of Political Economy</em>, 2022. [Go to the EViews code: <span style="color: #999999;">ROPE 2022</span>]
+1. <a href="https://www.tandfonline.com/doi/full/10.1080/09538259.2022.2062961" target="_blank" rel="noopener">Inequality and exchange rate movements in an open-economy macroeconomic model</a> (with E. Carnevali and F. Ruggeri), <em>Review of Political Economy</em>, 2022. [Go to the EViews code: <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/rope_2022_web.prg" target="_blank" rel="noopener">ROPE 2022</a>]
 
 1. <a href="https://www.sciencedirect.com/science/article/pii/S0954349X2100103X" target="_blank" rel="noopener">A comprehensive comparison of fiscal and monetary policies: a comparative dynamics approach</a> (with M. Sawyer), <em>Structural Change and Economic Dynamics</em>, 2021, 59(4), pp. 384-404. [Go to the R code: <a href="https://github.com/marcoverpas/STRECO_2021" target="_blank" rel="noopener">STRECO 2021</a>]
 
