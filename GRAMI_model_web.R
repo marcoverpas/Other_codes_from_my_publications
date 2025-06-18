@@ -3,7 +3,7 @@
 # Meets Graziani’s Monetary Circuit", International Journal of Political
 # Economy
 
-# Last update: 03/06/2025
+# Last update: 18/06/2025
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
