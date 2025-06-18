@@ -243,11 +243,11 @@ for (j in 1:nScenarios){
       
       #2) Price setting
       p[j,i,1]  =  ((            p[j,i,2]*A[2] + p[j,i,3]*A[3])*(1 + kappa[j,i,1] * delta) * (1+mup[j,i,1]) 
-                    + w/pr[j,i,1]) /(1 - A[1] * (1+mup[j,i,1]))                       #Price of consumer goods 
+                    + w/pr[j,i,1]) /(1 - A[1] * (1+mup[j,i,1]))                   #Price of consumer goods 
       p[j,i,2]  =  ((p[j,i,1]*A[4]             + p[j,i,3]*A[6])*(1 + kappa[j,i,2] * delta) * (1+mup[j,i,2]) 
-                    + w/pr[j,i,2]) /(1 - A[5] * (1+mup[j,i,2]))                       #Price of luxury goods
+                    + w/pr[j,i,2]) /(1 - A[5] * (1+mup[j,i,2]))                   #Price of luxury goods
       p[j,i,3]  =  ((p[j,i,1]*A[7] + p[j,i,2]*A[8]            )*(1 + kappa[j,i,3] * delta) * (1+mup[j,i,3]) 
-                    + w/pr[j,i,3]) /(1 - A[9] * (1+mup[j,i,3]))                       #Price of investment goods
+                    + w/pr[j,i,3]) /(1 - A[9] * (1+mup[j,i,3]))                   #Price of investment goods
       mup[j,i,] = mup0[j,i,] + mup1[j,i,] * (x[j,i-1,] - xN[j,i-1,])              #Mark-ups over direct costs
       xN[j,i,] = xN[j,i-1,] + phi[j,i,]*(x[j,i-1,]-xN[j,i-1,])                    #Potential output
       pw[j,i] = t(p[j,i,]) %*% betaw[j,i,]                                        #Average price of workers' consumption
@@ -277,7 +277,7 @@ for (j in 1:nScenarios){
       bsr[j,i] = bsr[j,i-1] + chi*pid[j,i]*id[j,i]/pbs[j,i]                       #Quantity of private securities supplied by the firms  
       bhr[j,i] = bsr[j,i]                                                         #Quantity of private securities held by the workers 
       bwr[j,i] = bhr[j,i]*(1-lambdaw)*vw[j,i]/((1-lambdaw)*vw[j,i]
-                                               + (1-lambdaz)*vz[j,i])                                             #Quantity of private securities held by the workers
+                                               + (1-lambdaz)*vz[j,i])             #Quantity of private securities held by the workers
       bzr[j,i] = bhr[j,i] - bwr[j,i]                                              #Quantity of private securities held by the rentiers
       bs[j,i] = bsr[j,i]*pbs[j,i]                                                 #Nominal stock of private securities held by the households
       bh[j,i] = bw[j,i] + bz[j,i]                                                 #Nominal stock of private securities issued by the firms
@@ -294,7 +294,7 @@ for (j in 1:nScenarios){
       kn[j,i] = kn[j,i-1] + pid[j,i]*id[j,i] - af[j,i]                            #Current nominal value of capital stock
       af[j,i] = da[j,i] * pid[j,i-1]                                              #Amortization funds
       pf[j,i] = (yn[j,i] - paym_l[j,i] - af[j,i] - paymz_b[j,i] +
-                   - paymw_b[j,i] - wb[j,i])                                       #Total profit of firms
+                   - paymw_b[j,i] - wb[j,i])                                      #Total profit of firms
       
       #5B) Alternative investment function (Minsky-like) 
       for (z in 1:nIndustries){
@@ -329,7 +329,7 @@ for (j in 1:nScenarios){
       fin_i[j,i] = wb[j,i] + pid[j,i]*id[j,i]                                     #Initial finance to production (including purchase of investment goods)
       fin_f[j,i] = (cw[j,i]*pw[j,i] + cz[j,i]*pz[j,i] + pid[j,i]*id[j,i] 
                     + (bs[j,i] - bs[j,i-1]) +
-                      - (paym_l[j,i] + paymw_b[j,i] + paymz_b[j,i] + pf[j,i]))     #Final finance obtained by firms (including purchase of investment goods)
+                      - (paym_l[j,i] + paymw_b[j,i] + paymz_b[j,i] + pf[j,i]))    #Final finance obtained by firms (including purchase of investment goods)
       ld[j,i] = ld[j,i-1] + fin_i[j,i] - fin_f[j,i]                               #Stock of debt (bank loans) of firms at the end of the period
       ls[j,i] = ls[j,i-1] + (ld[j,i] - ld[j,i-1])                                 #Supply of bank loans
       ms[j,i] = ms[j,i-1] + (ls[j,i] - ls[j,i-1])                                 #Supply of bank deposits    
@@ -351,11 +351,11 @@ for (j in 1:nScenarios){
       if(id[j,i]==0){
         rev_j[j,i,] = 0
         cost_j[j,i,] = 0}else{
-          rev_j[j,i,] = p[j,i,]*d[j,i,]                                             #Total revenue by industry
+          rev_j[j,i,] = p[j,i,]*d[j,i,]                                           #Total revenue by industry
           cost_j[j,i,] = (w*x[j,i-1,]/pr[j,i-1,]) + (af[j,i] +
                                                        + paym_l[j,i] + paymz_b[j,i] +
                                                        + paymw_b[j,i])*(id_j[j,i,]/id[j,i])                         #Total cost by industry
-          pf_j[j,i,] = rev_j[j,i,] - cost_j[j,i,]  }                                #Profit by industry
+          pf_j[j,i,] = rev_j[j,i,] - cost_j[j,i,]  }                              #Profit by industry
       
       #7) Employment and wages
       wb[j,i] = w*n[j,i]                                                          #Wage bill  
@@ -364,10 +364,10 @@ for (j in 1:nScenarios){
       #8) Interest payments 
       if (mh[j,i-1]==0){paym_l[j,i] = rl[j,i-1]*ld[j,i-1]} else{
         paym_l[j,i] = (rl[j,i-1]*ld[j,i-1] + (mw[j,i-1]/mh[j,i-1])
-                       *rl[j,i-1]*fin_f[j,i-1]/2)}                                 #Interest payments on bank loans (including average interest payments on repaid share of loans)
+                       *rl[j,i-1]*fin_f[j,i-1]/2)}                                #Interest payments on bank loans (including average interest payments on repaid share of loans)
       if (mh[j,i-1]==0){paymw_m[j,i] = rm[j,i-1]*mw[j,i-1]} else{
         paymw_m[j,i] = (rm[j,i-1]*mw[j,i-1] + (mw[j,i-1]/mh[j,i-1])
-                        *rm[j,i-1]*fin_f[j,i-1]/2)}                                #Interest payments on bank deposits (see above) to workers
+                        *rm[j,i-1]*fin_f[j,i-1]/2)}                               #Interest payments on bank deposits (see above) to workers
       paymz_m[j,i] = rm[j,i-1]*mz[j,i-1]                                          #Interest payments on bank deposits (see above) to capitalists
       paym_m[j,i] = paymw_m[j,i] + paymz_m[j,i]                                   #Total interest payments on bank deposits
       paymw_b[j,i] = rb[j,i-1]*bw[j,i-1] + cgw[j,i]                               #Interest payments and capital gains on private securities received by the workers
