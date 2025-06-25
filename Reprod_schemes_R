@@ -135,10 +135,10 @@ for (j in 1:nScenarios){
       g_c[j,i]=(((y_i[j,i]-k_i[j,i]-(s_i[j,i]*theta_i[j,i]*q_i[j,i])/(1+q_i[j,i]))/k_c[j,i])-1)  #Equilibrium condition
       
       #(19) Disposable income of capitalist in investment sector - new equation 1 ####
-      yd_i[j,i]=(1-theta_i[j,i-1])*s_i[j,i-1]
+      yd_i[j,i]=(1-theta_i[j,i])*s_i[j,i]
       
       #(20) Disposable income of capitalist in consumption sector - new equation 2 ####
-      yd_c[j,i]=(1-theta_c[j,i-1])*s_c[j,i-1]
+      yd_c[j,i]=(1-theta_c[j,i])*s_c[j,i]
       
       #(21) Wealth of capitalists in investment sector
       h_i[j,i]=h_i[j,i-1]+(yd_i[j,i]-cons_i[j,i])
