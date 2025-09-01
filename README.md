@@ -5,7 +5,7 @@ A colection of `R` and `EViews` codes from my publications:
 
 **CODES USED IN JOURNAL ARTICLES**
 
-1. Destabilising a Stable Economy: Minsky Meets Graziani’s Monetary Circuit </a>, <em>International Journal of Political Economy</em>, 2025. [Go to the R code: <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/GRAMI_model_web.R" target="_blank" rel="noopener">GRAMI-Model-R</a>];  
+1. [Destabilizing a Stable Economy: Minsky Meets Graziani’s Monetary Circuit](https://doi.org/10.1080/08911916.2025.2534752) </a>, <em>International Journal of Political Economy</em>, 2025. [Go to the R code: <a href="https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/GRAMI_model_web.R" target="_blank" rel="noopener">GRAMI-Model-R</a>];  
 
 1. <a href="https://www.sciencedirect.com/science/article/abs/pii/S0140988324001385?via%3Dihub" target="_blank" rel="noopener noreferrer">Energy crisis, economic growth and public finance in Italy</a> (with R. Canelli, G. Fontana and R. Realfonzo), <em>Energy Economics</em>, 2024, 132: 1-15. [<a href="https://www.marcopassarella.it/wp-content/uploads/Appendix-A.pdf" target="_blank" rel="noopener noreferrer">Appendix A</a>, <a href="https://www.marcopassarella.it/wp-content/uploads/Appendix-B.pdf" target="_blank" rel="noopener noreferrer">Appendix B</a>, go to the R code: <a href="https://github.com/marcoverpas/Italy-SFC-Model" target="_blank" rel="noopener">Italy-SFC-Model</a>] 
 
