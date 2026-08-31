@@ -1,5 +1,7 @@
 # Other_codes_from_my_publications
 
+[![DOI](https://zenodo.org/badge/718509889.svg)](https://doi.org/10.5281/zenodo.21220060)
+
 A colection of `R` and `EViews` codes from my publications:
 
 
