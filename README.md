@@ -7,6 +7,8 @@ A colection of `R` and `EViews` codes from my publications:
 
 **CODES USED IN JOURNAL ARTICLES**
 
+1. - Mr. Keynes and the `Classics' (Almost) a Century Later: Reviewing the IS-LM Model, <em>Journal of Post Keynesian Economics<em>, 2026. [Go to the R code: (available soon)]
+
 1. <a href="https://doi.org/10.1080/09538259.2025.2601163" target="_blank" rel="noopener">Keynes, Graziani, and non-bank financial intermediaries: A stock-flow consistent analysis</a> (with R. Canelli, G. Fontana and R. Realfonzo), <em>Review of Political Economy</em>, 37(5), 1796-1817. [Go to the R code: [AVAILABLE SOON]]
 
 1. <a href="https://doi.org/10.1080/09538259.2025.2593445" target="_blank" rel="noopener">The Impact of CBDC-Based Disintermediation on the Banking Sector and the Economy: An SFC Approach</a>  (with A. Bhattacharjee and G. Carlomagno), <em>Review of Political Economy</em>, 2025. [Go to the R code: [CBDC model](https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/cbdc_model_web.R); [CBDC charts](https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/cbdc_charts_web.R)]
