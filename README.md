@@ -7,7 +7,7 @@ A colection of `R` and `EViews` codes from my publications:
 
 **CODES USED IN JOURNAL ARTICLES**
 
-1. Mr. Keynes and the `Classics' (Almost) a Century Later: Reviewing the IS-LM Model, <em>Journal of Post Keynesian Economics<em>, 2026. [Go to the R code: [AVALABLE SOON]]
+1. [Mr. Keynes and the `Classics' (Almost) a Century Later: Reviewing the IS-LM Model](https://doi.org/10.1080/01603477.2026.2734483), <em>Journal of Post Keynesian Economics<em>, 2026. [Go to the R code: [AVALABLE SOON]]
 
 1. <a href="https://doi.org/10.1080/09538259.2025.2601163" target="_blank" rel="noopener">Keynes, Graziani, and non-bank financial intermediaries: A stock-flow consistent analysis</a> (with R. Canelli, G. Fontana and R. Realfonzo), <em>Review of Political Economy</em>, 2025, 37(5), 1796-1817. [Go to the R code: [AVAILABLE SOON]]
 
