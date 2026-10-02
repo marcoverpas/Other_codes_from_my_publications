@@ -56,7 +56,7 @@ In the code used for the published simulations, the coefficient on the return ra
 
 The corrected version of Figure 4, as drawn by `rope_2025_web.R`, is shown below. The solid line is Scenario 2 and the dashed line is Scenario 3.
 
-![Corrected Figure 4: output, employment, income inequality and wealth inequality in Scenarios 2 and 3, as differences from the baseline](rope_2025_figure4_corrected.png)
+![Corrected Figure 4: output, employment, income inequality and wealth inequality in Scenarios 2 and 3, as differences from the baseline](https://raw.githubusercontent.com/marcoverpas/figures/main/rope_2025_figure4_corrected.png)
 
 The table compares Scenario 3 before and after the corrections. As in Figure 4, each value is the difference from the baseline scenario multiplied by 100.
 
