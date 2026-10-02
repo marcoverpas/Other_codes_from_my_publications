@@ -26,8 +26,6 @@ Required packages: `ggplot2` and `patchwork` (with `ggplot2` 4.0.0 or later, `pa
 
 ## Corrections with respect to the published article
 
-### 1. Balance sheet of commercial banks (equation 34)
-
 The published article reports the government bonds held by banks as
 
 ```
@@ -47,10 +45,6 @@ bb[j, i] = ms[j, i] - qb[j, i] - ls[j, i]
 ```
 
 The error did not affect the baseline or Scenario 2, where EF2 securities are zero. In Scenario 3 it created an accounting leak: the redundant equation (cash supplied equal to cash held) was violated by about 0.5 from period 101 onwards. With the correction, the redundant equation holds in all three scenarios, with a maximum gap below 0.00004.
-
-### 2. Demand of workers for securities issued by firms (code only)
-
-In the code used for the published simulations, the coefficient on the return rate on securities of firms in the demand of workers for those securities was `lambda13l` instead of `lambda33l`. Equation (9) of the article is correct. The code has been aligned with it. The numerical effect of this correction is negligible.
 
 ## Implications for the results
 
