@@ -4,7 +4,7 @@ R code for the stock-flow consistent (SFC) model presented in:
 
 > Canelli, R., Fontana, G., Realfonzo, R. and Veronese Passarella, M. (2026). "Keynes, Graziani, and Non-Bank Financial Intermediaries: A Stock-Flow Consistent Analysis." *Review of Political Economy*. Open access. DOI: [10.1080/09538259.2025.2601163](https://doi.org/10.1080/09538259.2025.2601163)
 
-**Important.** The code in this repository corrects two errors found after publication. The figure it produces therefore differs from Figure 4 of the published article. The corrections and their implications are documented below.
+**Important.** The code in this repository corrects an error found after publication. The figure it produces therefore differs from Figure 4 of the published article. The corrections and their implications are documented below.
 
 ## Contents
 
