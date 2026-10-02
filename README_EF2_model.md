@@ -14,7 +14,7 @@ R code for the stock-flow consistent (SFC) model presented in:
 
 ## How to run
 
-Open `rope_2025_web.R` in R or RStudio and run the whole script. The consistency statement is printed in the console and the figures are drawn on screen.
+Open [rope_2025_web.R](https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/rope_2025_web.R) in R or RStudio and run the whole script. The consistency statement is printed in the console and the figures are drawn on screen.
 
 Required packages: `ggplot2` and `patchwork` (with `ggplot2` 4.0.0 or later, `patchwork` 1.3.1 or later is needed). Optional packages: `progress` (progress bar) and `beepr` (notification sound).
 
