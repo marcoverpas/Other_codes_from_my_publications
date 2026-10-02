@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # A stock-flow consistent (SFC) model with non-bank financial intermediaries
-# (Economic Function 2, or EF2), workers and rentiers
+# (EF2), workers and rentiers
 #
 # Companion code to:
 #   Canelli, R., Fontana, G., Realfonzo, R. and Veronese Passarella, M. (2026).
