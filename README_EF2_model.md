@@ -52,22 +52,22 @@ The corrected version of Figure 4, as drawn by `rope_2025_web.R`, is shown below
 
 ![Corrected Figure 4: output, employment, income inequality and wealth inequality in Scenarios 2 and 3, as differences from the baseline](https://raw.githubusercontent.com/marcoverpas/figures/main/rope_2025_figure4_corrected.png)
 
-The table compares Scenario 3 before and after the corrections. As in Figure 4, each value is the difference from the baseline scenario multiplied by 100.
+The table compares Scenario 3 before and after the corrections in three simulation periods: 105, 110 and 130. The shock starts in period 101, so these are the 5th, 10th and 30th periods of the shock, and they match the horizontal axis of Figure 4. As in the figure, each value is the difference between Scenario 3 and the baseline scenario in that period, multiplied by 100.
 
 | Scenario 3 | Period | Published | Corrected |
 |---|---|---|---|
 | Output | 105 | 4.31 | -1.68 |
-| | 110 | 7.02 | -0.33 |
-| | 130 | 5.38 | -0.27 |
+| Output | 110 | 7.02 | -0.33 |
+| Output | 130 | 5.38 | -0.27 |
 | Employment | 105 | 3.16 | -1.70 |
-| | 110 | 6.70 | -0.55 |
-| | 130 | 5.36 | -0.27 |
+| Employment | 110 | 6.70 | -0.55 |
+| Employment | 130 | 5.36 | -0.27 |
 | Income inequality | 105 | 0.34 | 0.20 |
-| | 110 | 0.31 | 0.21 |
-| | 130 | 0.29 | 0.21 |
+| Income inequality | 110 | 0.31 | 0.21 |
+| Income inequality | 130 | 0.29 | 0.21 |
 | Wealth inequality | 105 | 0.34 | 0.17 |
-| | 110 | 0.38 | 0.22 |
-| | 130 | 0.36 | 0.24 |
+| Wealth inequality | 110 | 0.38 | 0.22 |
+| Wealth inequality | 130 | 0.36 | 0.24 |
 
 **What still holds.** When EF2 replaces banks in lending to workers, both income inequality and wealth inequality rise relative to the baseline. The increase is smaller than in the published figure (roughly two thirds of it), but the sign and the persistence of the effect are unchanged. The results for Scenario 2 (credit exclusion of workers) are also unchanged.
 
