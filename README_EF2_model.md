@@ -78,7 +78,3 @@ The table compares Scenario 3 before and after the corrections. As in Figure 4, 
 ## Licence
 
 The code is released under the Creative Commons Attribution-NonCommercial 4.0 International licence (CC BY-NC 4.0), as stated in the `LICENSE` file of this repository. The article is open access under a Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND 4.0) licence. If you use or adapt the code, please cite the article above.
-
-## Contact
-
-Marco Veronese Passarella
