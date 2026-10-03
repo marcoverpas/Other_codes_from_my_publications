@@ -75,6 +75,24 @@ The table compares Scenario 3 before and after the corrections in three simulati
 
 **Overall.** The main distributive conclusion of the article, namely that the expansion of EF2 lending tends to raise income and wealth inequality, is confirmed. The corrected model suggests that this happens without any gain in output and employment.
 
+## Robustness of the corrected results
+
+To check whether the corrected results depend on the calibration, the corrected model was simulated under 4,000 random parameter configurations (`rope_2025_sensitivity.py`). The consumption, taxation, investment, loan and interest rate parameters were drawn from wide uniform ranges, which are listed in the header of the script. Of these configurations, 2,486 have a stable baseline and positive EF2 lending, and are used below.
+
+| Scenario 3 against the baseline | Share of configurations |
+|---|---|
+| Output falls in the short run (periods 102 to 106) | 96% |
+| Employment falls in the short run (periods 102 to 106) | 96% |
+| Income inequality rises (period 110) | 98% |
+| Wealth inequality rises (period 110) | 77% |
+| Pattern of the published figure (output, employment and both inequality indices rise) | 2% |
+
+The pattern of the published figure is found in 56 configurations only. In every one of them, either rentiers consume a larger share of their income than workers, or rentiers are taxed at a lower rate than workers, or both. When workers have the higher propensity to consume and rentiers are not taxed more lightly (821 configurations), output falls in 99% of the cases.
+
+The reason is the following. In the model, credit affects the consumption of workers only through their access to credit, measured as loans obtained over loans demanded. This ratio is already equal to one in the baseline. When EF2 replaces banks, it can only restore the same access at a higher interest rate, which transfers income from workers to rentiers.
+
+Three remarks are in order. First, the shares above depend on the sampling ranges, so they are indicative. Second, the rise in wealth inequality is less robust than the rise in income inequality. Third, the effects are small in absolute terms: under the published calibration, the fall in output is about 0.04% of its baseline level.
+
 ## Licence
 
 The code is released under the Creative Commons Attribution-NonCommercial 4.0 International licence (CC BY-NC 4.0), as stated in the `LICENSE` file of this repository. The article is open access under a Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND 4.0) licence. If you use or adapt the code, please cite the article above.
