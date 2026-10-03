@@ -48,7 +48,7 @@ The error did not affect the baseline or Scenario 2, where EF2 securities are ze
 
 ## Implications for the results
 
-The corrected version of Figure 4, as drawn by `rope_2025_web.R`, is shown below. The solid line is Scenario 2 and the dashed line is Scenario 3.
+The corrected version of Figure 4, as drawn by [rope_2025_web.R](https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/rope_2025_web.R), is shown below. The solid line is Scenario 2 and the dashed line is Scenario 3.
 
 ![Corrected Figure 4: output, employment, income inequality and wealth inequality in Scenarios 2 and 3, as differences from the baseline](https://raw.githubusercontent.com/marcoverpas/figures/main/rope_2025_figure4_corrected.png)
 
@@ -77,7 +77,7 @@ The table compares Scenario 3 before and after the corrections in three simulati
 
 ## Robustness of the corrected results
 
-To check whether the corrected results depend on the calibration, the corrected model was simulated under 4,000 random parameter configurations (`rope_2025_sensitivity.py`). The consumption, taxation, investment, loan and interest rate parameters were drawn from wide uniform ranges, which are listed in the header of the script. Of these configurations, 2,486 have a stable baseline and positive EF2 lending, and are used below.
+To check whether the corrected results depend on the calibration, the corrected model was simulated under 4,000 random parameter configurations ([rope_2025_sensitivity.py](https://github.com/marcoverpas/Other_codes_from_my_publications/blob/main/rope_2025_sensitivity.py)). The consumption, taxation, investment, loan and interest rate parameters were drawn from wide uniform ranges, which are listed in the header of the script. Of these configurations, 2,486 have a stable baseline and positive EF2 lending, and are used below.
 
 | Scenario 3 against the baseline | Share of configurations |
 |---|---|
