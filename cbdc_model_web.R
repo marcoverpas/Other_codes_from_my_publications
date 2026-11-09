@@ -1,6 +1,17 @@
 # CBDC-SFC model --- web version
 
-# Created by mvp. Last change on: 12/12/2025
+# Created by mvp. Version: 2.1. Last change on: 09/11/2026
+
+# Note (9 November 2026): this revised version corrects some errors in the code used for
+# the published article. Main changes: (1) central bank advances now cover only the reserve
+# shortfall caused by converting deposits into CBDCs (dc_conv = dcs - qep), whereas they
+# previously matched the whole CBDC stock, QEP issues included; (2) the supply of cash and
+# reserves follows the central bank's full budget constraint; (3) interest rates adjust to
+# the lagged gap, as stated in the article; (4) minor fixes to rentiers' taxes and loans,
+# portfolio symmetry and convergence checks.
+# Change (1) affects one result: under the QEP the loan intensity ratio no longer falls,
+# as its fall was due to advances inflating banks' bill holdings. All other qualitative
+# findings are unchanged.
 
 # Prepare environment and other panes ####
 
@@ -33,8 +44,6 @@ MaxIterations <- 100
 # Model identification: upload initial values ####
 
 source1 <- "https://www.dropbox.com/scl/fi/bsp8de3okkx3kos3elzl6/Tables-from-ENECO-2024.xlsx?rlkey=p58l8u6fwmry4ymhy61wktrc6&st=1n34ln6l&dl=1"
-
-source2 <- "https://www.dropbox.com/scl/fi/mxkc7p7gjl97cw3jpnb62/CBDC-example.xlsx?rlkey=v8g0key141s7nkgvblowde0kg&st=k3oze92v&dl=1"
 
 # Upload initial values of stocks ####
 bs_data <- read.xlsx(source1, sheet = "BS_Matrix", rows = 1:11, cols = 2:8)
@@ -83,19 +92,6 @@ rownames(int_data) <- c("r_star",
                         "rr",
                         "rq")
 colnames(int_data) <- "Rates"
-
-# Upload stock values after CBDC experiment ####
-bs_data00 <- read.xlsx(source2, rows = 1:11, cols = 2:8)
-rownames(bs_data00) <- c("Cash and res.",
-                         "Deposits",
-                         "CBDCs",
-                         "Loans",
-                         "Advances",
-                         "T-bills",
-                         "Dom. Sec.",
-                         "For. Sec.",
-                         "Capital stock",
-                         "Net wealth")
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -148,18 +144,16 @@ lambda23w<--0.05                                         #Workers' elasticity of
 lambda23z<--0.05                                         #Rentiers' elasticity of gov. sec. demand to private sec. rate 
 lambda24w<--0.01                                         #Workers' elasticity of gov. sec. demand to liquidity
 lambda24z<--0.01                                         #Rentiers' elasticity of gov. sec. demand to liquidity
-lambda31z<--0.1                                          #Rentiers' elasticity of private sec. demand to deposit rate
-lambda32z<--0.1                                          #Rentiers' elasticity of private sec. demand to gov. sec. rate
+lambda31z<--0.05                                         #Rentiers' elasticity of private sec. demand to deposit rate
+lambda32z<--0.05                                         #Rentiers' elasticity of private sec. demand to gov. sec. rate
 lambda33z<-0.1                                           #Rentiers' elasticity of private sec. demand to private sec. rate
 lambda34z<--0.02                                         #Rentiers' elasticity of private sec. demand to liquidity
-lambda31w<--0.1                                          #Workers' elasticity of private sec. demand to deposit rate
-lambda32w<--0.1                                          #Workers' elasticity of private sec. demand to gov. sec. rate
+lambda31w<--0.05                                         #Workers' elasticity of private sec. demand to deposit rate
+lambda32w<--0.05                                         #Workers' elasticity of private sec. demand to gov. sec. rate
 lambda33w<-0.1                                           #Workers' elasticity of private sec. demand to private sec. rate
 lambda34w<--0.02                                         #Workers' elasticity of private sec. demand to liquidity
 sigmaw1<-0.0                                             #Weight of regressive component of expectations of workers 
 sigmaw2<-0.1                                             #Adjustment coefficient of workers' inflation expectations 
-sigmaz1<-0.0                                             #Weight of regressive component of expectations of rentiers 
-sigmaz2<-0.1                                             #Adjustment coefficient of rentiers' inflation expectations 
 thetaw0<-0.11                                            #Autonomous component in workers' gross loans to disposable income ratio 
 thetaw1<-0.5                                             #Elasticity of Lw/YDw to interest rate 
 thetaz0<-0.11                                            #Autonomous component in rentiers' gross loans to disposable income ratio 
@@ -198,7 +192,6 @@ alpha1w<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)            #Propensity to 
 # Flows ####
 mue<-matrix(data=mue0,nrow=nScenarios,ncol=nPeriods)               #Risk premium on private securities
 af<-matrix(data=tfm_data[8,4],nrow=nScenarios,ncol=nPeriods)       #Amortization funds
-c<-matrix(data=tfm_data[1,3],nrow=nScenarios,ncol=nPeriods)        #Total nominal consumption
 cab<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Current account balance
 cw<-matrix(data=-tfm_data[1,1],nrow=nScenarios,ncol=nPeriods)      #Real consumption of workers
 cz<-matrix(data=-tfm_data[1,2],nrow=nScenarios,ncol=nPeriods)      #Real consumption of rentiers
@@ -298,7 +291,7 @@ vh<-matrix(data=vw+vz,nrow=nScenarios,ncol=nPeriods)               #Total net we
 p<-matrix(data=1,nrow=nScenarios,ncol=nPeriods)                    #Average price of domestic products 
 p_e<-matrix(data=p,nrow=nScenarios,ncol=nPeriods)                  #Expected price level 
 phi<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Impact of foreign prices to domestic prices
-pi<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                   #Actual inflation rate 
+infl<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                 #Actual inflation rate 
 pi_e<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                 #Expected inflation rate 
 pm<-matrix(data=1,nrow=nScenarios,ncol=nPeriods)                   #Average price of import 
 ra<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                   #Interest rate on advances 
@@ -313,8 +306,6 @@ thetaw<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)               #Workers' gro
 thetaz<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)               #Rentiers' gross loans to disposable income ratio  
 
 # Define variables related to CB digital currency ####
-dcb<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Stock of CBDC held by banks
-dcf<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Stock of CBDC held by foreign sector
 dcs<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Supply of CBDC
 dcw<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Stock of CBDC held by workers
 dcz<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Stock of CBDC held by rentiers
@@ -331,9 +322,15 @@ rcbf <- matrix(0, nrow = nScenarios, ncol = nPeriods)              # Reliance on
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Add a convergence tolerance and a vector to record iterations
-iteration_count <- matrix(0, nrow = nScenarios, ncol = nPeriods)
 tol <- 1e-6 # Convergence tolerance
 iter_used <- array(0, dim=c(nScenarios, nPeriods)) # Record iterations used per scenario and period
+
+conv_vars <- function(j,i) c(yn[j,i], ydw[j,i], ydz[j,i], cw[j,i], cz[j,i], vw[j,i], vz[j,i],
+                             id[j,i], pf[j,i], pB[j,i], tax[j,i], def[j,i], bs[j,i], bcb[j,i],
+                             hs[j,i], hh[j,i], hb[j,i], ms[j,i], mh[j,i], ls[j,i], lf[j,i],
+                             lw[j,i], lz[j,i], bb[j,i], bh[j,i], eh[j,i], qs[j,i], bf[j,i],
+                             ad[j,i], dcs[j,i], rm[j,i], rl[j,i], re[j,i], rb[j,i], ra[j,i],
+                             rr[j,i], rq[j,i], rdc[j,i])
 
 # Create a progress bar ####
 pb <- progress_bar$new( total = nScenarios * nPeriods,
@@ -349,7 +346,7 @@ for (j in 1:nScenarios){
     pb$tick()
     
     # Scenario 2: households replace deposits with CBDCs (with rdc=rm)  ####
-    if(i>9 && j==2){for (t in 1:10){
+    if(i>9 && j==2){for (t in 1:9){
       lambdadcw[j,9+t]=t/50
       lambdadcz[j,9+t]=t/50}        
       lambdadcw[j,19:nPeriods]=0.18
@@ -358,10 +355,10 @@ for (j in 1:nScenarios){
     
     # Scenario 3: households replace deposits with CBDCs (with rdc>rm)  ####
     if(j==3){
-      mudc[j,1:nPeriods]=0     #Instead of mudc = mum = -0.025
-      rdc[j,1:nPeriods]=r_bar0
+      if(i==2){mudc[j,1:nPeriods]=0     
+      rdc[j,1:nPeriods]=r_bar0}  
       if(i>9){
-      for (t in 1:10){
+      for (t in 1:9){
       lambdadcw[j,9+t]=t/50
       lambdadcz[j,9+t]=t/50}        
       lambdadcw[j,19:nPeriods]=0.18
@@ -375,7 +372,7 @@ for (j in 1:nScenarios){
     # Scenario 5: policy rate cut with CBDCs (with rdc=rm)  ####
     if(i>9 && j==5){
       r_bar[j,i] = 0.01
-       for (t in 1:10){
+       for (t in 1:9){
         lambdadcw[j,9+t]=t/50
         lambdadcz[j,9+t]=t/50}        
         lambdadcw[j,19:nPeriods]=0.18
@@ -390,7 +387,7 @@ for (j in 1:nScenarios){
     }                    
     
     # Initial guess for y (from previous period)
-    cond_old <- abs(hs[j,i-1] - hh[j,i-1] - hb[j,i-1])
+    cond_old <- conv_vars(j,i-1)
     
     # Define (max) iterations for converging to simultaneous solution ####
     for (iterations in 1:MaxIterations){
@@ -427,11 +424,11 @@ for (j in 1:nScenarios){
                                                     - rl[j,i-2]/2 )               #Endogenous propensity to consume out of workers' income  
       }
       if (i<6){
-      deltaw = (lw[j,i-1] + thetaw[j,i]*ydw[j,i] - lw[j,i])/lw[j,i-1]             #Personal loans demanded by workers
-      deltaz = (lz[j,i-1] + thetaw[j,i]*ydz[j,i] - lz[j,i])/lz[j,i-1]
+      deltaw = (lw[j,i-1] + thetaw[j,i]*ydw[j,i] - lw[j,i])/lw[j,i-1]             #Workers' repayment rate of loans
+      deltaz = (lz[j,i-1] + thetaz[j,i]*ydz[j,i] - lz[j,i])/lz[j,i-1]             #Rentiers' repayment rate of loans
       }else{
       lw[j,i] = lw[j,i-1] + thetaw[j,i]*ydw[j,i] - deltaw*lw[j,i-1]               #Personal loans demanded by workers
-      lz[j,i] = lz[j,i-1] + thetaw[j,i]*ydz[j,i] - deltaz*lz[j,i-1]               #Personal loans demanded by rentiers
+      lz[j,i] = lz[j,i-1] + thetaz[j,i]*ydz[j,i] - deltaz*lz[j,i-1]               #Personal loans demanded by rentiers 
       }
       thetaw[j,i] = thetaw0 - thetaw1 * rl[j,i-1]                                 #Workers' gross loans to disposable income ratio
       thetaz[j,i] = thetaz0 - thetaz1 * rl[j,i-1]                                 #Rentiers' gross loans to disposable income ratio 
@@ -457,8 +454,8 @@ for (j in 1:nScenarios){
                  + paymw_e[j,i] + paymw_q[j,i] + paymw_b[j,i] + paymw_dc[j,i])
                  + tauv[j,i]*vw[j,i-1] ))/(wab[j,i]*(1-omega)) 
       tauwz[j,i] = (taxz[j,i] - (tauz[j,i]*(pB[j,i] + pf[j,i]
-                 + paymz_m[j,i] + paymz_e[j,i] + paymz_q[j,i] + paymz_dc[j,i])
-                 + paymz_b[j,i] + tauv[j,i]*vz[j,i-1]))/(wab[j,i]*omega)  
+                 + paymz_m[j,i] + paymz_e[j,i] + paymz_q[j,i] + paymz_dc[j,i]
+                 + paymz_b[j,i]) + tauv[j,i]*vz[j,i-1]))/(wab[j,i]*omega)  
       }else{
       tauww[j,i] = tauww[j,5]  
       tauwz[j,i] = tauwz[j,5]    
@@ -467,8 +464,8 @@ for (j in 1:nScenarios){
                 + paymw_e[j,i] + paymw_q[j,i] + paymw_b[j,i] + paymw_dc[j,i])
                    + tauv[j,i]*vw[j,i-1])                                         #Taxes paid by wage-earners
       taxz_net[j,i] = (tauwz[j,i]*wab[j,i]*omega + tauz[j,i]*(pB[j,i] + pf[j,i]
-                + paymz_m[j,i] + paymz_e[j,i] + paymz_q[j,i] + paymz_dc[j,i])
-                + paymz_b[j,i] + tauv[j,i]*vz[j,i-1])                             #Taxes paid by rentiers
+                + paymz_m[j,i] + paymz_e[j,i] + paymz_q[j,i] + paymz_dc[j,i]
+                + paymz_b[j,i]) + tauv[j,i]*vz[j,i-1])                             #Taxes paid by rentiers 
       taxw[j,i] = taxw_net[j,i] - perc_qep[j,i]*(qep[j,i]-qep[j,i-1])             #Taxes paid by wage-earners including QEP effect
       taxz[j,i] = taxz_net[j,i] - (1-perc_qep[j,i])*(qep[j,i]-qep[j,i-1])         #Taxes paid by rentiers including QEP effect
       }
@@ -478,7 +475,7 @@ for (j in 1:nScenarios){
       seign[j,i] = paymcb_b[j,i] - paym_r[j,i] - paym_dc[j,i] + paym_a[j,i]       #Seigniorage income
       bs[j,i] = bs[j,i-1] + def[j,i]                                              #Supply of government securities 
       bcb[j,i] = bs[j,i] - bh[j,i] - bb[j,i] - bf[j,i]                            #Government securities held by CB
-      hs[j,i] = hs[j,i-1] + (bcb[j,i]-bcb[j,i-1])                                 #Cash supply (to households)
+      hs[j,i] = hs[j,i-1] + (bcb[j,i]-bcb[j,i-1]) + (as[j,i]-as[j,i-1]) - (dcs[j,i]-dcs[j,i-1])   #Supplied stock of cash and reserves 
       as[j,i] = ad[j,i]                                                           #Advances supply (to banks)
       
       # 4.A) Banks, initial finance and final finance (funding) ####
@@ -514,21 +511,21 @@ for (j in 1:nScenarios){
       p[j,i] = (1-phi[j,i])*(1 + mup)*(w/pr) + phi[j,i]*pm_t                      #Average price of domestic goods
       pm[j,i] = pm_t                                                              #Average price of import
       if (i>5){phi[j,i] = pm[j,i-1]*im[j,i-1]/yn[j,i-1]}                          #Impact of foreign prices to domestic prices (measured by import to GDP ratio in previous period)
-      pi[j,i] = (p[j,i]/p[j,i-1] - 1)                                             #Actual inflation rate 
-      pi_e[j,i] = (sigmaw1*(pi[j,i-1] + sigmaw2*(pi_t - pi[j,i-1]))               #Expected inflation: mixed regressive & observed (annual basis)  
-                   + (1-sigmaw1)*pi[j,i])
+      infl[j,i] = (p[j,i]/p[j,i-1] - 1)                                           #Actual inflation rate 
+      pi_e[j,i] = (sigmaw1*(infl[j,i-1] + sigmaw2*(pi_t - infl[j,i-1]))               #Expected inflation: mixed regressive & observed (annual basis)  
+                   + (1-sigmaw1)*infl[j,i])
       p_e[j,i] = p_e[j,i-1]*(1 + pi_e[j,i])                                       #Expected price level 
       
       # 8) Interest payments ####
       mue[j,i] = mue00 + mue1*pf[j,i]/es[j,i-1]                                   #Endogenous risk premium on private securities
-      re[j,i] = re[j,i-1] - deltare*(re[j,i]-r_bar[j,i-1]-mue[j,i])               #Rate of interest on private securities
-      rm[j,i] = rm[j,i-1] - deltarm*(rm[j,i]-r_bar[j,i-1]-mum[j,i])               #Rate of interest on deposits
-      rl[j,i] = rl[j,i-1] - deltarl*(rl[j,i]-r_bar[j,i-1]-mul)                    #Rate of interest on bank loans
-      rb[j,i] = rb[j,i-1] - deltarb*(rb[j,i]-r_bar[j,i-1]-mub)                    #Rate of interest on government securities
-      ra[j,i] = ra[j,i-1] - deltara*(ra[j,i]-r_bar[j,i-1]-mua)                    #Rate of interest on advances from CB
-      rr[j,i] = rr[j,i-1] - deltarr*(rr[j,i]-r_bar[j,i-1]-mur) #with: mur<0       #Rate of interest on reserves at CB
-      rq[j,i] = rq[j,i-1] - deltarq*(rq[j,i]-r_bar[j,i-1]-muf)                    #Interest rate on foreign bills 
-      rdc[j,i] = rdc[j,i-1] - deltardc*(rdc[j,i]-r_bar[j,i-1]-mudc[j,i])          #Rate of interest on CBDC
+      re[j,i] = re[j,i-1] - deltare*(re[j,i-1]-r_bar[j,i-1]-mue[j,i])               #Rate of interest on private securities 
+      rm[j,i] = rm[j,i-1] - deltarm*(rm[j,i-1]-r_bar[j,i-1]-mum[j,i])               #Rate of interest on deposits 
+      rl[j,i] = rl[j,i-1] - deltarl*(rl[j,i-1]-r_bar[j,i-1]-mul)                    #Rate of interest on bank loans 
+      rb[j,i] = rb[j,i-1] - deltarb*(rb[j,i-1]-r_bar[j,i-1]-mub)                    #Rate of interest on government securities 
+      ra[j,i] = ra[j,i-1] - deltara*(ra[j,i-1]-r_bar[j,i-1]-mua)                    #Rate of interest on advances from CB 
+      rr[j,i] = rr[j,i-1] - deltarr*(rr[j,i-1]-r_bar[j,i-1]-mur) #with: mur<0       #Rate of interest on reserves at CB 
+      rq[j,i] = rq[j,i-1] - deltarq*(rq[j,i-1]-r_bar[j,i-1]-muf)                    #Interest rate on foreign bills 
+      rdc[j,i] = rdc[j,i-1] - deltardc*(rdc[j,i-1]-r_bar[j,i-1]-mudc[j,i])          #Rate of interest on CBDC 
       paym_l[j,i] = rl[j,i-1]*lf[j,i-1]                                           #Interest payments on bank loans to firms
       paymw_m[j,i] = rm[j,i-1]*mw[j,i-1]                                          #Interest payments on bank deposits to workers
       paymz_m[j,i] = rm[j,i-1]*mz[j,i-1]                                          #Interest payments on bank deposits to rentiers
@@ -601,25 +598,22 @@ for (j in 1:nScenarios){
                  - dcz[j,i])                                                      #Demanded stock of deposits by rentiers (new formulation)
       mh[j,i] = mw[j,i] + mz[j,i]                                                 #Total demanded of deposits = buffer stock
       dcs[j,i] = dcw[j,i]+dcz[j,i]                                                #Supply of CBDC
-      if (dcs[j,i]<rho2*ms[j,i-1]){
-        hb[j,i] = (rho1+rho2)*ms[j,i-1]-dcs[j,i]                                  #Bank reserves at CB (normal times)
-        ad[j,i] = 0}                                                              #Banks advances from CB (normal times)
-      else{
-        hb[j,i] = rho1*ms[j,i-1]                                                  #Bank reserves at CB (with high CBDC emissions)
-        ad[j,i] = dcs[j,i]                                                        #Banks advances from CB (with high CBDC emissions)
-      } 
+      dc_conv <- dcs[j,i] - qep[j,i]                                              #CBDC stock that households obtained by converting bank deposits
+      hb[j,i] = max(rho1*ms[j,i-1], (rho1+rho2)*ms[j,i-1] - dc_conv)              #Bank reserves at CB 
+      ad[j,i] = max(0, dc_conv - rho2*ms[j,i-1])                                  #Banks advances from CB 
       
       # 11) Hidden equation ####
       ##hs[j,i] = hm[j,i] + hb[j,i]                                               #Equilibrium condition for liquidity
       
       # CHECK CONVERGENCE ####
-      if (abs((hs[j,i] - hh[j,i] - hb[j,i]) - cond_old) < tol){
+      cond_new <- conv_vars(j,i)
+      if (max(abs(cond_new - cond_old)) < tol){
         iter_used[j,i] <- iterations
         break   # Stop iterating once convergence is reached
       }
       
       # Update cond_old for next iteration
-      cond_old <- abs(hs[j,i] - hh[j,i] - hb[j,i])
+      cond_old <- cond_new
       
       # If max iterations reached
       if (iterations == MaxIterations){
@@ -640,11 +634,11 @@ aerror=0
 error=0
 
 for (j in 1:(nScenarios)){
-  for (i in 2:(nPeriods-1)){error = error + abs(hs[j,i]-hh[j,i]-hb[j,i])}
+  for (i in 2:nPeriods){error = error + abs(hs[j,i]-hh[j,i]-hb[j,i])}
 }
-aerror <- error/(nPeriods*nScenarios)
+aerror <- error/((nPeriods-1)*nScenarios)
 if ( aerror<0.1 ){cat("\n *********************************** \n Good news! The model is watertight! \n", "Average error =", aerror, "< 0.1 \n", "Cumulative error =", error, "\n ***********************************")} else{
-  if ( aerror<1 && aerror<1 ){cat("\n *********************************** \n Minor issues with model consistency \n", "Average error =", aerror, "> 0.1 \n", "Cumulative error =", error, "\n ***********************************")}
+  if ( aerror<1 ){cat("\n *********************************** \n Minor issues with model consistency \n", "Average error =", aerror, "> 0.1 \n", "Cumulative error =", error, "\n ***********************************")}
   else{cat("\n ******************************************* \n Warning: the model is not fully consistent! \n", "Average error =", aerror, "> 1 \n", "Cumulative error =", error, "\n *******************************************")} }      
 cat("\n Number of scenarios =", nScenarios)
 cat("\n Number of periods =", nPeriods)
@@ -653,5 +647,4 @@ cat("\n Max number of iterations =", max(iter_used),"/",MaxIterations)
 cat("\n ***********************************")
 
 # Add notification sound
-library(beepr)
-beep(sound = 2)
+if (requireNamespace("beepr", quietly = TRUE)) beepr::beep(sound = 2)
