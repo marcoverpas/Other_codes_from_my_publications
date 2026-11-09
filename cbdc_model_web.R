@@ -24,7 +24,7 @@ if(!is.null(dev.list())) dev.off()
 # Clear Console 
 cat("\014")
 
-# Load the progress package
+# Load packages
 library(progress)
 library(openxlsx)
 
@@ -124,7 +124,7 @@ lambda20w<-0                                             #Workers' share of gov.
 lambda20z<-0                                             #Rentiers' share of gov. securities to total wealth  
 lambda30z<-0                                             #Rentiers' share of private securities to total wealth
 lambda30w<-0                                             #Workers' share of private securities to total wealth 
-alpha1z<-0                                               #Propensity to consume out of profits 
+alpha1z<-0                                               #Rentiers' propensity to consume out of disposable income 
 n0<-2215.128                                             #Initial value of employment
 w<--tfm_data[7,3]/n0                                     #Wage rate
 pr <- tfm_data[6,3]/n0                                   #Product per unit of labour
@@ -185,7 +185,7 @@ gov0<-matrix(data=tfm_data[3,3],nrow=nScenarios,ncol=nPeriods)   #Autonomous gov
 mum<-matrix(data=mum0,nrow=nScenarios,ncol=nPeriods)             #Risk premium on deposits
 mudc<-matrix(data=mum,nrow=nScenarios,ncol=nPeriods)             #Risk premium on CBDC (initial value)
 r_bar<-matrix(data=r_bar0,nrow=nScenarios,ncol=nPeriods)         #Policy rate
-alpha1w<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)            #Propensity to consume out of wages
+alpha1w<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)            #Workers' propensity to consume out of disposable income
 
 # Define other variables as matrices ####
 
@@ -232,10 +232,10 @@ paymz_q<-matrix(data=tfm_data[19,2],nrow=nScenarios,ncol=nPeriods) #Interest pay
 pf<-matrix(data=tfm_data[9,2],nrow=nScenarios,ncol=nPeriods)       #Profit of firms
 seign<-matrix(data=tfm_data[20,5],nrow=nScenarios,ncol=nPeriods)   #CB Seigniorage income
 tax<-matrix(data=tfm_data[11,5],nrow=nScenarios,ncol=nPeriods)     #Total taxes
-taxw<-matrix(data=-tfm_data[11,1],nrow=nScenarios,ncol=nPeriods)   #Taxes paid workers
+taxw<-matrix(data=-tfm_data[11,1],nrow=nScenarios,ncol=nPeriods)   #Taxes paid by workers
 taxz<-matrix(data=-tfm_data[11,2],nrow=nScenarios,ncol=nPeriods)   #Taxes paid by rentiers
 tax_net<-matrix(data=tfm_data[11,5],nrow=nScenarios,ncol=nPeriods)     #Total taxes net of QEP
-taxw_net<-matrix(data=-tfm_data[11,1],nrow=nScenarios,ncol=nPeriods)   #Taxes paid workers net of QEP
+taxw_net<-matrix(data=-tfm_data[11,1],nrow=nScenarios,ncol=nPeriods)   #Taxes paid by workers net of QEP
 taxz_net<-matrix(data=-tfm_data[11,2],nrow=nScenarios,ncol=nPeriods)   #Taxes paid by rentiers net of QEP
 tb<-matrix(data=ex-im,nrow=nScenarios,ncol=nPeriods)               #Trade balance
 upf<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                  #Retained or undistributed profit (in addition to AF)
@@ -276,11 +276,11 @@ ls<-matrix(data=bs_data[4,5],nrow=nScenarios,ncol=nPeriods)        #Supply of lo
 lw<-matrix(data=-bs_data[4,1],nrow=nScenarios,ncol=nPeriods)       #Personal loans to workers
 lz<-matrix(data=-bs_data[4,2],nrow=nScenarios,ncol=nPeriods)       #Personal loans to rentiers
 ms<-matrix(data=-bs_data[2,5],nrow=nScenarios,ncol=nPeriods)       #Supply of deposits
-mw<-matrix(data=bs_data[2,1],nrow=nScenarios,ncol=nPeriods)        #Bank deposits held by workers by workers
-mz<-matrix(data=bs_data[2,2],nrow=nScenarios,ncol=nPeriods)        #Bank deposits held by workers by rentiers
+mw<-matrix(data=bs_data[2,1],nrow=nScenarios,ncol=nPeriods)        #Bank deposits held by workers
+mz<-matrix(data=bs_data[2,2],nrow=nScenarios,ncol=nPeriods)        #Bank deposits held by rentiers
 mh<-matrix(data=mw+mz,nrow=nScenarios,ncol=nPeriods)               #Total bank deposits held by households
 niip<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)                 #Net international investment position
-qs<-matrix(data=-bs_data[8,7],nrow=nScenarios,ncol=nPeriods)       #Foreign bills held by domestic sectors (note: drop export from bf)
+qs<-matrix(data=-bs_data[8,7],nrow=nScenarios,ncol=nPeriods)       #Foreign bills held by domestic sectors
 qw<-matrix(data=bs_data[8,1],nrow=nScenarios,ncol=nPeriods)        #Foreign bills held by workers
 qz<-matrix(data=bs_data[8,2],nrow=nScenarios,ncol=nPeriods)        #Foreign bills demanded by rentiers
 vw<-matrix(data=-bs_data[10,1],nrow=nScenarios,ncol=nPeriods)      #Net wealth of workers
@@ -299,9 +299,9 @@ rb<-matrix(data=int_data[5,1],nrow=nScenarios,ncol=nPeriods)       #Rate of retu
 re<-matrix(data=int_data[4,1],nrow=nScenarios,ncol=nPeriods)       #Rate of return on private securities 
 rl<-matrix(data=int_data[2,1],nrow=nScenarios,ncol=nPeriods)       #Interest rate on loans
 rm<-matrix(data=int_data[3,1],nrow=nScenarios,ncol=nPeriods)       #Interest rate on deposits
-rdc<-matrix(data=rm,nrow=nScenarios,ncol=nPeriods)                 #Interest on rate on CBDC 
+rdc<-matrix(data=rm,nrow=nScenarios,ncol=nPeriods)                 #Interest rate on CBDC 
 rq<-matrix(data=int_data[7,1],nrow=nScenarios,ncol=nPeriods)       #Interest rate on foreign bills 
-rr<-matrix(data=int_data[6,1],nrow=nScenarios,ncol=nPeriods)       #Interest on rate on reserves 
+rr<-matrix(data=int_data[6,1],nrow=nScenarios,ncol=nPeriods)       #Interest rate on reserves 
 thetaw<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)               #Workers' gross loans to disposable income ratio 
 thetaz<-matrix(data=0,nrow=nScenarios,ncol=nPeriods)               #Rentiers' gross loans to disposable income ratio  
 
@@ -333,7 +333,7 @@ conv_vars <- function(j,i) c(yn[j,i], ydw[j,i], ydz[j,i], cw[j,i], cz[j,i], vw[j
                              rr[j,i], rq[j,i], rdc[j,i])
 
 # Create a progress bar ####
-pb <- progress_bar$new( total = nScenarios * nPeriods,
+pb <- progress_bar$new( total = nScenarios * (nPeriods-1),
                         format = "Progress [:bar] :percent ETA: :eta")
 
 # Choose scenario ####
@@ -386,7 +386,7 @@ for (j in 1:nScenarios){
       
     }                    
     
-    # Initial guess for y (from previous period)
+    # Initial values of convergence variables (from previous period)
     cond_old <- conv_vars(j,i-1)
     
     # Define (max) iterations for converging to simultaneous solution ####
@@ -411,7 +411,7 @@ for (j in 1:nScenarios){
       yd_net[j,i] =  ydw_net[j,i] + ydz_net[j,i]                                  #Total disposable income of households net of QEP
       vw[j,i] = vw[j,i-1] + ydw[j,i] - cw[j,i]*p[j,i]                             #Stock of wealth of workers
       vz[j,i] = vz[j,i-1] + ydz[j,i] - cz[j,i]*p[j,i]                             #Stock of wealth of rentiers
-      vh[j,i] = vw[j,i] + vz[j,i]                                                 #Total stock of wealth of workers
+      vh[j,i] = vw[j,i] + vz[j,i]                                                 #Total stock of wealth of households
       if (i<6){
         alpha1w[j,i] = (cw[j,i] - alpha2w*(vw[j,i-1]/p[j,i-1]) - alpha0w[j,i])/(ydw[j,i]/p_e[j,i]) 
         alpha1z = (cz[j,i] - alpha2z*(vz[j,i-1]/p[j,i-1]) - alpha0z[j,i] )/(ydz[j,i]/p_e[j,i])
@@ -470,7 +470,7 @@ for (j in 1:nScenarios){
       taxz[j,i] = taxz_net[j,i] - (1-perc_qep[j,i])*(qep[j,i]-qep[j,i-1])         #Taxes paid by rentiers including QEP effect
       }
       tax[j,i] = taxw[j,i]+taxz[j,i]                                              #Total tax revenue including QE effect
-      tax_net[j,i] = taxw_net[j,i]+taxz_net[j,i]                                  #Total tax revenue 
+      tax_net[j,i] = taxw_net[j,i]+taxz_net[j,i]                                  #Total tax revenue net of QEP
       def[j,i] = gov[j,i]*p[j,i] + paym_b[j,i] - tax[j,i] - seign[j,i]            #Government deficit (Note: payment on reserves/advances and CBDC reduces/increases the Seigniorage received from the CB)
       seign[j,i] = paymcb_b[j,i] - paym_r[j,i] - paym_dc[j,i] + paym_a[j,i]       #Seigniorage income
       bs[j,i] = bs[j,i-1] + def[j,i]                                              #Supply of government securities 
@@ -485,11 +485,6 @@ for (j in 1:nScenarios){
       ms[j,i] = mh[j,i]                                                           #Supply of bank deposits   
       pB[j,i] = (paym_l[j,i] + paymb_b[j,i] + paym_r[j,i] 
                  + paym_h[j,i] - paym_m[j,i] - paym_a[j,i])                       #Bank profit
-      
-      # 4.B) New bank ratio calculations
-      lin[j, i] <- ls[j, i]/(ls[j, i] + bb[j, i] + hb[j, i])                      #Loan intensity ratio 
-      ltd[j, i] <- ls[j, i] / ms[j, i]                                            #Loans to deposits ratio
-      rcbf[j, i] <- ad[j, i] / (ad[j, i] + ms[j, i])                              #Reliance on central bank funding 
       
       # 5) Foreign sector ####
       if (i>6){
@@ -596,14 +591,19 @@ for (j in 1:nScenarios){
                  - dcw[j,i])                                                      #Demanded stock of deposits by workers (new formulation)
       mz[j,i] = (vz[j,i] + lz[j,i] - hz[j,i] - bz[j,i] - ez[j,i] - qz[j,i]
                  - dcz[j,i])                                                      #Demanded stock of deposits by rentiers (new formulation)
-      mh[j,i] = mw[j,i] + mz[j,i]                                                 #Total demanded of deposits = buffer stock
+      mh[j,i] = mw[j,i] + mz[j,i]                                                 #Total demanded stock of deposits (buffer stock)
       dcs[j,i] = dcw[j,i]+dcz[j,i]                                                #Supply of CBDC
       dc_conv <- dcs[j,i] - qep[j,i]                                              #CBDC stock that households obtained by converting bank deposits
       hb[j,i] = max(rho1*ms[j,i-1], (rho1+rho2)*ms[j,i-1] - dc_conv)              #Bank reserves at CB 
       ad[j,i] = max(0, dc_conv - rho2*ms[j,i-1])                                  #Banks advances from CB 
       
+      # 4.B) New bank ratio calculations
+      lin[j, i] <- ls[j, i]/(ls[j, i] + bb[j, i] + hb[j, i])                      #Loan intensity ratio 
+      ltd[j, i] <- ls[j, i] / ms[j, i]                                            #Loans to deposits ratio
+      rcbf[j, i] <- ad[j, i] / (ad[j, i] + ms[j, i])                              #Reliance on central bank funding 
+      
       # 11) Hidden equation ####
-      ##hs[j,i] = hm[j,i] + hb[j,i]                                               #Equilibrium condition for liquidity
+      ##hs[j,i] = hh[j,i] + hb[j,i]                                               #Equilibrium condition for liquidity
       
       # CHECK CONVERGENCE ####
       cond_new <- conv_vars(j,i)
