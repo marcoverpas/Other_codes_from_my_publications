@@ -354,7 +354,7 @@ vh[6, 5:tspan] <- vh[6, 5:tspan] / vh[1, 5:tspan]
 
 # New variables ####
 
-# LEVERAGE RATIO
+# LOAN INTENSITY RATIO
 lin[5, 5:tspan] <- lin[5, 5:tspan] - lin[2, 5:tspan]
 lin[2, 5:tspan] <- lin[2, 5:tspan] - lin[1, 5:tspan]
 lin[3, 5:tspan] <- lin[3, 5:tspan] - lin[1, 5:tspan]
@@ -368,7 +368,7 @@ ltd[3, 5:tspan] <- ltd[3, 5:tspan] - ltd[1, 5:tspan]
 ltd[4, 5:tspan] <- ltd[4, 5:tspan] - ltd[1, 5:tspan]
 ltd[6, 5:tspan] <- ltd[6, 5:tspan] - ltd[1, 5:tspan]
 
-# NET STABLE FUNDING RATIO
+# RELIANCE ON CENTRAL BANK FUNDING
 rcbf[5, 5:tspan] <- rcbf[5, 5:tspan] - rcbf[2, 5:tspan]
 rcbf[2, 5:tspan] <- rcbf[2, 5:tspan] - rcbf[1, 5:tspan]
 rcbf[3, 5:tspan] <- rcbf[3, 5:tspan] - rcbf[1, 5:tspan]
