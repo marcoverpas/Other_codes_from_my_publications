@@ -1,3 +1,5 @@
+# Note: run cbdc_model_web.R first, then run this script only once (it overwrites the model matrices with normalised values; re-run the model before running it again).
+
 # Upload libraries
 library(tidyverse)
 library(ggplot2)
